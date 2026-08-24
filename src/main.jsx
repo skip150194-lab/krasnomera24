@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
-const SUPABASE_URL = "https://tjxumwgktffnfgpdka.supabase.co";
+const SUPABASE_URL =
+  "https://tjxumwgktffnfgpdka.supabase.co";
+
 const SUPABASE_KEY =
   "sb_publishable_29-OjXwd3B9rGcPg06If4Q_1R8-DjQh";
 
@@ -10,7 +12,7 @@ const API_URL = `${SUPABASE_URL}/rest/v1/numbers`;
 
 const FALLBACK_NUMBERS = [
   {
-    id: "package-1",
+    id: "package-333",
     number: "С333ОК24 + С333ОК124",
     price: 1300000,
     category: "Комплекты",
@@ -18,7 +20,7 @@ const FALLBACK_NUMBERS = [
     regionCode: "24",
   },
   {
-    id: "999",
+    id: "u999tt24",
     number: "У999ТТ",
     price: 550000,
     category: "Одинаковые цифры",
@@ -26,7 +28,7 @@ const FALLBACK_NUMBERS = [
     regionCode: "24",
   },
   {
-    id: "001",
+    id: "u001et24",
     number: "У001ЕТ",
     price: 550000,
     category: "Первая сотня",
@@ -35,10 +37,12 @@ const FALLBACK_NUMBERS = [
   },
 ];
 
-function formatPrice(price) {
-  const value = Number(price || 0);
+/* =========================
+   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+========================= */
 
-  return `${value.toLocaleString("ru-RU")} ₽`;
+function formatPrice(price) {
+  return `${Number(price || 0).toLocaleString("ru-RU")} ₽`;
 }
 
 function getLevel(item) {
@@ -62,78 +66,102 @@ function normalizeCategory(category) {
 
   const value = String(category).trim();
 
-  const names = {
-    "Первая сотня": "Первая сотня",
-    "Одинаковые цифры": "Одинаковые цифры",
-    "Комплекты": "Комплекты",
-    "Красивые буквы": "Красивые буквы",
-    "Зеркальные": "Зеркальные",
-    "Одинаковые буквы": "Одинаковые буквы",
+  const aliases = {
+    "первая сотня": "Первая сотня",
+    "одинаковые цифры": "Одинаковые цифры",
+    "комплекты": "Комплекты",
+    "красивые буквы": "Красивые буквы",
+    "зеркальные": "Зеркальные",
+    "одинаковые буквы": "Одинаковые буквы",
   };
 
-  return names[value] || value;
+  return aliases[value.toLowerCase()] || value;
 }
 
 function normalizeNumber(item, index) {
   return {
-    id: item.id ?? `${item.number ?? "number"}-${index}`,
+    id:
+      item?.id ??
+      `${item?.number || item?.plate || "number"}-${index}`,
+
     number:
-      item.number ??
-      item.plate ??
-      item.name ??
-      item.номер ??
+      item?.number ??
+      item?.plate ??
+      item?.name ??
+      item?.["номер"] ??
       "",
-    price: Number(item.price ?? 0),
+
+    price: Number(item?.price ?? 0),
+
     category: normalizeCategory(
-      item.category ?? item.type ?? item.category_name
+      item?.category ??
+        item?.type ??
+        item?.category_name
     ),
+
     region:
-      item.region ??
-      item.region_name ??
+      item?.region ??
+      item?.region_name ??
       "Красноярский край",
+
     regionCode:
-      item.region_code ??
-      item.regionCode ??
-      item.code ??
+      item?.region_code ??
+      item?.regionCode ??
+      item?.code ??
       "24",
-    reserved: Boolean(item.reserved),
-    description: item.description ?? "",
+
+    reserved:
+      Boolean(item?.reserved) ||
+      item?.status === "reserved" ||
+      item?.status === "Продан",
+
+    description: item?.description ?? "",
+
+    phone: item?.phone ?? "",
+    telegram: item?.telegram ?? "",
   };
 }
 
-function getUniqueNumbers(items) {
-  const map = new Map();
+/*
+ * Убираем настоящие дубли.
+
+ * Например, если Supabase отдаёт:
+ *
+ * С333ОК24 + С333ОК124
+ * С333ОК24 + С333ОК124
+ * С333ОК24 + С333ОК124
+ *
+ * останется только одна карточка.
+
+ * Разные номера с одинаковой ценой НЕ удаляются.
+ */
+function removeDuplicates(items) {
+  const result = [];
+  const keys = new Set();
 
   for (const item of items) {
-    const normalized = item;
-
-    const number = String(normalized.number || "")
+    const number = String(item.number || "")
       .trim()
-      .toUpperCase();
+      .toUpperCase()
+      .replace(/\s+/g, " ");
 
-    const category = String(normalized.category || "")
+    const category = String(item.category || "")
       .trim()
       .toLowerCase();
 
-    const price = Number(normalized.price || 0);
+    const price = Number(item.price || 0);
 
-    /*
-     * Один и тот же номер/комплект с одинаковой ценой
-     * считаем одной карточкой.
-     *
-     * Это как раз убирает повторение:
-     * С333ОК24 + С333ОК124
-     * С333ОК24 + С333ОК124
-     * С333ОК24 + С333ОК124
-     */
     const key = `${category}|${number}|${price}`;
 
-    if (!map.has(key)) {
-      map.set(key, normalized);
+    if (keys.has(key)) {
+      continue;
     }
+
+    keys.add(key);
+    result.push(item);
   }
 
-  return Array.from(map.values());
+  return result;
 }
 
 function isReserved(item) {
@@ -144,10 +172,17 @@ function isReserved(item) {
   );
 }
 
+/* =========================
+   ГОСУДАРСТВЕННЫЙ НОМЕР
+========================= */
+
 function Plate({ number, regionCode }) {
   const text = String(number || "").trim();
 
-  const parts = text.split("+").map((part) => part.trim());
+  const parts = text
+    .split("+")
+    .map((part) => part.trim())
+    .filter(Boolean);
 
   return (
     <div className="plate-wrapper">
@@ -156,7 +191,9 @@ function Plate({ number, regionCode }) {
           {parts.map((part, index) => (
             <React.Fragment key={`${part}-${index}`}>
               {index > 0 && (
-                <span className="plate-plus"> + </span>
+                <span className="plate-plus">
+                  {" + "}
+                </span>
               )}
 
               <span>{part}</span>
@@ -172,6 +209,10 @@ function Plate({ number, regionCode }) {
     </div>
   );
 }
+
+/* =========================
+   КАРТОЧКА НОМЕРА
+========================= */
 
 function NumberCard({
   item,
@@ -196,7 +237,7 @@ function NumberCard({
             favorite ? "active" : ""
           }`}
           onClick={() => onFavorite(item.id)}
-          aria-label="Добавить в избранное"
+          aria-label="Избранное"
         >
           {favorite ? "♥" : "♡"}
         </button>
@@ -204,7 +245,9 @@ function NumberCard({
 
       <div className="number-info">
         {level && (
-          <div className={`level level-${level.toLowerCase()}`}>
+          <div
+            className={`level level-${level.toLowerCase()}`}
+          >
             {level}
           </div>
         )}
@@ -249,29 +292,19 @@ function NumberCard({
   );
 }
 
-function EmptyState({ search, loading }) {
-  if (loading) {
-    return (
-      <div className="empty-state">
-        Загрузка номеров...
-      </div>
-    );
-  }
-
-  return (
-    <div className="empty-state">
-      {search
-        ? "Номеров по вашему запросу не найдено."
-        : "Номера пока не добавлены."}
-    </div>
-  );
-}
+/* =========================
+   APP
+========================= */
 
 function App() {
   const [numbers, setNumbers] = useState([]);
+
   const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState("");
+
   const [filter, setFilter] = useState("Все");
+
   const [favorites, setFavorites] = useState(() => {
     try {
       const saved = localStorage.getItem(
@@ -287,7 +320,12 @@ function App() {
   const [selectedNumber, setSelectedNumber] =
     useState(null);
 
-  const [activeTab, setActiveTab] = useState("catalog");
+  const [activeTab, setActiveTab] =
+    useState("catalog");
+
+  /* =========================
+     ЗАГРУЗКА ИЗ SUPABASE
+  ========================= */
 
   async function loadNumbers() {
     setLoading(true);
@@ -317,21 +355,28 @@ function App() {
         ? data.map(normalizeNumber)
         : [];
 
-      const unique = getUniqueNumbers(normalized);
+      const unique = removeDuplicates(normalized);
 
-      /*
-       * Если база вернула данные — используем базу.
-       * Если таблица пустая — показываем тестовые данные.
-       */
-      setNumbers(
-        unique.length > 0
-          ? unique
-          : getUniqueNumbers(FALLBACK_NUMBERS)
-      );
+      if (unique.length > 0) {
+        setNumbers(unique);
+      } else {
+        setNumbers(
+          removeDuplicates(
+            FALLBACK_NUMBERS.map(normalizeNumber)
+          )
+        );
+      }
     } catch (error) {
-      console.error("Ошибка загрузки номеров:", error);
+      console.error(
+        "Ошибка загрузки номеров:",
+        error
+      );
 
-      setNumbers(getUniqueNumbers(FALLBACK_NUMBERS));
+      setNumbers(
+        removeDuplicates(
+          FALLBACK_NUMBERS.map(normalizeNumber)
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -341,6 +386,10 @@ function App() {
     loadNumbers();
   }, []);
 
+  /* =========================
+     СОХРАНЕНИЕ ИЗБРАННОГО
+  ========================= */
+
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -348,23 +397,25 @@ function App() {
         JSON.stringify(favorites)
       );
     } catch {
-      // Ничего не делаем, если localStorage недоступен
+      // localStorage недоступен
     }
   }, [favorites]);
 
   function toggleFavorite(id) {
     setFavorites((current) => {
       if (current.includes(id)) {
-        return current.filter((item) => item !== id);
+        return current.filter(
+          (item) => item !== id
+        );
       }
 
       return [...current, id];
     });
   }
 
-  function handleDetails(item) {
-    setSelectedNumber(item);
-  }
+  /* =========================
+     ФИЛЬТРАЦИЯ
+  ========================= */
 
   const filteredNumbers = useMemo(() => {
     let result = [...numbers];
@@ -385,10 +436,14 @@ function App() {
 
     if (query) {
       result = result.filter((item) => {
-        const number = String(item.number || "").toLowerCase();
+        const number = String(
+          item.number || ""
+        ).toLowerCase();
+
         const category = String(
           item.category || ""
         ).toLowerCase();
+
         const region = String(
           item.region || ""
         ).toLowerCase();
@@ -410,6 +465,55 @@ function App() {
     );
   }, [numbers, favorites]);
 
+  /* =========================
+     ГЛАВНАЯ
+  ========================= */
+
+  function renderHome() {
+    return (
+      <section className="home-section">
+        <div className="hero-card">
+          <div className="hero-region">
+            КРАСНОЯРСКИЙ КРАЙ
+          </div>
+
+          <h1>Красивые номера 24</h1>
+
+          <p>
+            Подберите номер, который запомнят.
+          </p>
+
+          <button
+            type="button"
+            onClick={() =>
+              setActiveTab("catalog")
+            }
+          >
+            Смотреть каталог
+          </button>
+        </div>
+
+        <div className="home-stats">
+          <div>
+            <strong>{numbers.length}</strong>
+            <span>номеров</span>
+          </div>
+
+          <div>
+            <strong>
+              {favoriteNumbers.length}
+            </strong>
+            <span>избранных</span>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  /* =========================
+     КАТАЛОГ
+  ========================= */
+
   function renderCatalog() {
     return (
       <>
@@ -421,7 +525,9 @@ function App() {
           </div>
 
           <div className="search-row">
-            <span className="search-icon">⌕</span>
+            <span className="search-icon">
+              ⌕
+            </span>
 
             <input
               type="text"
@@ -437,7 +543,9 @@ function App() {
             <button
               type="button"
               className={
-                filter === "Все" ? "selected" : ""
+                filter === "Все"
+                  ? "selected"
+                  : ""
               }
               onClick={() => setFilter("Все")}
             >
@@ -447,9 +555,13 @@ function App() {
             <button
               type="button"
               className={
-                filter === "Premium" ? "selected" : ""
+                filter === "Premium"
+                  ? "selected"
+                  : ""
               }
-              onClick={() => setFilter("Premium")}
+              onClick={() =>
+                setFilter("Premium")
+              }
             >
               Premium
             </button>
@@ -457,9 +569,13 @@ function App() {
             <button
               type="button"
               className={
-                filter === "VIP" ? "selected" : ""
+                filter === "VIP"
+                  ? "selected"
+                  : ""
               }
-              onClick={() => setFilter("VIP")}
+              onClick={() =>
+                setFilter("VIP")
+              }
             >
               VIP
             </button>
@@ -467,19 +583,26 @@ function App() {
         </section>
 
         <section className="numbers-list">
-          {filteredNumbers.length === 0 ? (
-            <EmptyState
-              search={Boolean(search)}
-              loading={loading}
-            />
+          {loading ? (
+            <div className="empty-state">
+              Загрузка номеров...
+            </div>
+          ) : filteredNumbers.length === 0 ? (
+            <div className="empty-state">
+              {search
+                ? "Номеров по вашему запросу не найдено."
+                : "Номера пока не добавлены."}
+            </div>
           ) : (
             filteredNumbers.map((item) => (
               <NumberCard
                 key={item.id}
                 item={item}
-                favorite={favorites.includes(item.id)}
+                favorite={favorites.includes(
+                  item.id
+                )}
                 onFavorite={toggleFavorite}
-                onDetails={handleDetails}
+                onDetails={setSelectedNumber}
               />
             ))
           )}
@@ -487,6 +610,10 @@ function App() {
       </>
     );
   }
+
+  /* =========================
+     ИЗБРАННОЕ
+  ========================= */
 
   function renderFavorites() {
     return (
@@ -505,7 +632,7 @@ function App() {
                 item={item}
                 favorite={true}
                 onFavorite={toggleFavorite}
-                onDetails={handleDetails}
+                onDetails={setSelectedNumber}
               />
             ))}
           </div>
@@ -514,42 +641,9 @@ function App() {
     );
   }
 
-  function renderHome() {
-    return (
-      <section className="home-section">
-        <div className="hero-card">
-          <div className="hero-region">
-            КРАСНОЯРСКИЙ КРАЙ
-          </div>
-
-          <h1>Красивые номера 24</h1>
-
-          <p>
-            Подберите номер, который запомнят.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("catalog")}
-          >
-            Смотреть каталог
-          </button>
-        </div>
-
-        <div className="home-stats">
-          <div>
-            <strong>{numbers.length}</strong>
-            <span>номеров</span>
-          </div>
-
-          <div>
-            <strong>{favoriteNumbers.length}</strong>
-            <span>в избранном</span>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  /* =========================
+     ЗАЯВКИ
+  ========================= */
 
   function renderRequests() {
     return (
@@ -563,6 +657,10 @@ function App() {
       </section>
     );
   }
+
+  /* =========================
+     ПРОФИЛЬ
+  ========================= */
 
   function renderProfile() {
     return (
@@ -582,6 +680,10 @@ function App() {
     );
   }
 
+  /* =========================
+     ОСНОВНОЙ ЭКРАН
+  ========================= */
+
   return (
     <div className="app">
       <main className="content">
@@ -589,20 +691,21 @@ function App() {
           КРАСНОЯРСКИЙ КРАЙ
         </div>
 
-        <header className="app-header">
+        <header className="main-header">
           <h1>Красивые номера 24</h1>
 
           <button
             type="button"
             className="refresh-button"
             onClick={loadNumbers}
-            title="Обновить"
+            aria-label="Обновить"
           >
             ⟳
           </button>
         </header>
 
-        {activeTab === "home" && renderHome()}
+        {activeTab === "home" &&
+          renderHome()}
 
         {activeTab === "catalog" &&
           renderCatalog()}
@@ -617,11 +720,17 @@ function App() {
           renderProfile()}
       </main>
 
+      {/* =========================
+          НИЖНЯЯ НАВИГАЦИЯ
+      ========================= */}
+
       <nav className="bottom-nav">
         <button
           type="button"
           className={
-            activeTab === "home" ? "active" : ""
+            activeTab === "home"
+              ? "active"
+              : ""
           }
           onClick={() => setActiveTab("home")}
         >
@@ -632,9 +741,13 @@ function App() {
         <button
           type="button"
           className={
-            activeTab === "catalog" ? "active" : ""
+            activeTab === "catalog"
+              ? "active"
+              : ""
           }
-          onClick={() => setActiveTab("catalog")}
+          onClick={() =>
+            setActiveTab("catalog")
+          }
         >
           <span className="nav-icon">▦</span>
           <span>Каталог</span>
@@ -643,24 +756,28 @@ function App() {
         <button
           type="button"
           className={
-            activeTab === "favorites" ? "active" : ""
+            activeTab === "favorites"
+              ? "active"
+              : ""
           }
           onClick={() =>
             setActiveTab("favorites")
           }
         >
-          <span className="nav-icon">
-            {favorites.length > 0 ? "♥" : "♡"}
-          </span>
+          <span className="nav-icon">♡</span>
           <span>Избранное</span>
         </button>
 
         <button
           type="button"
           className={
-            activeTab === "requests" ? "active" : ""
+            activeTab === "requests"
+              ? "active"
+              : ""
           }
-          onClick={() => setActiveTab("requests")}
+          onClick={() =>
+            setActiveTab("requests")
+          }
         >
           <span className="nav-icon">□</span>
           <span>Заявки</span>
@@ -669,19 +786,29 @@ function App() {
         <button
           type="button"
           className={
-            activeTab === "profile" ? "active" : ""
+            activeTab === "profile"
+              ? "active"
+              : ""
           }
-          onClick={() => setActiveTab("profile")}
+          onClick={() =>
+            setActiveTab("profile")
+          }
         >
           <span className="nav-icon">♙</span>
           <span>Профиль</span>
         </button>
       </nav>
 
+      {/* =========================
+          ОКНО "ПОДРОБНЕЕ"
+      ========================= */}
+
       {selectedNumber && (
         <div
           className="modal-overlay"
-          onClick={() => setSelectedNumber(null)}
+          onClick={() =>
+            setSelectedNumber(null)
+          }
         >
           <div
             className="modal"
@@ -699,49 +826,63 @@ function App() {
               ×
             </button>
 
-            <div className="modal-title">
-              {selectedNumber.category}
-            </div>
-
             <Plate
               number={selectedNumber.number}
-              regionCode={selectedNumber.regionCode}
+              regionCode={
+                selectedNumber.regionCode
+              }
             />
 
-            <div className="modal-details">
-              <div>
-                <span>Категория</span>
-                <strong>
-                  {selectedNumber.category}
-                </strong>
-              </div>
-
-              <div>
-                <span>Регион</span>
-                <strong>
-                  {selectedNumber.region} ·{" "}
-                  {selectedNumber.regionCode}
-                </strong>
-              </div>
-
-              <div>
-                <span>Стоимость</span>
-                <strong>
-                  {formatPrice(selectedNumber.price)}
-                </strong>
-              </div>
+            <div className="modal-level">
+              {getLevel(selectedNumber)}
             </div>
+
+            <h3>
+              {selectedNumber.category}
+            </h3>
+
+            <div className="modal-region">
+              {selectedNumber.region}
+              {" · регион "}
+              {selectedNumber.regionCode}
+            </div>
+
+            <div className="modal-price">
+              {formatPrice(
+                selectedNumber.price
+              )}
+            </div>
+
+            {selectedNumber.description && (
+              <p className="modal-description">
+                {selectedNumber.description}
+              </p>
+            )}
 
             <button
               type="button"
-              className="request-button"
+              className="details-button modal-action"
               onClick={() => {
-                alert(
-                  "Заявка на номер принята. Свяжитесь с менеджером для оформления."
+                toggleFavorite(
+                  selectedNumber.id
                 );
               }}
             >
-              Оставить заявку
+              {favorites.includes(
+                selectedNumber.id
+              )
+                ? "Убрать из избранного"
+                : "Добавить в избранное"}
+            </button>
+
+            <button
+              type="button"
+              className="details-button"
+              onClick={() =>
+                setSelectedNumber(null)
+              }
+            >
+              Закрыть
             </button>
           </div>
         </div>
@@ -750,16 +891,17 @@ function App() {
   );
 }
 
-const rootElement = document.getElementById("root");
+/* =========================
+   ЗАПУСК REACT
+========================= */
 
-if (!rootElement) {
-  throw new Error(
-    'Не найден элемент <div id="root"></div> в index.html'
+const rootElement =
+  document.getElementById("root");
+
+if (rootElement) {
+  createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
   );
 }
-
-createRoot(rootElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
