@@ -1,237 +1,643 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import "./styles.css";
+import "./index.css";
 
-const TG = window.Telegram?.WebApp;
+const SUPABASE_URL = "https://tjxuumgwkttfnfgpdkaj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_29-OjXwd3B9rGcPGo6IF4Q_1R8-DjQh";
 
-const NUMBERS = [
-  { id: 1, plate: "А777АА", region: "24", category: "Premium", price: 2500000, tags: ["777", "три одинаковые"] },
-  { id: 2, plate: "М001ММ", region: "24", category: "VIP", price: 1200000, tags: ["001", "зеркальный"] },
-  { id: 3, plate: "В555ВВ", region: "24", category: "VIP", price: 950000, tags: ["555", "три одинаковые"] },
-  { id: 4, plate: "К007КК", region: "24", category: "Premium", price: 1800000, tags: ["007", "зеркальный"] },
-  { id: 5, plate: "О100ОО", region: "24", category: "VIP", price: 850000, tags: ["100", "круглое число"] },
-  { id: 6, plate: "Е888ЕЕ", region: "24", category: "Premium", price: 2100000, tags: ["888", "три одинаковые"] },
-  { id: 7, plate: "Н101НН", region: "24", category: "VIP", price: 720000, tags: ["101", "зеркальный"] },
-  { id: 8, plate: "Т777ТТ", region: "24", category: "Premium", price: 2300000, tags: ["777", "три одинаковые"] }
+const TABLE_NAME = "numbers";
+
+// ------------------------------------------------------------
+// Перевод латинских букв из CSV в российские буквы номера
+// ------------------------------------------------------------
+
+const LATIN_TO_CYRILLIC = {
+  A: "А",
+  B: "В",
+  C: "С",
+  E: "Е",
+  H: "Н",
+  K: "К",
+  M: "М",
+  O: "О",
+  P: "Р",
+  T: "Т",
+  X: "Х",
+  Y: "У",
+};
+
+function displayNumber(value) {
+  if (!value) return "";
+
+  return String(value)
+    .split("")
+    .map((char) => LATIN_TO_CYRILLIC[char] || char)
+    .join("");
+}
+
+// ------------------------------------------------------------
+// Нормализация поиска
+// ------------------------------------------------------------
+
+function normalize(value) {
+  return String(value || "")
+    .toUpperCase()
+    .replace(/\s+/g, "")
+    .replace(/[^A-ZА-Я0-9]/g, "");
+}
+
+function formatPrice(value) {
+  const number = Number(value || 0);
+
+  return new Intl.NumberFormat("ru-RU").format(number) + " ₽";
+}
+
+// ------------------------------------------------------------
+// Категории
+// ------------------------------------------------------------
+
+const CATEGORY_ORDER = [
+  "Все",
+  "Первая сотня",
+  "Одинаковые цифры",
+  "Комплекты",
+  "Сотни",
+  "Буквы",
+  "124/124;224/224",
+  "Зеркала",
+  "Прочее",
+  "Прицеп",
+  "Мото",
 ];
 
-const money = (n) => new Intl.NumberFormat("ru-RU").format(n) + " ₽";
+function categoryLabel(category) {
+  if (!category) return "Прочее";
+  return category;
+}
 
-function Plate({ item, large = false }) {
+// ------------------------------------------------------------
+// Supabase REST
+// ------------------------------------------------------------
+
+async function loadNumbers() {
+  const url =
+    `${SUPABASE_URL}/rest/v1/${TABLE_NAME}` +
+    "?select=id,created_at,number,price,category,status" +
+    "&order=id.asc";
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+
+    throw new Error(
+      `Supabase ${response.status}: ${text || "Ошибка загрузки данных"}`
+    );
+  }
+
+  return response.json();
+}
+
+// ------------------------------------------------------------
+// Иконки
+// ------------------------------------------------------------
+
+function SearchIcon() {
   return (
-    <div className={"plate " + (large ? "plate-large" : "")}>
-      <span className="plate-main">{item.plate}</span>
-      <span className="plate-region">{item.region}<small> RUS</small></span>
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-4-4" />
+    </svg>
+  );
+}
+
+function HeartIcon({ filled = false }) {
+  return (
+    <svg
+      width="30"
+      height="30"
+      viewBox="0 0 24 24"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <path d="M20.8 8.9c0 5.5-8.8 10.2-8.8 10.2S3.2 14.4 3.2 8.9A4.7 4.7 0 0 1 8 4.2c1.4 0 2.7.7 4 2 1.3-1.3 2.6-2 4-2a4.7 4.7 0 0 1 4.8 4.7Z" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
+  );
+}
+
+// ------------------------------------------------------------
+// Автомобильный номер
+// ------------------------------------------------------------
+
+function NumberPlate({ value }) {
+  const number = displayNumber(value);
+
+  // Обычный номер типа А777АА24
+  // Комплект и прицеп/мото тоже отображаются аккуратно.
+  const match = number.match(/^([А-Я])(\d{3})([А-Я]{2})(\d{2,3})$/);
+
+  if (!match) {
+    return (
+      <div className="plate">
+        <div className="plate-main">{number}</div>
+        <div className="plate-country">
+          <strong>RUS</strong>
+        </div>
+      </div>
+    );
+  }
+
+  const [, letter, digits, letters, region] = match;
+
+  return (
+    <div className="plate">
+      <div className="plate-main">
+        <span>{letter}</span>
+        <span>{digits}</span>
+        <span>{letters}</span>
+      </div>
+
+      <div className="plate-region">
+        <strong>{region}</strong>
+        <small>RUS</small>
+      </div>
     </div>
   );
 }
 
+// ------------------------------------------------------------
+// Основное приложение
+// ------------------------------------------------------------
+
 function App() {
-  const [tab, setTab] = useState("home");
-  const [query, setQuery] = useState("");
+  const [numbers, setNumbers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Все");
-  const [selected, setSelected] = useState(null);
-  const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem("favorites24") || "[]"));
-  const [requests, setRequests] = useState(() => JSON.parse(localStorage.getItem("requests24") || "[]"));
-  const [toast, setToast] = useState("");
+
+  const [selectedNumber, setSelectedNumber] = useState(null);
+
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("grz124_favorites") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  // ----------------------------------------------------------
+  // Загрузка номеров
+  // ----------------------------------------------------------
+
+  async function refreshNumbers() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await loadNumbers();
+
+      setNumbers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Не удалось загрузить номера");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    if (TG) {
-      TG.ready();
-      TG.expand();
-      try {
-        TG.setHeaderColor("#0b0b0e");
-        TG.setBackgroundColor("#0b0b0e");
-      } catch {}
-    }
+    refreshNumbers();
   }, []);
 
-  useEffect(() => localStorage.setItem("favorites24", JSON.stringify(favorites)), [favorites]);
-  useEffect(() => localStorage.setItem("requests24", JSON.stringify(requests)), [requests]);
+  // ----------------------------------------------------------
+  // Избранное
+  // ----------------------------------------------------------
 
-  const filtered = useMemo(() => {
-    const q = query.toLowerCase().replaceAll(" ", "");
-    return NUMBERS.filter((n) => {
-      const matchQuery = !q || n.plate.toLowerCase().replaceAll(" ", "").includes(q) || n.tags.some(t => t.includes(q));
-      const matchCat = category === "Все" || n.category === category;
-      return matchQuery && matchCat;
+  function toggleFavorite(id) {
+    setFavorites((previous) => {
+      const next = previous.includes(id)
+        ? previous.filter((item) => item !== id)
+        : [...previous, id];
+
+      localStorage.setItem("grz124_favorites", JSON.stringify(next));
+
+      return next;
     });
-  }, [query, category]);
+  }
 
-  const toggleFavorite = (id) => {
-    setFavorites(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  };
+  // ----------------------------------------------------------
+  // Фильтрация
+  // ----------------------------------------------------------
 
-  const addRequest = (item) => {
-    const exists = requests.some(r => r.numberId === item.id && r.status !== "Завершена");
-    if (!exists) {
-      setRequests(prev => [{ id: Date.now(), numberId: item.id, createdAt: new Date().toLocaleDateString("ru-RU"), status: "Новая" }, ...prev]);
-    }
-    setSelected(null);
-    setToast("Заявка отправлена");
-    setTimeout(() => setToast(""), 2200);
-    if (TG) {
-      try { TG.HapticFeedback.notificationOccurred("success"); } catch {}
-    }
-  };
+  const filteredNumbers = useMemo(() => {
+    const query = normalize(search);
 
-  const openSupport = () => {
-    setToast("Свяжитесь с менеджером через бота");
-    setTimeout(() => setToast(""), 2200);
-  };
+    return numbers.filter((item) => {
+      const itemNumber = normalize(item.number);
+      const itemDisplayNumber = normalize(displayNumber(item.number));
+
+      const matchesSearch =
+        !query ||
+        itemNumber.includes(query) ||
+        itemDisplayNumber.includes(query);
+
+      const matchesCategory =
+        category === "Все" || item.category === category;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [numbers, search, category]);
+
+  // ----------------------------------------------------------
+  // Доступные категории из БД
+  // ----------------------------------------------------------
+
+  const categories = useMemo(() => {
+    const existing = new Set(
+      numbers
+        .map((item) => item.category)
+        .filter(Boolean)
+    );
+
+    const ordered = CATEGORY_ORDER.filter(
+      (item) => item === "Все" || existing.has(item)
+    );
+
+    // Если в БД появится новая категория,
+    // она тоже автоматически появится.
+    const additional = [...existing].filter(
+      (item) => !CATEGORY_ORDER.includes(item)
+    );
+
+    return [...ordered, ...additional];
+  }, [numbers]);
+
+  // ----------------------------------------------------------
+  // Статистика
+  // ----------------------------------------------------------
+
+  const availableCount = numbers.filter(
+    (item) => item.status !== "reserved"
+  ).length;
+
+  const reservedCount = numbers.filter(
+    (item) => item.status === "reserved"
+  ).length;
+
+  // ----------------------------------------------------------
+  // Экран загрузки
+  // ----------------------------------------------------------
+
+  if (loading) {
+    return (
+      <div className="app">
+        <div className="loading-screen">
+          <div className="loader"></div>
+
+          <h2>GRZ124</h2>
+
+          <p>Загружаем каталог номеров...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------------
+  // Ошибка
+  // ----------------------------------------------------------
+
+  if (error) {
+    return (
+      <div className="app">
+        <div className="error-screen">
+          <div className="error-icon">!</div>
+
+          <h2>Не удалось загрузить каталог</h2>
+
+          <p>{error}</p>
+
+          <button
+            className="primary-button"
+            onClick={refreshNumbers}
+          >
+            Повторить
+          </button>
+
+          <small>
+            Проверь RLS policy таблицы numbers и доступ SELECT
+            для anon.
+          </small>
+        </div>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------------
+  // Основной интерфейс
+  // ----------------------------------------------------------
 
   return (
     <div className="app">
-      <header className="topbar">
-        <div>
-          <div className="eyebrow">КРАСНОЯРСКИЙ КРАЙ</div>
-          <h1>Красивые номера <b>24</b></h1>
-        </div>
-        <button className="icon-btn" onClick={openSupport}>◉</button>
-      </header>
+      <div className="page">
 
-      {tab === "home" && (
-        <main className="page">
-          <section className="hero">
-            <div className="hero-glow" />
-            <div className="eyebrow">PREMIUM АВТОНОМЕРА</div>
-            <h2>Подбери свой<br/>красивый номер</h2>
-            <p>Каталог комбинаций для Красноярского края</p>
-            <button className="primary" onClick={() => setTab("catalog")}>Найти номер <span>⌕</span></button>
-          </section>
+        {/* HEADER */}
 
-          <section className="section">
-            <div className="section-title"><h3>Популярные комбинации</h3><button onClick={() => setTab("catalog")}>Все →</button></div>
-            <div className="chips">
-              {["777","001","555","100","888","007"].map(x => <button key={x} onClick={() => {setQuery(x); setTab("catalog")}}>{x}</button>)}
+        <header className="header">
+          <div>
+            <div className="region-title">
+              КРАСНОЯРСКИЙ КРАЙ
             </div>
-          </section>
 
-          <section className="category-grid">
-            {[
-              ["💎","Premium","Эксклюзивные номера","Premium"],
-              ["⭐","VIP","Очень красивые сочетания","VIP"],
-              ["🔥","Популярные","Хиты каталога","Все"],
-              ["🆕","Новинки","Недавно добавленные","Все"]
-            ].map(([icon,title,sub,cat]) => (
-              <button className="category-card" key={title} onClick={() => {setCategory(cat); setTab("catalog")}}>
-                <span className="category-icon">{icon}</span><strong>{title}</strong><small>{sub}</small>
+            <h1>
+              Красивые номера <span>24</span>
+            </h1>
+          </div>
+
+          <button
+            className="header-button"
+            onClick={refreshNumbers}
+            title="Обновить"
+          >
+            ↻
+          </button>
+        </header>
+
+        {/* CATALOG */}
+
+        <main>
+          <div className="catalog-header">
+            <div>
+              <h2>Каталог номеров</h2>
+
+              <div className="stats">
+                <span>{availableCount} в наличии</span>
+
+                {reservedCount > 0 && (
+                  <span>{reservedCount} в брони</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* SEARCH */}
+
+          <div className="search-box">
+            <SearchIcon />
+
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Поиск: 777, 001..."
+              type="text"
+            />
+
+            {search && (
+              <button
+                className="clear-button"
+                onClick={() => setSearch("")}
+              >
+                ×
+              </button>
+            )}
+          </div>
+
+          {/* CATEGORIES */}
+
+          <div className="categories">
+            {categories.map((item) => (
+              <button
+                key={item}
+                className={
+                  category === item
+                    ? "category active"
+                    : "category"
+                }
+                onClick={() => setCategory(item)}
+              >
+                {item}
               </button>
             ))}
-          </section>
-
-          <div className="trust">
-            <span>⚡ Быстрый поиск</span><span>🔒 Надёжно</span><span>📍 Регион 24</span>
           </div>
-        </main>
-      )}
 
-      {tab === "catalog" && (
-        <main className="page">
-          <div className="page-title"><h2>Каталог номеров</h2><button className="filter-btn">☷</button></div>
-          <div className="search"><span>⌕</span><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Поиск: 777, 001..." /><button onClick={() => setQuery("")}>×</button></div>
-          <div className="chips">
-            {["Все","Premium","VIP"].map(c => <button className={category === c ? "active" : ""} key={c} onClick={() => setCategory(c)}>{c}</button>)}
-          </div>
-          <div className="list">
-            {filtered.map(item => (
-              <article className="number-card" key={item.id}>
-                <div className="card-top">
-                  <Plate item={item}/>
-                  <button className={"heart " + (favorites.includes(item.id) ? "liked" : "")} onClick={() => toggleFavorite(item.id)}>{favorites.includes(item.id) ? "♥" : "♡"}</button>
-                </div>
-                <div className="meta"><span className={"badge " + item.category.toLowerCase()}>{item.category}</span><strong>{money(item.price)}</strong></div>
-                <div className="muted">Красноярский край · регион 24</div>
-                <button className="secondary" onClick={() => setSelected(item)}>Подробнее</button>
-              </article>
-            ))}
-            {!filtered.length && <div className="empty">Ничего не найдено. Попробуйте другую комбинацию.</div>}
-          </div>
-        </main>
-      )}
+          {/* RESULT COUNT */}
 
-      {tab === "favorites" && (
-        <main className="page">
-          <div className="page-title"><h2>Избранное</h2></div>
-          <div className="list">
-            {NUMBERS.filter(n => favorites.includes(n.id)).map(item => (
-              <article className="number-card compact" key={item.id}>
-                <div className="card-top"><Plate item={item}/><button className="heart liked" onClick={() => toggleFavorite(item.id)}>♥</button></div>
-                <div className="meta"><span className={"badge " + item.category.toLowerCase()}>{item.category}</span><strong>{money(item.price)}</strong></div>
-              </article>
-            ))}
-            {!favorites.length && <div className="empty">Добавляйте номера в избранное, чтобы быстро вернуться к ним.</div>}
+          <div className="result-count">
+            Найдено: <strong>{filteredNumbers.length}</strong>
           </div>
-        </main>
-      )}
 
-      {tab === "requests" && (
-        <main className="page">
-          <div className="page-title"><h2>Мои заявки</h2></div>
-          <div className="list">
-            {requests.map(r => {
-              const item = NUMBERS.find(n => n.id === r.numberId);
-              return <article className="request-card" key={r.id}>
-                <Plate item={item}/>
-                <div><span className="status">{r.status}</span><div className="muted">{r.createdAt}</div><strong>{money(item.price)}</strong></div>
-              </article>
-            })}
-            {!requests.length && <div className="empty">Здесь появятся ваши заявки на номера.</div>}
-          </div>
-        </main>
-      )}
+          {/* CARDS */}
 
-      {tab === "profile" && (
-        <main className="page">
-          <div className="profile">
-            <div className="avatar">24</div>
-            <h2>Мой профиль</h2>
-            <p className="muted">Telegram-пользователь</p>
-          </div>
-          <div className="menu-card">
-            <button onClick={() => setTab("requests")}>📋 Мои заявки <span>›</span></button>
-            <button onClick={() => setTab("favorites")}>♥ Избранное <span>›</span></button>
-            <button onClick={openSupport}>💬 Поддержка <span>›</span></button>
-            <button>ℹ️ О приложении <span>›</span></button>
-          </div>
-        </main>
-      )}
+          {filteredNumbers.length === 0 ? (
+            <div className="empty">
+              <div className="empty-icon">⌕</div>
 
-      <nav className="bottom-nav">
-        {[
-          ["home","⌂","Главная"],
-          ["catalog","▦","Каталог"],
-          ["favorites","♡","Избранное"],
-          ["requests","▣","Заявки"],
-          ["profile","♙","Профиль"]
-        ].map(([id,icon,label]) => (
-          <button className={tab === id ? "nav-active" : ""} key={id} onClick={() => setTab(id)}>
-            <span>{icon}</span><small>{label}</small>
-          </button>
-        ))}
-      </nav>
+              <h3>Ничего не найдено</h3>
 
-      {selected && (
-        <div className="modal-backdrop" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelected(null)}>×</button>
-            <Plate item={selected} large/>
-            <span className={"badge " + selected.category.toLowerCase()}>{selected.category}</span>
-            <div className="modal-price">{money(selected.price)}</div>
-            <div className="detail-list">
-              <div><span>Регион</span><strong>24 · Красноярский край</strong></div>
-              <div><span>Комбинация</span><strong>{selected.tags.join(", ")}</strong></div>
-              <div><span>Статус</span><strong className="available">Доступен</strong></div>
+              <p>
+                Попробуй изменить запрос или выбрать другую
+                категорию.
+              </p>
             </div>
-            <p className="notice">Демонстрационные данные. Перед реальным запуском нужно подключить источник актуальных номеров и юридически корректную схему оформления.</p>
-            <button className="primary full" onClick={() => addRequest(selected)}>Оставить заявку</button>
+          ) : (
+            <div className="numbers-list">
+              {filteredNumbers.map((item) => {
+                const isReserved = item.status === "reserved";
+                const isFavorite = favorites.includes(item.id);
+
+                return (
+                  <article
+                    className={
+                      isReserved
+                        ? "number-card reserved"
+                        : "number-card"
+                    }
+                    key={item.id}
+                  >
+                    <div className="card-top">
+                      <NumberPlate value={item.number} />
+
+                      <button
+                        className={
+                          isFavorite
+                            ? "favorite active"
+                            : "favorite"
+                        }
+                        onClick={() =>
+                          toggleFavorite(item.id)
+                        }
+                        aria-label="Избранное"
+                      >
+                        <HeartIcon filled={isFavorite} />
+                      </button>
+                    </div>
+
+                    <div className="card-info">
+                      <div className="card-left">
+                        <div className="badge">
+                          {categoryLabel(item.category)}
+                        </div>
+
+                        {isReserved && (
+                          <div className="reserved-badge">
+                            Бронь
+                          </div>
+                        )}
+
+                        <div className="location">
+                          Красноярский край · регион 24
+                        </div>
+                      </div>
+
+                      <div className="price">
+                        {formatPrice(item.price)}
+                      </div>
+                    </div>
+
+                    <button
+                      className="details-button"
+                      onClick={() =>
+                        setSelectedNumber(item)
+                      }
+                    >
+                      Подробнее
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* DETAIL MODAL */}
+
+      {selectedNumber && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setSelectedNumber(null)}
+        >
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="modal-close"
+              onClick={() => setSelectedNumber(null)}
+            >
+              <CloseIcon />
+            </button>
+
+            <div className="modal-title">
+              <span>Номер</span>
+
+              <h2>
+                {displayNumber(selectedNumber.number)}
+              </h2>
+            </div>
+
+            <NumberPlate value={selectedNumber.number} />
+
+            <div className="modal-price">
+              {formatPrice(selectedNumber.price)}
+            </div>
+
+            <div className="modal-row">
+              <span>Категория</span>
+              <strong>
+                {categoryLabel(selectedNumber.category)}
+              </strong>
+            </div>
+
+            <div className="modal-row">
+              <span>Регион</span>
+              <strong>Красноярский край · 24</strong>
+            </div>
+
+            <div className="modal-row">
+              <span>Статус</span>
+
+              <strong
+                className={
+                  selectedNumber.status === "reserved"
+                    ? "status-reserved"
+                    : "status-available"
+                }
+              >
+                {selectedNumber.status === "reserved"
+                  ? "Забронирован"
+                  : "В наличии"}
+              </strong>
+            </div>
+
+            <div className="modal-actions">
+              {selectedNumber.status === "reserved" ? (
+                <button className="disabled-button" disabled>
+                  Номер забронирован
+                </button>
+              ) : (
+                <a
+                  className="primary-button"
+                  href={`https://t.me/Dremov767?text=${encodeURIComponent(
+                    `Здравствуйте! Интересует номер ${displayNumber(
+                      selectedNumber.number
+                    )} за ${formatPrice(selectedNumber.price)}`
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Написать продавцу
+                </a>
+              )}
+            </div>
+
+            <div className="modal-note">
+              Помощь с переоформлением · Быстро и без рисков
+            </div>
           </div>
         </div>
       )}
-
-      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+// ------------------------------------------------------------
+// Запуск
+// ------------------------------------------------------------
+
+createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
