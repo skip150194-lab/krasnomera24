@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
+import "./styles.css";
 
 const SUPABASE_URL = "https://tjxuumgwkttfnfgpdkaj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_29-OjXwd3B9rGcPGo6IF4Q_1R8-DjQh";
