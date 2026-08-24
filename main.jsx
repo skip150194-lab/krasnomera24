@@ -1,1185 +1,1088 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import "./styles.css";
 
-/* =========================
-   TELEGRAM
-========================= */
-
-const TG = window.Telegram?.WebApp;
-
-/* =========================
-   SUPABASE
-========================= */
+import "./index.css";
 
 const SUPABASE_URL = "https://tjxuumgwkttfnfgpdkaj.supabase.co";
-
-// ВСТАВЬ СЮДА СВОЙ PUBLISHABLE KEY
 const SUPABASE_KEY = "sb_publishable_29-OjXwd3B9rGcPGo6IF4Q_1R8-DjQh";
 
-/* =========================
-   HELPERS
-========================= */
+const API_URL = `${SUPABASE_URL}/rest/v1/numbers`;
 
-const money = (value) => {
-  return (
-    new Intl.NumberFormat("ru-RU").format(Number(value) || 0) + " ₽"
-  );
-};
-
-const normalize = (value) => {
-  return String(value || "")
-    .toLowerCase()
-    .replaceAll(" ", "")
-    .trim();
-};
-
-const categoryEmoji = (category) => {
-  const value = String(category || "").toLowerCase();
-
-  if (value.includes("одинаков")) return "🔥";
-  if (value.includes("зеркал")) return "🪞";
-  if (value.includes("букв")) return "🔤";
-  if (value.includes("комплект")) return "💎";
-  if (value.includes("прицеп")) return "🚚";
-  if (value.includes("мото")) return "🏍";
-  if (value.includes("сотн")) return "💯";
-  if (value.includes("124")) return "✨";
-
-  return "⭐";
-};
-
-/* =========================
-   SUPABASE LOAD
-========================= */
-
-async function loadNumbers() {
-  const url =
-    `${SUPABASE_URL}/rest/v1/numbers` +
-    `?select=id,number,price,category,status` +
-    `&order=id.asc`;
-
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Supabase error ${response.status}`);
-  }
-
-  const data = await response.json();
-
-  return data.map((item) => ({
-    id: item.id,
-    plate: item.number,
-    price: Number(item.price) || 0,
-    category: item.category || "Прочее",
-    status: item.status || "available",
-  }));
+function formatPrice(price) {
+  return `${Number(price || 0).toLocaleString("ru-RU")} ₽`;
 }
 
-/* =========================
-   PLATE
-========================= */
+function getLevel(item) {
+  const price = Number(item.price || 0);
 
-function Plate({ item, large = false }) {
+  if (price >= 400000) return "VIP";
+  if (price >= 200000) return "Premium";
+
+  return "";
+}
+
+function getCategoryName(category) {
+  const categories = {
+    "Первая сотня": "Первая сотня",
+    "Одинаковые цифры": "Одинаковые цифры",
+    "Комплекты": "Комплекты",
+    "Сотни": "Сотни",
+    "Буквы": "Буквы",
+    "124/124;224/224": "124 / 224",
+    "Зеркала": "Зеркала",
+    "Прочее": "Прочее",
+    "Прицеп": "Прицеп",
+    "Мото": "Мото",
+  };
+
+  return categories[category] || category || "Прочее";
+}
+
+function isReserved(status) {
   return (
-    <div className={`plate ${large ? "plate-large" : ""}`}>
-      <span className="plate-main">
-        {item.plate}
-      </span>
+    status === "reserved" ||
+    status === "bron" ||
+    status === "бронь"
+  );
+}
 
-      <span className="plate-region">
-        24
-        <small> RUS</small>
-      </span>
+function Plate({ number }) {
+  const value = String(number || "").trim();
+
+  // Обычный автомобильный номер:
+  // А777АА24
+  // Если это прицеп/мото — оставляем как есть.
+  const match = value.match(/^(.+?)(\d{2,3})$/);
+
+  if (!match) {
+    return <div className="plate">{value}</div>;
+  }
+
+  const lettersAndDigits = match[1];
+  const region = match[2];
+
+  return (
+    <div className="plate">
+      <div className="plate-main">{lettersAndDigits}</div>
+
+      <div className="plate-region">
+        <strong>{region}</strong>
+        <span>RUS</span>
+      </div>
     </div>
   );
 }
 
-/* =========================
-   APP
-========================= */
+function NumberCard({ item, favorite, onFavorite, onDetails }) {
+  const level = getLevel(item);
+  const reserved = isReserved(item.status);
+
+  return (
+    <div className={`number-card ${reserved ? "reserved-card" : ""}`}>
+      <div className="card-top">
+        <Plate number={item.number} />
+
+        <button
+          className={`favorite ${favorite ? "active" : ""}`}
+          onClick={() => onFavorite(item.id)}
+          aria-label="Добавить в избранное"
+        >
+          {favorite ? "♥" : "♡"}
+        </button>
+      </div>
+
+      <div className="card-middle">
+        <div className="card-info">
+          {level && (
+            <div className={`level ${level.toLowerCase()}`}>
+              {level}
+            </div>
+          )}
+
+          {reserved && (
+            <div className="level reserved">
+              Бронь
+            </div>
+          )}
+
+          <div className="location">
+            Красноярский край · регион 24
+          </div>
+
+          <div className="category">
+            {getCategoryName(item.category)}
+          </div>
+        </div>
+
+        <div className="price">
+          {formatPrice(item.price)}
+        </div>
+      </div>
+
+      <button
+        className="details-button"
+        onClick={() => onDetails(item)}
+      >
+        Подробнее
+      </button>
+    </div>
+  );
+}
 
 function App() {
-  const [tab, setTab] = useState("home");
-
-  const [query, setQuery] = useState("");
-
-  const [category, setCategory] = useState("Все");
-
-  const [selected, setSelected] = useState(null);
-
   const [numbers, setNumbers] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
+
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
 
   const [favorites, setFavorites] = useState(() => {
     try {
-      return JSON.parse(
-        localStorage.getItem("grz124_favorites") || "[]"
-      );
+      return JSON.parse(localStorage.getItem("grz124_favorites")) || [];
     } catch {
       return [];
     }
   });
 
-  const [requests, setRequests] = useState(() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("grz124_requests") || "[]"
-      );
-    } catch {
-      return [];
-    }
-  });
-
-  const [toast, setToast] = useState("");
-
-  /* =========================
-     TELEGRAM INIT
-  ========================= */
+  const [selectedNumber, setSelectedNumber] = useState(null);
 
   useEffect(() => {
-    if (!TG) return;
-
-    TG.ready();
-    TG.expand();
-
-    try {
-      TG.setHeaderColor("#09090b");
-      TG.setBackgroundColor("#09090b");
-    } catch {}
-
+    loadNumbers();
   }, []);
 
-  /* =========================
-     LOAD NUMBERS
-  ========================= */
+  async function loadNumbers() {
+    try {
+      setLoading(true);
+      setError("");
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function load() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const data = await loadNumbers();
-
-        if (mounted) {
-          setNumbers(data);
+      const response = await fetch(
+        `${API_URL}?select=*&order=id.asc`,
+        {
+          method: "GET",
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            Accept: "application/json",
+          },
         }
+      );
 
-      } catch (err) {
-        console.error(err);
-
-        if (mounted) {
-          setError(
-            "Не удалось загрузить каталог. Проверьте настройки Supabase."
-          );
-        }
-
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Ошибка загрузки номеров");
       }
+
+      const data = await response.json();
+
+      setNumbers(data || []);
+    } catch (err) {
+      console.error(err);
+      setError(
+        "Не удалось загрузить номера. Проверь подключение к Supabase."
+      );
+    } finally {
+      setLoading(false);
     }
+  }
 
-    load();
+  function toggleFavorite(id) {
+    setFavorites((current) => {
+      const next = current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id];
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+      localStorage.setItem(
+        "grz124_favorites",
+        JSON.stringify(next)
+      );
 
-  /* =========================
-     LOCAL STORAGE
-  ========================= */
-
-  useEffect(() => {
-    localStorage.setItem(
-      "grz124_favorites",
-      JSON.stringify(favorites)
-    );
-  }, [favorites]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "grz124_requests",
-      JSON.stringify(requests)
-    );
-  }, [requests]);
-
-  /* =========================
-     CATEGORIES
-  ========================= */
-
-  const categories = useMemo(() => {
-    const unique = Array.from(
-      new Set(
-        numbers
-          .map((item) => item.category)
-          .filter(Boolean)
-      )
-    );
-
-    return ["Все", ...unique];
-
-  }, [numbers]);
-
-  /* =========================
-     FILTER
-  ========================= */
+      return next;
+    });
+  }
 
   const filteredNumbers = useMemo(() => {
+    let result = [...numbers];
 
-    const search = normalize(query);
+    const query = search.trim().toLowerCase();
 
-    return numbers.filter((item) => {
+    if (query) {
+      result = result.filter((item) => {
+        const number = String(item.number || "").toLowerCase();
+        const category = String(item.category || "").toLowerCase();
 
-      const plate = normalize(item.plate);
-
-      const categoryValue = normalize(item.category);
-
-      const searchMatch =
-        !search ||
-        plate.includes(search) ||
-        categoryValue.includes(search);
-
-      const categoryMatch =
-        category === "Все" ||
-        item.category === category;
-
-      return searchMatch && categoryMatch;
-
-    });
-
-  }, [numbers, query, category]);
-
-  /* =========================
-     FAVORITES
-  ========================= */
-
-  const toggleFavorite = (id) => {
-
-    setFavorites((prev) => {
-
-      if (prev.includes(id)) {
-        return prev.filter((item) => item !== id);
-      }
-
-      return [...prev, id];
-
-    });
-
-  };
-
-  /* =========================
-     REQUEST
-  ========================= */
-
-  const addRequest = (item) => {
-
-    const alreadyExists = requests.some(
-      (request) =>
-        request.numberId === item.id &&
-        request.status !== "Завершена"
-    );
-
-    if (!alreadyExists) {
-
-      const newRequest = {
-        id: Date.now(),
-        numberId: item.id,
-        number: item.plate,
-        price: item.price,
-        createdAt: new Date().toLocaleDateString(
-          "ru-RU"
-        ),
-        status: "Новая",
-      };
-
-      setRequests((prev) => [
-        newRequest,
-        ...prev,
-      ]);
-
-    }
-
-    setSelected(null);
-
-    showToast("Заявка отправлена");
-
-    if (TG) {
-      try {
-        TG.HapticFeedback.notificationOccurred(
-          "success"
+        return (
+          number.includes(query) ||
+          category.includes(query)
         );
-      } catch {}
+      });
     }
 
-  };
+    if (filter === "premium") {
+      result = result.filter(
+        (item) => getLevel(item) === "Premium"
+      );
+    }
 
-  /* =========================
-     TOAST
-  ========================= */
+    if (filter === "vip") {
+      result = result.filter(
+        (item) => getLevel(item) === "VIP"
+      );
+    }
 
-  const showToast = (message) => {
+    if (filter === "favorites") {
+      result = result.filter((item) =>
+        favorites.includes(item.id)
+      );
+    }
 
-    setToast(message);
+    return result;
+  }, [numbers, search, filter, favorites]);
 
-    setTimeout(() => {
-      setToast("");
-    }, 2200);
-
-  };
-
-  /* =========================
-     SUPPORT
-  ========================= */
-
-  const openSupport = () => {
-
-    showToast(
-      "Свяжитесь с менеджером через Telegram"
-    );
-
-  };
-
-  /* =========================
-     HOME
-  ========================= */
-
-  const Home = () => {
-
-    return (
-      <main className="page">
-
-        <section className="hero">
-
-          <div className="hero-glow" />
-
-          <div className="eyebrow">
-            GRZ124 · КРАСНОЯРСКИЙ КРАЙ
+  return (
+    <div className="app">
+      <header className="header">
+        <div>
+          <div className="region-title">
+            КРАСНОЯРСКИЙ КРАЙ
           </div>
 
-          <h2>
-            Подбери свой
-            <br />
-            красивый номер
-          </h2>
-
-          <p>
-            Актуальный каталог красивых
-            государственных номеров
-          </p>
-
-          <button
-            className="primary"
-            onClick={() => setTab("catalog")}
-          >
-            Открыть каталог
-            <span>⌕</span>
-          </button>
-
-        </section>
-
-        <section className="section">
-
-          <div className="section-title">
-
-            <h3>
-              Категории
-            </h3>
-
-            <button
-              onClick={() => {
-                setCategory("Все");
-                setTab("catalog");
-              }}
-            >
-              Все →
-            </button>
-
-          </div>
-
-          <div className="chips">
-
-            {categories
-              .slice(0, 8)
-              .map((item) => (
-
-                <button
-                  key={item}
-                  onClick={() => {
-                    setCategory(item);
-                    setTab("catalog");
-                  }}
-                >
-                  {item}
-                </button>
-
-              ))}
-
-          </div>
-
-        </section>
-
-        <section className="category-grid">
-
-          {categories
-            .filter(
-              (item) => item !== "Все"
-            )
-            .slice(0, 4)
-            .map((item) => (
-
-              <button
-                className="category-card"
-                key={item}
-                onClick={() => {
-                  setCategory(item);
-                  setTab("catalog");
-                }}
-              >
-
-                <span className="category-icon">
-                  {categoryEmoji(item)}
-                </span>
-
-                <strong>
-                  {item}
-                </strong>
-
-                <small>
-                  Смотреть номера
-                </small>
-
-              </button>
-
-            ))}
-
-        </section>
-
-        <div className="trust">
-
-          <span>
-            ⚡ Актуальная база
-          </span>
-
-          <span>
-            🔒 Надёжно
-          </span>
-
-          <span>
-            📍 Регион 24
-          </span>
-
+          <h1>
+            Красивые номера <span>24</span>
+          </h1>
         </div>
 
-      </main>
-    );
+        <button className="header-button">
+          ◉
+        </button>
+      </header>
 
-  };
+      <main>
+        <section className="catalog-header">
+          <div>
+            <h2>Каталог номеров</h2>
 
-  /* =========================
-     CATALOG
-  ========================= */
+            <div className="total">
+              {loading
+                ? "Загрузка..."
+                : `${numbers.length} номеров`}
+            </div>
+          </div>
 
-  const Catalog = () => {
-
-    return (
-      <main className="page">
-
-        <div className="page-title">
-
-          <h2>
-            Каталог номеров
-          </h2>
-
-          <button
-            className="filter-btn"
-            onClick={() => {
-              setCategory("Все");
-              setQuery("");
-            }}
-          >
-            ☷
+          <button className="view-button">
+            ▦
           </button>
+        </section>
 
-        </div>
-
-        <div className="search">
-
-          <span>
-            ⌕
-          </span>
+        <div className="search-box">
+          <span className="search-icon">⌕</span>
 
           <input
-            value={query}
-            onChange={(e) =>
-              setQuery(e.target.value)
-            }
-            placeholder="Поиск номера..."
+            type="text"
+            placeholder="Поиск: 777, 001..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
 
-          {query && (
+          {search && (
             <button
-              onClick={() => setQuery("")}
+              className="clear-search"
+              onClick={() => setSearch("")}
             >
               ×
             </button>
           )}
-
         </div>
 
-        <div className="chips category-scroll">
+        <div className="filters">
+          <button
+            className={filter === "all" ? "selected" : ""}
+            onClick={() => setFilter("all")}
+          >
+            Все
+          </button>
 
-          {categories.map((item) => (
+          <button
+            className={filter === "premium" ? "selected" : ""}
+            onClick={() => setFilter("premium")}
+          >
+            Premium
+          </button>
 
-            <button
-              key={item}
-              className={
-                category === item
-                  ? "active"
-                  : ""
-              }
-              onClick={() =>
-                setCategory(item)
-              }
-            >
-              {item}
+          <button
+            className={filter === "vip" ? "selected" : ""}
+            onClick={() => setFilter("vip")}
+          >
+            VIP
+          </button>
+        </div>
+
+        {error && (
+          <div className="error-box">
+            <strong>Ошибка</strong>
+            <p>{error}</p>
+
+            <button onClick={loadNumbers}>
+              Повторить
             </button>
-
-          ))}
-
-        </div>
-
-        {loading && (
-          <div className="empty">
-            Загружаем каталог GRZ124...
           </div>
         )}
 
-        {error && (
-          <div className="empty">
-            {error}
+        {loading && !error && (
+          <div className="loading">
+            <div className="loader"></div>
+            <p>Загружаем номера...</p>
           </div>
         )}
 
         {!loading && !error && (
-          <div className="muted">
-            Найдено номеров:{" "}
-            <strong>
-              {filteredNumbers.length}
-            </strong>
-          </div>
-        )}
+          <>
+            <div className="catalog-count">
+              Найдено: <strong>{filteredNumbers.length}</strong>
+            </div>
 
-        <div className="list">
+            <div className="numbers-list">
+              {filteredNumbers.map((item) => (
+                <NumberCard
+                  key={item.id}
+                  item={item}
+                  favorite={favorites.includes(item.id)}
+                  onFavorite={toggleFavorite}
+                  onDetails={setSelectedNumber}
+                />
+              ))}
+            </div>
 
-          {!loading &&
-            !error &&
-            filteredNumbers.map((item) => (
-
-              <article
-                className="number-card"
-                key={item.id}
-              >
-
-                <div className="card-top">
-
-                  <Plate item={item} />
-
-                  <button
-                    className={
-                      "heart " +
-                      (
-                        favorites.includes(item.id)
-                          ? "liked"
-                          : ""
-                      )
-                    }
-                    onClick={() =>
-                      toggleFavorite(item.id)
-                    }
-                  >
-                    {favorites.includes(item.id)
-                      ? "♥"
-                      : "♡"}
-                  </button>
-
-                </div>
-
-                <div className="meta">
-
-                  <span className="badge">
-
-                    {categoryEmoji(item.category)}{" "}
-                    {item.category}
-
-                  </span>
-
-                  <strong>
-                    {money(item.price)}
-                  </strong>
-
-                </div>
-
-                <div className="muted">
-
-                  {item.status === "reserved"
-                    ? "🟡 Забронирован"
-                    : "🟢 В наличии"}
-
-                </div>
-
-                <button
-                  className="secondary"
-                  onClick={() =>
-                    setSelected(item)
-                  }
-                >
-                  Подробнее
-                </button>
-
-              </article>
-
-            ))}
-
-          {!loading &&
-            !error &&
-            filteredNumbers.length === 0 && (
-
+            {filteredNumbers.length === 0 && (
               <div className="empty">
+                <div className="empty-icon">⌕</div>
 
-                Ничего не найдено.
+                <h3>Номеров не найдено</h3>
 
-                <br />
-
-                Попробуйте другой номер
-                или категорию.
-
+                <p>
+                  Попробуй изменить поисковый запрос
+                </p>
               </div>
-
             )}
-
-        </div>
-
+          </>
+        )}
       </main>
-    );
-
-  };
-
-  /* =========================
-     FAVORITES
-  ========================= */
-
-  const Favorites = () => {
-
-    const favoriteNumbers =
-      numbers.filter((item) =>
-        favorites.includes(item.id)
-      );
-
-    return (
-      <main className="page">
-
-        <div className="page-title">
-
-          <h2>
-            Избранное
-          </h2>
-
-        </div>
-
-        <div className="list">
-
-          {favoriteNumbers.map((item) => (
-
-            <article
-              className="number-card"
-              key={item.id}
-            >
-
-              <div className="card-top">
-
-                <Plate item={item} />
-
-                <button
-                  className="heart liked"
-                  onClick={() =>
-                    toggleFavorite(item.id)
-                  }
-                >
-                  ♥
-                </button>
-
-              </div>
-
-              <div className="meta">
-
-                <span className="badge">
-                  {item.category}
-                </span>
-
-                <strong>
-                  {money(item.price)}
-                </strong>
-
-              </div>
-
-              <button
-                className="secondary"
-                onClick={() =>
-                  setSelected(item)
-                }
-              >
-                Подробнее
-              </button>
-
-            </article>
-
-          ))}
-
-          {!favoriteNumbers.length && (
-
-            <div className="empty">
-
-              Пока нет избранных номеров.
-
-              <br />
-
-              Нажмите ♡ у понравившегося номера.
-
-            </div>
-
-          )}
-
-        </div>
-
-      </main>
-    );
-
-  };
-
-  /* =========================
-     REQUESTS
-  ========================= */
-
-  const Requests = () => {
-
-    return (
-      <main className="page">
-
-        <div className="page-title">
-
-          <h2>
-            Мои заявки
-          </h2>
-
-        </div>
-
-        <div className="list">
-
-          {requests.map((request) => (
-
-            <article
-              className="request-card"
-              key={request.id}
-            >
-
-              <div>
-
-                <strong>
-                  {request.number}
-                </strong>
-
-                <div className="muted">
-                  {request.createdAt}
-                </div>
-
-              </div>
-
-              <div>
-
-                <span className="status">
-                  {request.status}
-                </span>
-
-                <strong>
-                  {money(request.price)}
-                </strong>
-
-              </div>
-
-            </article>
-
-          ))}
-
-          {!requests.length && (
-
-            <div className="empty">
-
-              У вас пока нет заявок.
-
-              <br />
-
-              Выберите номер в каталоге.
-
-            </div>
-
-          )}
-
-        </div>
-
-      </main>
-    );
-
-  };
-
-  /* =========================
-     PROFILE
-  ========================= */
-
-  const Profile = () => {
-
-    return (
-      <main className="page">
-
-        <div className="profile">
-
-          <div className="avatar">
-            24
-          </div>
-
-          <h2>
-            GRZ124
-          </h2>
-
-          <p className="muted">
-            Красивые государственные номера
-          </p>
-
-        </div>
-
-        <div className="menu-card">
-
-          <button
-            onClick={() =>
-              setTab("requests")
-            }
-          >
-            📋 Мои заявки
-            <span>›</span>
-          </button>
-
-          <button
-            onClick={() =>
-              setTab("favorites")
-            }
-          >
-            ♥ Избранное
-            <span>›</span>
-          </button>
-
-          <button
-            onClick={openSupport}
-          >
-            💬 Поддержка
-            <span>›</span>
-          </button>
-
-          <button
-            onClick={() =>
-              showToast(
-                "GRZ124 · Красноярский край"
-              )
-            }
-          >
-            ℹ️ О магазине
-            <span>›</span>
-          </button>
-
-        </div>
-
-      </main>
-    );
-
-  };
-
-  /* =========================
-     CURRENT PAGE
-  ========================= */
-
-  let content;
-
-  if (tab === "home") {
-    content = <Home />;
-  }
-
-  if (tab === "catalog") {
-    content = <Catalog />;
-  }
-
-  if (tab === "favorites") {
-    content = <Favorites />;
-  }
-
-  if (tab === "requests") {
-    content = <Requests />;
-  }
-
-  if (tab === "profile") {
-    content = <Profile />;
-  }
-
-  /* =========================
-     RETURN
-  ========================= */
-
-  return (
-    <div className="app">
-
-      <header className="topbar">
-
-        <div>
-
-          <div className="eyebrow">
-            GRZ124 · КРАСНОЯРСКИЙ КРАЙ
-          </div>
-
-          <h1>
-            Красивые номера{" "}
-            <b>24</b>
-          </h1>
-
-        </div>
-
-        <button
-          className="icon-btn"
-          onClick={openSupport}
-        >
-          ◉
-        </button>
-
-      </header>
-
-      {content}
 
       <nav className="bottom-nav">
+        <button
+          className={filter === "all" ? "active" : ""}
+          onClick={() => setFilter("all")}
+        >
+          <span>⌂</span>
+          <small>Главная</small>
+        </button>
 
-        {[
-          ["home", "⌂", "Главная"],
-          ["catalog", "▦", "Каталог"],
-          ["favorites", "♡", "Избранное"],
-          ["requests", "▣", "Заявки"],
-          ["profile", "♙", "Профиль"],
-        ].map(
-          ([id, icon, label]) => (
+        <button
+          className={filter !== "favorites" ? "active" : ""}
+          onClick={() => setFilter("all")}
+        >
+          <span>▦</span>
+          <small>Каталог</small>
+        </button>
 
-            <button
-              key={id}
-              className={
-                tab === id
-                  ? "nav-active"
-                  : ""
-              }
-              onClick={() =>
-                setTab(id)
-              }
-            >
+        <button
+          className={filter === "favorites" ? "active" : ""}
+          onClick={() => setFilter("favorites")}
+        >
+          <span>♡</span>
+          <small>Избранное</small>
+        </button>
 
-              <span>
-                {icon}
-              </span>
+        <button>
+          <span>□</span>
+          <small>Заявки</small>
+        </button>
 
-              <small>
-                {label}
-              </small>
-
-            </button>
-
-          )
-        )}
-
+        <button>
+          <span>♙</span>
+          <small>Профиль</small>
+        </button>
       </nav>
 
-      {/* =========================
-          MODAL
-      ========================= */}
-
-      {selected && (
-
+      {selectedNumber && (
         <div
-          className="modal-backdrop"
-          onClick={() =>
-            setSelected(null)
-          }
+          className="modal-overlay"
+          onClick={() => setSelectedNumber(null)}
         >
-
           <div
             className="modal"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
+            onClick={(e) => e.stopPropagation()}
           >
-
             <button
               className="modal-close"
-              onClick={() =>
-                setSelected(null)
-              }
+              onClick={() => setSelectedNumber(null)}
             >
               ×
             </button>
 
-            <Plate
-              item={selected}
-              large
-            />
+            <div className="modal-title">
+              Номер
+            </div>
 
-            <span className="badge">
-
-              {categoryEmoji(
-                selected.category
-              )}{" "}
-
-              {selected.category}
-
-            </span>
+            <Plate number={selectedNumber.number} />
 
             <div className="modal-price">
-
-              {money(selected.price)}
-
+              {formatPrice(selectedNumber.price)}
             </div>
 
-            <div className="detail-list">
-
-              <div>
-
-                <span>
-                  Номер
-                </span>
-
-                <strong>
-                  {selected.plate}
-                </strong>
-
-              </div>
-
-              <div>
-
-                <span>
-                  Категория
-                </span>
-
-                <strong>
-                  {selected.category}
-                </strong>
-
-              </div>
-
-              <div>
-
-                <span>
-                  Регион
-                </span>
-
-                <strong>
-                  Красноярский край · 24
-                </strong>
-
-              </div>
-
-              <div>
-
-                <span>
-                  Статус
-                </span>
-
-                <strong
-                  className={
-                    selected.status ===
-                    "available"
-                      ? "available"
-                      : ""
-                  }
-                >
-
-                  {selected.status ===
-                  "reserved"
-                    ? "Бронь"
-                    : "В наличии"}
-
-                </strong>
-
-              </div>
-
+            <div className="modal-category">
+              {getCategoryName(selectedNumber.category)}
             </div>
 
-            {selected.status ===
-              "reserved" ? (
+            <div className="modal-location">
+              Красноярский край · регион 24
+            </div>
 
-              <button
-                className="primary full"
-                disabled
-              >
+            {isReserved(selectedNumber.status) && (
+              <div className="modal-reserved">
                 Номер забронирован
-              </button>
-
-            ) : (
-
-              <button
-                className="primary full"
-                onClick={() =>
-                  addRequest(selected)
-                }
-              >
-                Оставить заявку
-              </button>
-
+              </div>
             )}
 
+            <a
+              className="contact-button"
+              href="https://t.me/Dremov767"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Узнать о номере
+            </a>
           </div>
-
         </div>
-
       )}
-
-      {/* =========================
-          TOAST
-      ========================= */}
-
-      {toast && (
-
-        <div className="toast">
-          {toast}
-        </div>
-
-      )}
-
     </div>
   );
 }
 
-/* =========================
-   RENDER
-========================= */
+const style = document.createElement("style");
 
-createRoot(
-  document.getElementById("root")
-).render(
-  <App />
+style.textContent = `
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  background: #08080b;
+  color: #f5f5f7;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+body {
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  min-height: 100vh;
+  max-width: 980px;
+  margin: 0 auto;
+  background:
+    radial-gradient(
+      circle at 70% 25%,
+      rgba(88, 49, 110, 0.18),
+      transparent 35%
+    ),
+    #0b0b0f;
+  padding-bottom: 100px;
+}
+
+.header {
+  min-height: 122px;
+  padding: 28px 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0a0a0d;
+}
+
+.region-title {
+  color: #92919b;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 5px;
+  margin-bottom: 6px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: -1.5px;
+}
+
+h1 span {
+  color: #ffc400;
+}
+
+.header-button,
+.view-button {
+  width: 74px;
+  height: 74px;
+  border-radius: 22px;
+  background: #121217;
+  border: 1px solid #33333c;
+  color: #f3f3f5;
+  font-size: 28px;
+}
+
+main {
+  padding: 28px 32px 40px;
+  background:
+    radial-gradient(
+      circle at 80% 0%,
+      rgba(104, 61, 124, 0.12),
+      transparent 45%
+    ),
+    #15131a;
+}
+
+.catalog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.catalog-header h2 {
+  margin: 0;
+  font-size: 32px;
+  letter-spacing: -1px;
+}
+
+.total {
+  color: #85848e;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.view-button {
+  width: 72px;
+  height: 72px;
+}
+
+.search-box {
+  height: 82px;
+  border-radius: 26px;
+  border: 1px solid #383840;
+  background: #111116;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  margin-top: 14px;
+}
+
+.search-icon {
+  font-size: 30px;
+  margin-right: 14px;
+  color: #f2f2f3;
+}
+
+.search-box input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  color: #fff;
+  background: transparent;
+  font-size: 24px;
+  min-width: 0;
+}
+
+.search-box input::placeholder {
+  color: #9998a1;
+}
+
+.clear-search {
+  border: 0;
+  background: transparent;
+  color: #898890;
+  font-size: 28px;
+}
+
+.filters {
+  display: flex;
+  gap: 14px;
+  margin: 20px 0 28px;
+}
+
+.filters button {
+  padding: 13px 28px;
+  border-radius: 30px;
+  border: 1px solid #363640;
+  background: #111116;
+  color: #b9b8c1;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.filters button.selected {
+  color: #ffc400;
+  border-color: #aa8200;
+}
+
+.catalog-count {
+  color: #777681;
+  margin-bottom: 12px;
+}
+
+.catalog-count strong {
+  color: #d8d7dc;
+}
+
+.numbers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.number-card {
+  position: relative;
+  padding: 28px;
+  border-radius: 30px;
+  border: 1px solid #34343d;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(30, 30, 37, 0.95),
+      rgba(15, 15, 19, 0.98)
+    );
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+.reserved-card {
+  opacity: 0.72;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.plate {
+  display: flex;
+  align-items: stretch;
+  width: fit-content;
+  min-height: 68px;
+  background: #f3f3f1;
+  color: #111;
+  border: 4px solid #333;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,.3);
+  font-weight: 900;
+}
+
+.plate-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  font-size: 34px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.plate-region {
+  min-width: 62px;
+  padding: 5px 7px 4px;
+  border-left: 3px solid #444;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.plate-region strong {
+  font-size: 26px;
+}
+
+.plate-region span {
+  font-size: 10px;
+  margin-top: 5px;
+}
+
+.favorite {
+  border: 0;
+  background: transparent;
+  color: #77777e;
+  font-size: 55px;
+  line-height: 1;
+  padding: 0;
+}
+
+.favorite.active {
+  color: #ffca00;
+}
+
+.card-middle {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.card-info {
+  min-width: 0;
+}
+
+.level {
+  width: fit-content;
+  padding: 8px 16px;
+  border-radius: 13px;
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 9px;
+}
+
+.level.premium {
+  color: #fff;
+  background: #7836dc;
+}
+
+.level.vip {
+  color: #fff;
+  background: #c99800;
+}
+
+.level.reserved {
+  color: #fff;
+  background: #7b3b3b;
+}
+
+.location {
+  color: #8a8993;
+  font-size: 20px;
+}
+
+.category {
+  margin-top: 5px;
+  color: #65646e;
+  font-size: 14px;
+}
+
+.price {
+  font-size: 31px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.details-button {
+  width: 100%;
+  margin-top: 22px;
+  height: 62px;
+  border-radius: 19px;
+  border: 1px solid #41414b;
+  background: #19191f;
+  color: #f4f4f6;
+  font-size: 21px;
+  font-weight: 750;
+}
+
+.details-button:active {
+  transform: scale(.99);
+}
+
+.loading {
+  padding: 80px 20px;
+  text-align: center;
+  color: #8d8c96;
+}
+
+.loader {
+  width: 42px;
+  height: 42px;
+  border: 4px solid #33333a;
+  border-top-color: #ffc400;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin: 0 auto 18px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-box {
+  padding: 25px;
+  border-radius: 20px;
+  background: #281717;
+  border: 1px solid #6b2929;
+  color: #ff9a9a;
+}
+
+.error-box p {
+  color: #c6a0a0;
+}
+
+.error-box button {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: #ffc400;
+  color: #111;
+  font-weight: 800;
+}
+
+.empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: #85848e;
+}
+
+.empty-icon {
+  font-size: 50px;
+}
+
+.empty h3 {
+  color: #eee;
+  font-size: 24px;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: min(980px, 100%);
+  height: 90px;
+  background: rgba(9, 9, 12, .97);
+  border-top: 1px solid #292930;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  z-index: 20;
+}
+
+.bottom-nav button {
+  border: 0;
+  background: transparent;
+  color: #777780;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.bottom-nav button span {
+  font-size: 27px;
+}
+
+.bottom-nav button small {
+  font-size: 13px;
+}
+
+.bottom-nav button.active {
+  color: #ffc400;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0,0,0,.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal {
+  position: relative;
+  width: min(520px, 100%);
+  border-radius: 28px;
+  border: 1px solid #3b3b44;
+  background: #15151a;
+  padding: 32px;
+  box-shadow: 0 30px 100px rgba(0,0,0,.6);
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  font-size: 34px;
+}
+
+.modal-title {
+  color: #9998a1;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.modal-price {
+  margin-top: 25px;
+  font-size: 34px;
+  font-weight: 850;
+}
+
+.modal-category,
+.modal-location {
+  margin-top: 8px;
+  color: #85848e;
+}
+
+.modal-reserved {
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #542727;
+  color: #ffb2b2;
+  text-align: center;
+  font-weight: 700;
+}
+
+.contact-button {
+  display: block;
+  text-align: center;
+  margin-top: 25px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #ffc400;
+  color: #111;
+  text-decoration: none;
+  font-weight: 850;
+  font-size: 18px;
+}
+
+@media (max-width: 700px) {
+  .header {
+    padding: 24px 20px;
+  }
+
+  .region-title {
+    font-size: 13px;
+    letter-spacing: 3px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  .header-button {
+    width: 60px;
+    height: 60px;
+  }
+
+  main {
+    padding: 22px 16px 30px;
+  }
+
+  .catalog-header h2 {
+    font-size: 27px;
+  }
+
+  .view-button {
+    width: 58px;
+    height: 58px;
+  }
+
+  .search-box {
+    height: 68px;
+    padding: 0 18px;
+  }
+
+  .search-box input {
+    font-size: 19px;
+  }
+
+  .filters {
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .filters button {
+    font-size: 16px;
+    padding: 11px 20px;
+    white-space: nowrap;
+  }
+
+  .number-card {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .plate {
+    min-height: 55px;
+  }
+
+  .plate-main {
+    font-size: 26px;
+    padding: 0 10px;
+  }
+
+  .plate-region {
+    min-width: 50px;
+  }
+
+  .plate-region strong {
+    font-size: 21px;
+  }
+
+  .card-middle {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .price {
+    font-size: 26px;
+  }
+
+  .location {
+    font-size: 17px;
+  }
+
+  .favorite {
+    font-size: 45px;
+  }
+
+  .bottom-nav {
+    height: 78px;
+  }
+
+  .bottom-nav button span {
+    font-size: 22px;
+  }
+}
+`;
+
+document.head.appendChild(style);
+
+createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );
