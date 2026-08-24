@@ -2,28 +2,28 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
-const SUPABASE_URL = "https://tjxuumgwkttfnfgpdkaj.supabase.co";
+const SUPABASE_URL =
+  "https://tjxuumgwkttfnfgpdkaj.supabase.co";
+
 const SUPABASE_KEY =
   "sb_publishable_29-OjXwd3B9rGcPGo6IF4Q_1R8-DjQh";
 
-const API_URL = `${SUPABASE_URL}/rest/v1/numbers`;
+const API_URL =
+  `${SUPABASE_URL}/rest/v1/numbers`;
+
+/* =========================
+   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+========================= */
 
 function formatPrice(price) {
-  const value = Number(price || 0);
-
-  return `${value.toLocaleString("ru-RU")} ₽`;
+  return `${Number(price || 0).toLocaleString("ru-RU")} ₽`;
 }
 
 function getLevel(item) {
   const price = Number(item?.price || 0);
 
-  if (price >= 400000) {
-    return "VIP";
-  }
-
-  if (price >= 200000) {
-    return "Premium";
-  }
+  if (price >= 400000) return "VIP";
+  if (price >= 200000) return "Premium";
 
   return "";
 }
@@ -32,22 +32,29 @@ function getCategoryName(category) {
   const names = {
     "Первая сотня": "Первая сотня",
     "Одинаковые цифры": "Одинаковые цифры",
-    Комплекты: "Комплекты",
-    Сотни: "Сотни",
-    Буквы: "Буквы",
+    "Комплекты": "Комплекты",
+    "Сотни": "Сотни",
+    "Буквы": "Буквы",
     "124/124;224/224": "124 / 224",
-    Зеркала: "Зеркала",
-    Прочее: "Прочее",
-    Прицеп: "Прицеп",
-    Мото: "Мото",
+    "Зеркала": "Зеркала",
+    "Прочее": "Прочее",
+    "Прицеп": "Прицеп",
+    "Мото": "Мото",
   };
 
   return names[category] || category || "Прочее";
 }
 
 function isReserved(item) {
-  return String(item?.status || "").toLowerCase() === "reserved";
+  return (
+    String(item?.status || "").toLowerCase() ===
+    "reserved"
+  );
 }
+
+/* =========================
+   ГОСНОМЕР
+========================= */
 
 function Plate({ number }) {
   const value = String(number || "").trim();
@@ -66,17 +73,17 @@ function Plate({ number }) {
   }
 
   /*
-    Комплекты могут выглядеть примерно так:
+    Комплект:
 
-    С333ОК24+С333ОК
-    или
-    С333ОК24 + С333ОК
+    С333ОК24 + С333ОК124
 
-    В таком случае показываем всю строку
-    как единый номер.
+    Показываем как ОДИН номер.
   */
+
   if (value.includes("+")) {
-    const parts = value.split("+");
+    const parts = value
+      .split("+")
+      .map((part) => part.trim());
 
     return (
       <div className="plate">
@@ -97,9 +104,13 @@ function Plate({ number }) {
     );
   }
 
-  const regionMatch = value.match(/(224|124|24)$/);
+  const regionMatch = value.match(
+    /(224|124|24)$/
+  );
 
-  const region = regionMatch ? regionMatch[1] : "24";
+  const region = regionMatch
+    ? regionMatch[1]
+    : "24";
 
   const mainNumber = regionMatch
     ? value.slice(0, -region.length)
@@ -107,7 +118,9 @@ function Plate({ number }) {
 
   return (
     <div className="plate">
-      <div className="plate-main">{mainNumber}</div>
+      <div className="plate-main">
+        {mainNumber}
+      </div>
 
       <div className="plate-region">
         <strong>{region}</strong>
@@ -117,11 +130,35 @@ function Plate({ number }) {
   );
 }
 
-function NumberCard({ item, favorite, onFavorite }) {
+/* =========================
+   КАРТОЧКА НОМЕРА
+========================= */
+
+function NumberCard({
+  item,
+  favorite,
+  onFavorite,
+}) {
   const level = getLevel(item);
   const reserved = isReserved(item);
 
-  const number = String(item?.number || "");
+  const number = String(
+    item?.number || ""
+  ).trim();
+
+  function contact() {
+    const message =
+      `Здравствуйте! Интересует номер ${number} ` +
+      `за ${formatPrice(item?.price)}.`;
+
+    window.open(
+      `https://t.me/Dremov767?text=${encodeURIComponent(
+        message
+      )}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }
 
   return (
     <article
@@ -137,12 +174,10 @@ function NumberCard({ item, favorite, onFavorite }) {
           className={`favorite ${
             favorite ? "active" : ""
           }`}
-          onClick={() => onFavorite(number)}
-          aria-label={
-            favorite
-              ? "Убрать из избранного"
-              : "Добавить в избранное"
+          onClick={() =>
+            onFavorite(number)
           }
+          aria-label="Избранное"
         >
           {favorite ? "♥" : "♡"}
         </button>
@@ -159,7 +194,9 @@ function NumberCard({ item, favorite, onFavorite }) {
           )}
 
           <div className="category">
-            {getCategoryName(item?.category)}
+            {getCategoryName(
+              item?.category
+            )}
           </div>
 
           <div className="location">
@@ -181,19 +218,7 @@ function NumberCard({ item, favorite, onFavorite }) {
       <button
         type="button"
         className="details-button"
-        onClick={() => {
-          const message =
-            `Здравствуйте! Интересует номер ${number} ` +
-            `за ${formatPrice(item?.price)}.`;
-
-          window.open(
-            `https://t.me/Dremov767?text=${encodeURIComponent(
-              message
-            )}`,
-            "_blank",
-            "noopener,noreferrer"
-          );
-        }}
+        onClick={contact}
       >
         Подробнее
       </button>
@@ -201,28 +226,45 @@ function NumberCard({ item, favorite, onFavorite }) {
   );
 }
 
+/* =========================
+   ПРИЛОЖЕНИЕ
+========================= */
+
 function App() {
-  const [numbers, setNumbers] = useState([]);
+  const [numbers, setNumbers] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] =
+    useState("");
 
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] =
+    useState("all");
 
-  const [favorites, setFavorites] = useState(() => {
-    try {
-      const saved = localStorage.getItem(
-        "grz124_favorites"
-      );
+  const [favorites, setFavorites] =
+    useState(() => {
+      try {
+        const saved =
+          localStorage.getItem(
+            "grz124_favorites"
+          );
 
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+        return saved
+          ? JSON.parse(saved)
+          : [];
+      } catch {
+        return [];
+      }
+    });
+
+  /* =========================
+     ЗАГРУЗКА ИЗ SUPABASE
+  ========================= */
 
   async function loadNumbers() {
     try {
@@ -236,21 +278,26 @@ function App() {
 
           headers: {
             apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
+            Authorization:
+              `Bearer ${SUPABASE_KEY}`,
+            "Content-Type":
+              "application/json",
           },
         }
       );
 
       if (!response.ok) {
-        const text = await response.text();
+        const text =
+          await response.text();
 
         throw new Error(
-          text || `HTTP ${response.status}`
+          text ||
+            `HTTP ${response.status}`
         );
       }
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!Array.isArray(data)) {
         throw new Error(
@@ -273,17 +320,26 @@ function App() {
     }
   }
 
+  /* =========================
+     ПЕРВАЯ ЗАГРУЗКА
+  ========================= */
+
   useEffect(() => {
     loadNumbers();
 
-    const interval = setInterval(() => {
-      loadNumbers();
-    }, 30000);
+    const interval =
+      setInterval(() => {
+        loadNumbers();
+      }, 30000);
 
     return () => {
       clearInterval(interval);
     };
   }, []);
+
+  /* =========================
+     СОХРАНЕНИЕ ИЗБРАННОГО
+  ========================= */
 
   useEffect(() => {
     try {
@@ -292,60 +348,147 @@ function App() {
         JSON.stringify(favorites)
       );
     } catch {
-      // Ничего не делаем, если localStorage недоступен.
+      // localStorage может быть недоступен
     }
   }, [favorites]);
 
   function toggleFavorite(number) {
     setFavorites((previous) => {
-      if (previous.includes(number)) {
+      if (
+        previous.includes(number)
+      ) {
         return previous.filter(
           (item) => item !== number
         );
       }
 
-      return [...previous, number];
+      return [
+        ...previous,
+        number,
+      ];
     });
   }
 
-  const filteredNumbers = useMemo(() => {
-    const query = search.trim().toLowerCase();
+  /* =========================
+     ФИЛЬТРАЦИЯ
+  ========================= */
 
-    return numbers.filter((item) => {
-      const number = String(
-        item?.number || ""
-      ).toLowerCase();
+  const filteredNumbers =
+    useMemo(() => {
+      const query =
+        search.trim().toLowerCase();
 
-      const category = String(
-        item?.category || ""
-      ).toLowerCase();
+      const filtered =
+        numbers.filter((item) => {
+          const number =
+            String(
+              item?.number || ""
+            ).toLowerCase();
 
-      const matchesSearch =
-        !query ||
-        number.includes(query) ||
-        category.includes(query);
+          const category =
+            String(
+              item?.category || ""
+            ).toLowerCase();
 
-      const level = getLevel(item);
+          const matchesSearch =
+            !query ||
+            number.includes(query) ||
+            category.includes(query);
 
-      let matchesFilter = true;
+          const level =
+            getLevel(item);
 
-      if (filter === "premium") {
-        matchesFilter = level === "Premium";
+          let matchesFilter =
+            true;
+
+          if (
+            filter === "premium"
+          ) {
+            matchesFilter =
+              level === "Premium";
+          }
+
+          if (
+            filter === "vip"
+          ) {
+            matchesFilter =
+              level === "VIP";
+          }
+
+          return (
+            matchesSearch &&
+            matchesFilter
+          );
+        });
+
+      /*
+       * ГЛАВНОЕ ИЗМЕНЕНИЕ:
+       *
+       * Одинаковые записи больше
+       * не показываем несколько раз.
+       *
+       * Например:
+       *
+       * С333ОК24+С333ОК124
+       * 1300000
+       * Комплекты
+       *
+       * если в базе находится 3 раза,
+       * на сайте будет ОДНА карточка.
+       */
+
+      const unique = [];
+      const seen = new Set();
+
+      for (
+        const item of filtered
+      ) {
+        const number =
+          String(
+            item?.number || ""
+          )
+            .trim()
+            .toUpperCase();
+
+        const price =
+          Number(
+            item?.price || 0
+          );
+
+        const category =
+          String(
+            item?.category || ""
+          )
+            .trim()
+            .toLowerCase();
+
+        const key =
+          `${number}|${price}|${category}`;
+
+        if (seen.has(key)) {
+          continue;
+        }
+
+        seen.add(key);
+        unique.push(item);
       }
 
-      if (filter === "vip") {
-        matchesFilter = level === "VIP";
-      }
+      return unique;
+    }, [
+      numbers,
+      search,
+      filter,
+    ]);
 
-      return (
-        matchesSearch &&
-        matchesFilter
-      );
-    });
-  }, [numbers, search, filter]);
+  /* =========================
+     РАЗМЕТКА
+  ========================= */
 
   return (
     <div className="app">
+
+      {/* HEADER */}
+
       <header className="header">
         <div>
           <div className="region-title">
@@ -362,16 +505,20 @@ function App() {
           type="button"
           className="header-button"
           onClick={loadNumbers}
-          title="Обновить"
-          aria-label="Обновить номера"
+          aria-label="Обновить"
         >
           ⟳
         </button>
       </header>
 
+      {/* CATALOG */}
+
       <main className="catalog">
+
         <div className="catalog-title-row">
-          <h2>Каталог номеров</h2>
+          <h2>
+            Каталог номеров
+          </h2>
 
           <button
             type="button"
@@ -382,6 +529,8 @@ function App() {
           </button>
         </div>
 
+        {/* SEARCH */}
+
         <div className="search-box">
           <span className="search-icon">
             ⌕
@@ -391,7 +540,9 @@ function App() {
             type="text"
             value={search}
             onChange={(event) =>
-              setSearch(event.target.value)
+              setSearch(
+                event.target.value
+              )
             }
             placeholder="Поиск: 777, 001..."
           />
@@ -400,15 +551,20 @@ function App() {
             <button
               type="button"
               className="clear-search"
-              onClick={() => setSearch("")}
-              aria-label="Очистить поиск"
+              onClick={() =>
+                setSearch("")
+              }
+              aria-label="Очистить"
             >
               ×
             </button>
           )}
         </div>
 
+        {/* FILTERS */}
+
         <div className="filters">
+
           <button
             type="button"
             className={
@@ -450,53 +606,78 @@ function App() {
           >
             VIP
           </button>
+
         </div>
+
+        {/* LOADING */}
 
         {loading && (
           <div className="state">
-            Загружаем актуальные номера...
+            Загружаем актуальные
+            номера...
           </div>
         )}
 
-        {error && !loading && (
-          <div className="state error">
-            <div>{error}</div>
+        {/* ERROR */}
 
-            <button
-              type="button"
-              onClick={loadNumbers}
-            >
-              Повторить
-            </button>
-          </div>
-        )}
+        {error &&
+          !loading && (
+            <div className="state error">
+              <div>
+                {error}
+              </div>
 
-        {!loading &&
-          !error &&
-          filteredNumbers.length === 0 && (
-            <div className="state">
-              Номеров по вашему запросу
-              не найдено.
+              <button
+                type="button"
+                onClick={
+                  loadNumbers
+                }
+              >
+                Повторить
+              </button>
             </div>
           )}
 
-        {!loading && !error && (
-          <div className="numbers-list">
-            {filteredNumbers.map((item) => (
-              <NumberCard
-                key={item.id}
-                item={item}
-                favorite={favorites.includes(
-                  item.number
-                )}
-                onFavorite={toggleFavorite}
-              />
-            ))}
-          </div>
-        )}
+        {/* EMPTY */}
+
+        {!loading &&
+          !error &&
+          filteredNumbers.length ===
+            0 && (
+            <div className="state">
+              Номеров по вашему
+              запросу не найдено.
+            </div>
+          )}
+
+        {/* NUMBERS */}
+
+        {!loading &&
+          !error && (
+            <div className="numbers-list">
+              {filteredNumbers.map(
+                (item) => (
+                  <NumberCard
+                    key={`${item.id}-${item.number}-${item.price}`}
+                    item={item}
+                    favorite={favorites.includes(
+                      item.number
+                    )}
+                    onFavorite={
+                      toggleFavorite
+                    }
+                  />
+                )
+              )}
+            </div>
+          )}
+
       </main>
 
+      {/* BOTTOM NAVIGATION */}
+
       <nav className="bottom-nav">
+
         <button
           type="button"
           onClick={() => {
@@ -505,7 +686,9 @@ function App() {
           }}
         >
           <span>⌂</span>
-          <small>Главная</small>
+          <small>
+            Главная
+          </small>
         </button>
 
         <button
@@ -517,34 +700,47 @@ function App() {
           }}
         >
           <span>▦</span>
-          <small>Каталог</small>
+          <small>
+            Каталог
+          </small>
         </button>
 
         <button
           type="button"
           onClick={() => {
             setSearch("");
-
             setFilter("all");
           }}
         >
           <span>♡</span>
-          <small>Избранное</small>
+          <small>
+            Избранное
+          </small>
         </button>
 
         <button type="button">
           <span>□</span>
-          <small>Заявки</small>
+          <small>
+            Заявки
+          </small>
         </button>
 
         <button type="button">
           <span>♙</span>
-          <small>Профиль</small>
+          <small>
+            Профиль
+          </small>
         </button>
+
       </nav>
+
     </div>
   );
 }
+
+/* =========================
+   ЗАПУСК
+========================= */
 
 const rootElement =
   document.getElementById("root");
@@ -555,7 +751,9 @@ if (!rootElement) {
   );
 }
 
-createRoot(rootElement).render(
+createRoot(
+  rootElement
+).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
