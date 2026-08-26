@@ -1,12 +1,14 @@
-```jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 import "./admin-panel.css";
 
 const SUPABASE_URL = "https://tjxumwgktffnfgpdka.supabase.co";
-const SUPABASE_KEY = "sb_publishable_29-OjXwd3B9rGcPg06If4Q_1R8-DjQh";
-const API_URL = `${SUPABASE_URL}/rest/v1/numbers`;
+const SUPABASE_KEY =
+  "sb_publishable_29-OjXwd3B9rGcPg06If4Q_1R8-DjQh";
+
+// ВАЖНО: без template literal, чтобы Vite не ловил ошибку с $
+const API_URL = SUPABASE_URL + "/rest/v1/numbers";
 
 const ADMIN_PASSWORD = "124124";
 const LOCAL_NUMBERS_KEY = "grz124-admin-numbers";
@@ -134,6 +136,7 @@ const FALLBACK_NUMBERS = [
     regionCode: "24",
     status: "available",
   },
+
   {
     id: "number-14",
     number: "Н111ХЕ124",
@@ -206,6 +209,7 @@ const FALLBACK_NUMBERS = [
     regionCode: "24",
     status: "available",
   },
+
   {
     id: "number-22",
     number: "А731АА24+А731АА124",
@@ -224,6 +228,7 @@ const FALLBACK_NUMBERS = [
     regionCode: "24",
     status: "available",
   },
+
   {
     id: "number-24",
     number: "Х200НУ24",
@@ -233,6 +238,7 @@ const FALLBACK_NUMBERS = [
     regionCode: "24",
     status: "available",
   },
+
   {
     id: "number-25",
     number: "Р014РР24",
@@ -314,6 +320,7 @@ const FALLBACK_NUMBERS = [
     regionCode: "24",
     status: "available",
   },
+
   {
     id: "number-34",
     number: "Х124УВ124",
@@ -323,6 +330,7 @@ const FALLBACK_NUMBERS = [
     regionCode: "24",
     status: "available",
   },
+
   {
     id: "number-35",
     number: "Н121УМ124",
@@ -421,12 +429,19 @@ const FALLBACK_NUMBERS = [
 
 function normalizeNumber(item) {
   return {
-    id: String(item.id ?? crypto.randomUUID()),
+    id: String(
+      item.id ??
+        (typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `number-${Date.now()}-${Math.random()}`)
+    ),
     number: String(item.number ?? ""),
     price: Number(item.price ?? 0),
     category: String(item.category ?? "Красивые номера"),
     region: String(item.region ?? "Красноярский край"),
-    regionCode: String(item.regionCode ?? item.region_code ?? "24"),
+    regionCode: String(
+      item.regionCode ?? item.region_code ?? "24"
+    ),
     status: String(item.status ?? "available"),
     description: item.description ?? "",
   };
@@ -486,13 +501,15 @@ function getLevel(item) {
 
 function Plate({ number, regionCode }) {
   const text = String(number || "");
-
   const parts = text.split("+");
 
   return (
     <div className="plate-wrap">
       {parts.map((part, index) => (
-        <div className="plate" key={`${part}-${index}`}>
+        <div
+          className="plate"
+          key={`${part}-${index}`}
+        >
           <div className="plate-number">
             {part}
           </div>
@@ -675,25 +692,29 @@ function AdminPanel({
 
   async function saveToSupabase(item, isNew) {
     try {
+      const headers = {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      };
+
+      const body = {
+        id: item.id,
+        number: item.number,
+        price: item.price,
+        category: item.category,
+        region: item.region,
+        regionCode: item.regionCode,
+        status: item.status,
+        description: item.description,
+      };
+
       if (isNew) {
         await fetch(API_URL, {
           method: "POST",
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            Prefer: "return=minimal",
-          },
-          body: JSON.stringify({
-            id: item.id,
-            number: item.number,
-            price: item.price,
-            category: item.category,
-            region: item.region,
-            regionCode: item.regionCode,
-            status: item.status,
-            description: item.description,
-          }),
+          headers,
+          body: JSON.stringify(body),
         });
       } else {
         await fetch(
@@ -702,12 +723,7 @@ function AdminPanel({
           )}`,
           {
             method: "PATCH",
-            headers: {
-              apikey: SUPABASE_KEY,
-              Authorization: `Bearer ${SUPABASE_KEY}`,
-              "Content-Type": "application/json",
-              Prefer: "return=minimal",
-            },
+            headers,
             body: JSON.stringify({
               number: item.number,
               price: item.price,
@@ -870,6 +886,7 @@ function AdminPanel({
         <div className="admin-header">
           <div>
             <h2>Админ-панель</h2>
+
             <div className="region">
               GRZ124 · управление номерами
             </div>
@@ -927,6 +944,7 @@ function AdminPanel({
       <div className="admin-header">
         <div>
           <h2>Админ-панель</h2>
+
           <div className="region">
             Номеров: {numbers.length}
           </div>
@@ -989,21 +1007,27 @@ function AdminPanel({
           <option>
             Одинаковые цифры
           </option>
+
           <option>
             Первая сотня
           </option>
+
           <option>
             Комплекты
           </option>
+
           <option>
             Сотни
           </option>
+
           <option>
             Буквы
           </option>
+
           <option>
             Зеркала
           </option>
+
           <option>
             124/124;224/224
           </option>
@@ -1022,6 +1046,7 @@ function AdminPanel({
           <option value="available">
             Доступен
           </option>
+
           <option value="reserved">
             Занят
           </option>
@@ -1085,8 +1110,7 @@ function AdminPanel({
 
               <small>
                 {item.category} ·{" "}
-                {item.status ===
-                "reserved"
+                {item.status === "reserved"
                   ? "Занят"
                   : "Доступен"}
               </small>
@@ -1108,8 +1132,7 @@ function AdminPanel({
                   toggleReserved(item)
                 }
               >
-                {item.status ===
-                "reserved"
+                {item.status === "reserved"
                   ? "Освободить"
                   : "Занять"}
               </button>
@@ -1173,10 +1196,6 @@ function App() {
   const [adminOpen, setAdminOpen] =
     useState(false);
 
-  /* -------------------------------------------------------
-     Загружаем локальные изменения админа
-     ------------------------------------------------------- */
-
   function getLocalNumbers() {
     try {
       const saved =
@@ -1196,10 +1215,6 @@ function App() {
     }
   }
 
-  /* -------------------------------------------------------
-     Загрузка каталога
-     ------------------------------------------------------- */
-
   async function loadNumbers() {
     setLoading(true);
 
@@ -1214,7 +1229,8 @@ function App() {
     try {
       const response =
         await fetch(
-          `${API_URL}?select=*&order=price.desc`,
+          API_URL +
+            "?select=*&order=price.desc",
           {
             method: "GET",
             headers: {
@@ -1241,10 +1257,6 @@ function App() {
           ? data.map(normalizeNumber)
           : [];
 
-      /*
-       * Локальный каталог используется
-       * как основной, а Supabase его дополняет.
-       */
       setNumbers(
         removeDuplicates([
           ...baseNumbers,
@@ -1383,6 +1395,7 @@ function App() {
             <strong>
               {numbers.length}
             </strong>
+
             <span>номеров</span>
           </div>
 
@@ -1390,6 +1403,7 @@ function App() {
             <strong>
               {favoriteNumbers.length}
             </strong>
+
             <span>избранных</span>
           </div>
         </div>
@@ -1640,6 +1654,7 @@ function App() {
           <span className="nav-icon">
             ⌂
           </span>
+
           <span>Главная</span>
         </button>
 
@@ -1657,6 +1672,7 @@ function App() {
           <span className="nav-icon">
             ▦
           </span>
+
           <span>Каталог</span>
         </button>
 
@@ -1674,6 +1690,7 @@ function App() {
           <span className="nav-icon">
             ♡
           </span>
+
           <span>Избранное</span>
         </button>
 
@@ -1691,6 +1708,7 @@ function App() {
           <span className="nav-icon">
             □
           </span>
+
           <span>Заявки</span>
         </button>
 
@@ -1708,6 +1726,7 @@ function App() {
           <span className="nav-icon">
             ♙
           </span>
+
           <span>Профиль</span>
         </button>
       </nav>
@@ -1820,4 +1839,3 @@ if (rootElement) {
     </React.StrictMode>
   );
 }
-```
