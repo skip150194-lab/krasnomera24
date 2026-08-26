@@ -13,7 +13,6 @@ body,
 
 body {
   font-family:
-    Inter,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -23,204 +22,149 @@ body {
 
   background:
     radial-gradient(
-      circle at 80% 0%,
-      rgba(78, 60, 92, 0.35),
-      transparent 38%
+      circle at 75% 0%,
+      rgba(70, 55, 85, 0.35),
+      transparent 42%
     ),
-    linear-gradient(135deg, #050608 0%, #0b0b0f 55%, #17131c 100%);
+    linear-gradient(
+      135deg,
+      #050609 0%,
+      #09090c 55%,
+      #18141d 100%
+    );
 
   color: #f5f5f7;
 }
 
-/* Основной контейнер приложения */
-#root {
-  min-height: 100vh;
-}
-
-/* Общие элементы */
-button,
-input {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-/* Скролл */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #34343b;
-  border-radius: 10px;
-}
-
-/* =========================================================
-   LAYOUT
-   ========================================================= */
+/* =========================
+   APP
+========================= */
 
 .app {
   width: 100%;
   min-height: 100vh;
-  padding-bottom: 92px;
-
-  background:
-    radial-gradient(
-      circle at 80% 0%,
-      rgba(75, 57, 91, 0.25),
-      transparent 40%
-    ),
-    linear-gradient(135deg, #050608 0%, #0a0a0d 55%, #17131c 100%);
+  padding-bottom: 105px;
 }
 
-.page {
+.content {
   width: min(100%, 900px);
+  min-height: 100vh;
+
   margin: 0 auto;
-  padding: 0 30px 40px;
+  padding: 0 32px 50px;
 }
 
-/* =========================================================
+/* =========================
    HEADER
-   ========================================================= */
+========================= */
 
-.region-title {
-  margin: 0;
-  padding-top: 4px;
+.top-region {
+  padding-top: 5px;
 
   font-size: 28px;
   line-height: 1.2;
   font-weight: 400;
-  letter-spacing: -0.5px;
 }
 
-.main-title {
+.main-header h1 {
   margin: 42px 0 0;
 
-  font-size: clamp(48px, 7vw, 68px);
+  font-size: 58px;
   line-height: 1.05;
   font-weight: 750;
-  letter-spacing: -2.5px;
+  letter-spacing: -2px;
 }
-
-/* =========================================================
-   REFRESH
-   ========================================================= */
 
 .refresh-button {
   width: 48px;
   height: 38px;
 
-  margin-top: 48px;
+  margin-top: 46px;
+
+  padding: 0;
 
   border: 0;
   border-radius: 11px;
 
-  background: #f2f2f3;
+  background: #f3f3f4;
   color: #202126;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   font-size: 18px;
-  font-weight: 600;
 
-  transition:
-    transform 0.15s ease,
-    opacity 0.15s ease;
+  cursor: pointer;
 }
 
-.refresh-button:hover {
-  opacity: 0.9;
-}
+/* =========================
+   CATALOG
+========================= */
 
-.refresh-button:active {
-  transform: scale(0.94);
-}
+.catalog-header h2 {
+  margin: 48px 0 0;
 
-/* =========================================================
-   CATALOG HEADER
-   ========================================================= */
-
-.catalog-title {
-  margin: 52px 0 0;
-
-  font-size: clamp(40px, 5vw, 48px);
+  font-size: 44px;
   line-height: 1.1;
   font-weight: 750;
   letter-spacing: -1.5px;
 }
 
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-.catalog-tools {
-  margin-top: 42px;
-}
-
 .catalog-icon {
+  margin-top: 38px;
+
   width: 28px;
   height: 28px;
-
-  margin-bottom: 8px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: #f4f4f5;
-  font-size: 22px;
+  font-size: 24px;
 }
 
 .search-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+
+  margin-top: 7px;
+
+  gap: 7px;
 }
 
 .search-icon {
-  font-size: 22px;
+  font-size: 23px;
   line-height: 1;
 }
 
-.search-input {
-  width: min(100%, 330px);
-  height: 44px;
+.search-row input {
+  width: 300px;
+  height: 42px;
 
-  padding: 0 14px;
+  padding: 0 13px;
 
   border: 0;
-  border-radius: 10px;
   outline: none;
+  border-radius: 10px;
 
   background: #f3f3f4;
-  color: #17181c;
+  color: #15161a;
 
-  font-size: 20px;
+  font-size: 18px;
 }
 
-.search-input::placeholder {
-  color: #a6a6aa;
+.search-row input::placeholder {
+  color: #a5a5a9;
 }
 
 .filters {
   display: flex;
   gap: 4px;
+
   margin-top: 5px;
-  flex-wrap: wrap;
 }
 
-.filter-button {
-  height: 36px;
+.filters button {
+  height: 35px;
 
-  padding: 0 16px;
+  padding: 0 15px;
 
   border: 0;
   border-radius: 10px;
@@ -228,41 +172,36 @@ button {
   background: #f3f3f4;
   color: #202126;
 
-  font-size: 18px;
-  font-weight: 500;
-
-  transition:
-    transform 0.15s ease,
-    opacity 0.15s ease;
+  font-size: 17px;
+  cursor: pointer;
 }
 
-.filter-button:hover {
-  opacity: 0.9;
-}
-
-.filter-button:active {
-  transform: scale(0.97);
-}
-
-.filter-button.active {
+.filters button.selected {
   font-weight: 700;
 }
 
-/* =========================================================
-   CATALOG LIST
-   ========================================================= */
+/* =========================
+   LIST
+========================= */
 
-.catalog-list {
+.numbers-list {
   display: flex;
   flex-direction: column;
+
   gap: 2px;
 
   margin-top: 8px;
 }
 
-/* =========================================================
-   NUMBER CARD
-   ========================================================= */
+.empty-state {
+  padding: 24px 0;
+
+  font-size: 25px;
+}
+
+/* =========================
+   CARD
+========================= */
 
 .number-card {
   position: relative;
@@ -270,50 +209,57 @@ button {
   width: 100%;
   min-height: 300px;
 
-  padding: 26px 28px 24px;
+  padding: 26px 28px 25px;
 
   border: 1px solid #292a30;
-  border-radius: 30px;
+  border-radius: 28px;
 
   background:
     linear-gradient(
       145deg,
-      rgba(23, 23, 28, 0.98),
-      rgba(15, 15, 19, 0.98)
+      rgba(22, 22, 27, 0.98),
+      rgba(14, 14, 18, 0.98)
     );
 
   overflow: hidden;
 }
 
-.number-card + .number-card {
-  margin-top: 0;
+.number-card-top {
+  position: relative;
+
+  width: 100%;
 }
 
-/* =========================================================
-   NUMBER PLATE
-   ========================================================= */
+/* =========================
+   PLATE
+========================= */
 
-.number-plate {
+.plate-wrapper {
+  display: block;
+
+  max-width: calc(100% - 80px);
+}
+
+.plate {
   display: inline-flex;
   align-items: stretch;
 
-  max-width: calc(100% - 70px);
-
-  min-height: 78px;
+  max-width: 100%;
+  min-height: 76px;
 
   border: 4px solid #292929;
-  border-radius: 10px;
+  border-radius: 9px;
 
-  background: #f5f5f4;
+  background: #f4f4f3;
   color: #101114;
 
-  box-shadow:
-    0 5px 14px rgba(0, 0, 0, 0.35);
-
   overflow: hidden;
+
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
-.number-main {
+.plate-number {
   min-width: 0;
 
   display: flex;
@@ -321,21 +267,25 @@ button {
 
   padding: 7px 14px;
 
-  font-size: clamp(26px, 4vw, 40px);
+  font-size: 36px;
   line-height: 1;
   font-weight: 850;
   letter-spacing: -1px;
 
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.number-region {
-  width: 76px;
-  min-width: 76px;
+.plate-plus {
+  display: inline-block;
 
-  padding: 8px 7px;
+  padding: 0 5px;
+
+  font-weight: 700;
+}
+
+.plate-region {
+  width: 78px;
+  min-width: 78px;
 
   border-left: 4px solid #292929;
 
@@ -344,20 +294,30 @@ button {
   align-items: center;
   justify-content: center;
 
-  font-size: 26px;
+  padding: 7px 4px;
+
+  font-size: 25px;
   line-height: 1.05;
   font-weight: 850;
 }
 
-/* =========================================================
-   FAVORITE BUTTON
-   ========================================================= */
+.plate-region strong {
+  font-weight: 850;
+}
+
+.plate-region span {
+  font-weight: 850;
+}
+
+/* =========================
+   FAVORITE
+========================= */
 
 .favorite-button {
   position: absolute;
 
-  top: 26px;
-  right: 28px;
+  top: 0;
+  right: 0;
 
   width: 50px;
   height: 40px;
@@ -366,81 +326,75 @@ button {
   border-radius: 11px;
 
   background: #f3f3f4;
-  color: #17181c;
+  color: #15161a;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 22px;
+  font-size: 23px;
   line-height: 1;
 
-  z-index: 3;
+  cursor: pointer;
 
-  transition:
-    transform 0.15s ease,
-    background 0.15s ease;
-}
-
-.favorite-button:hover {
-  transform: scale(1.04);
-}
-
-.favorite-button:active {
-  transform: scale(0.94);
+  z-index: 5;
 }
 
 .favorite-button.active {
   color: #111;
 }
 
-/* =========================================================
+/* =========================
    CARD INFO
-   ========================================================= */
+========================= */
 
 .number-info {
-  margin-top: 12px;
+  margin-top: 10px;
 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
-.number-level {
-  font-size: 28px;
+.level {
+  font-size: 27px;
   line-height: 1.15;
   font-weight: 500;
 }
 
-.number-category {
+.category {
+  margin-top: 4px;
+
+  font-size: 27px;
+  line-height: 1.15;
+}
+
+.region {
+  margin-top: 4px;
+
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.price {
   margin-top: 5px;
 
   font-size: 28px;
   line-height: 1.15;
-  font-weight: 400;
-}
-
-.number-location {
-  margin-top: 4px;
-
-  font-size: 27px;
-  line-height: 1.2;
-  font-weight: 400;
-}
-
-.number-price {
-  margin-top: 6px;
-
-  font-size: 29px;
-  line-height: 1.15;
   font-weight: 500;
 }
 
-.details-button {
-  margin-top: 10px;
+.description {
+  margin-top: 7px;
 
+  font-size: 19px;
+  line-height: 1.3;
+}
+
+.details-button {
   height: 38px;
 
+  margin-top: 10px;
   padding: 0 15px;
 
   border: 0;
@@ -451,48 +405,50 @@ button {
 
   font-size: 18px;
   font-weight: 500;
+
+  cursor: pointer;
 }
 
-/* =========================================================
-   EMPTY CATALOG
-   ========================================================= */
-
-.empty-state {
-  padding: 24px 0;
-
-  font-size: 26px;
-  color: #f0f0f2;
+.details-button.disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
-/* =========================================================
+/* =========================
    HOME
-   ========================================================= */
+========================= */
 
-.home-page {
-  min-height: calc(100vh - 100px);
+.home-section {
+  padding-top: 0;
 }
 
-.home-region {
-  margin-top: 0;
+.hero-card {
+  margin-top: 45px;
 }
 
-.home-title {
-  margin-top: 42px;
-}
-
-.home-description {
-  margin-top: 42px;
-
+.hero-region {
   font-size: 28px;
-  line-height: 1.3;
 }
 
-.home-button {
-  margin-top: 28px;
+.hero-card h1 {
+  margin: 42px 0 0;
 
-  height: 42px;
+  font-size: 58px;
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
 
-  padding: 0 17px;
+.hero-card p {
+  margin: 42px 0 0;
+
+  font-size: 27px;
+}
+
+.hero-card button {
+  height: 40px;
+
+  margin-top: 26px;
+  padding: 0 15px;
 
   border: 0;
   border-radius: 10px;
@@ -503,20 +459,61 @@ button {
   font-size: 18px;
 }
 
-.favorites-count {
-  margin-top: 8px;
-
+.home-stats {
   display: flex;
-  flex-direction: column;
+  gap: 35px;
 
-  font-size: 28px;
-  line-height: 1.1;
-  font-weight: 650;
+  margin-top: 8px;
 }
 
-/* =========================================================
-   BOTTOM NAVIGATION
-   ========================================================= */
+.home-stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.home-stats strong,
+.home-stats span {
+  font-size: 27px;
+  line-height: 1.05;
+}
+
+.page-section {
+  padding-top: 45px;
+}
+
+.page-section h2 {
+  margin: 0;
+
+  font-size: 44px;
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.profile-card {
+  margin-top: 30px;
+  padding: 25px;
+
+  border: 1px solid #292a30;
+  border-radius: 24px;
+
+  background: #111116;
+}
+
+.profile-title {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.profile-text {
+  margin-top: 10px;
+  font-size: 22px;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
 
 .bottom-nav {
   position: fixed;
@@ -527,26 +524,25 @@ button {
   transform: translateX(-50%);
 
   width: min(100%, 900px);
-  height: 92px;
+  height: 94px;
 
-  padding: 10px 20px;
+  padding: 9px 18px;
 
-  border-top: 1px solid #2a2b30;
+  border-top: 1px solid #292a30;
 
-  background: rgba(8, 8, 11, 0.96);
+  background: rgba(8, 8, 11, 0.97);
 
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
 
   display: grid;
   grid-template-columns: repeat(5, 1fr);
 
-  z-index: 100;
+  z-index: 1000;
 }
 
-.nav-button {
-  min-width: 0;
-
+.bottom-nav button {
   border: 0;
+
   background: transparent;
 
   color: #77777f;
@@ -556,188 +552,278 @@ button {
   align-items: center;
   justify-content: center;
 
-  gap: 5px;
+  gap: 4px;
 
   font-size: 16px;
 
-  transition:
-    color 0.15s ease,
-    transform 0.15s ease;
+  cursor: pointer;
 }
 
-.nav-button:hover {
-  color: #bcbcc2;
-}
-
-.nav-button.active {
-  color: #f1f1f3;
+.bottom-nav button.active {
+  color: #f2f2f4;
 }
 
 .nav-icon {
-  font-size: 28px;
+  font-size: 27px;
   line-height: 1;
 }
 
-.nav-label {
+.bottom-nav button span:last-child {
   font-size: 16px;
   line-height: 1.1;
   white-space: nowrap;
 }
 
-/* =========================================================
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.modal {
+  position: relative;
+
+  width: min(100%, 560px);
+  max-height: calc(100vh - 40px);
+
+  padding: 30px;
+
+  border: 1px solid #33343a;
+  border-radius: 25px;
+
+  background: #111116;
+
+  overflow-y: auto;
+}
+
+.modal-close {
+  position: absolute;
+
+  top: 16px;
+  right: 16px;
+
+  width: 40px;
+  height: 40px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: #f3f3f4;
+  color: #17181c;
+
+  font-size: 25px;
+}
+
+.modal .plate {
+  max-width: calc(100% - 50px);
+}
+
+.modal-level {
+  margin-top: 15px;
+
+  font-size: 26px;
+}
+
+.modal h3 {
+  margin: 5px 0 0;
+
+  font-size: 27px;
+}
+
+.modal-region {
+  margin-top: 5px;
+
+  font-size: 24px;
+}
+
+.modal-price {
+  margin-top: 7px;
+
+  font-size: 27px;
+}
+
+.modal-description {
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.modal-action {
+  margin-top: 18px;
+}
+
+/* =========================
    MOBILE
-   ========================================================= */
+========================= */
 
 @media (max-width: 700px) {
   .app {
-    padding-bottom: 86px;
+    padding-bottom: 90px;
   }
 
-  .page {
-    padding: 0 18px 30px;
+  .content {
+    width: 100%;
+    padding: 0 18px 35px;
   }
 
-  .region-title {
+  .top-region {
     font-size: 22px;
   }
 
-  .main-title {
-    margin-top: 38px;
+  .main-header h1 {
+    margin-top: 35px;
 
     font-size: 43px;
-    letter-spacing: -1.8px;
+    letter-spacing: -1.5px;
   }
 
   .refresh-button {
     margin-top: 38px;
   }
 
-  .catalog-title {
-    margin-top: 44px;
-
-    font-size: 39px;
+  .catalog-header h2 {
+    margin-top: 43px;
+    font-size: 38px;
   }
 
-  .catalog-tools {
-    margin-top: 34px;
+  .catalog-icon {
+    margin-top: 32px;
   }
 
-  .search-input {
+  .search-row input {
     width: min(100%, 300px);
-    font-size: 18px;
   }
 
   .number-card {
-    min-height: 300px;
+    min-height: 285px;
 
-    padding: 22px 26px 24px;
+    padding: 22px 22px 23px;
 
-    border-radius: 26px;
+    border-radius: 25px;
   }
 
   .favorite-button {
-    top: 22px;
-    right: 24px;
-
     width: 48px;
     height: 39px;
   }
 
-  .number-plate {
-    max-width: calc(100% - 64px);
-    min-height: 70px;
+  .plate-wrapper {
+    max-width: calc(100% - 62px);
   }
 
-  .number-main {
-    padding: 6px 11px;
-
-    font-size: clamp(22px, 5vw, 32px);
+  .plate {
+    min-height: 68px;
   }
 
-  .number-region {
-    width: 68px;
-    min-width: 68px;
+  .plate-number {
+    padding: 6px 10px;
 
+    font-size: clamp(21px, 5vw, 31px);
+  }
+
+  .plate-region {
+    width: 67px;
+    min-width: 67px;
+
+    font-size: 22px;
+  }
+
+  .level,
+  .category {
+    font-size: 24px;
+  }
+
+  .region {
     font-size: 23px;
   }
 
-  .number-level,
-  .number-category,
-  .number-location {
-    font-size: 24px;
-  }
-
-  .number-price {
-    font-size: 26px;
+  .price {
+    font-size: 25px;
   }
 
   .bottom-nav {
-    height: 86px;
-    padding: 7px 8px;
+    height: 88px;
+    padding: 6px 5px;
   }
 
   .nav-icon {
-    font-size: 24px;
+    font-size: 23px;
   }
 
-  .nav-label {
-    font-size: 13px;
+  .bottom-nav button span:last-child {
+    font-size: 12px;
   }
 }
 
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
+/* =========================
+   VERY SMALL
+========================= */
 
 @media (max-width: 430px) {
-  .page {
+  .content {
     padding-left: 14px;
     padding-right: 14px;
   }
 
-  .main-title {
+  .main-header h1 {
     font-size: 37px;
   }
 
-  .catalog-title {
+  .catalog-header h2 {
     font-size: 34px;
   }
 
   .number-card {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding-left: 17px;
+    padding-right: 17px;
   }
 
-  .number-plate {
-    max-width: calc(100% - 55px);
+  .plate-wrapper {
+    max-width: calc(100% - 58px);
   }
 
-  .number-main {
-    font-size: 21px;
-    letter-spacing: -0.6px;
-  }
-
-  .number-region {
-    width: 60px;
-    min-width: 60px;
+  .plate-number {
     font-size: 20px;
   }
 
-  .favorite-button {
-    right: 18px;
+  .plate-region {
+    width: 59px;
+    min-width: 59px;
+
+    font-size: 19px;
   }
 
-  .number-level,
-  .number-category,
-  .number-location {
+  .favorite-button {
+    right: 0;
+  }
+
+  .level,
+  .category {
     font-size: 21px;
   }
 
-  .number-price {
+  .region {
+    font-size: 20px;
+  }
+
+  .price {
     font-size: 23px;
   }
 
-  .nav-label {
-    font-size: 11px;
+  .bottom-nav button span:last-child {
+    font-size: 10px;
   }
 }
