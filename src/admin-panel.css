@@ -1,0 +1,146 @@
+
+/* GRZ124 ADMIN PANEL */
+.admin-page {
+  padding-bottom: 120px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.admin-form,
+.admin-number-row,
+.profile-card {
+  box-sizing: border-box;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  margin-bottom: 18px;
+  border: 1px solid #2b2c31;
+  border-radius: 16px;
+  background: #111216;
+}
+
+.admin-form h3 {
+  margin: 0 0 4px;
+}
+
+.admin-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 46px;
+  padding: 11px 13px;
+  border: 1px solid #303137;
+  border-radius: 11px;
+  background: #0b0c0f;
+  color: #fff;
+  font: inherit;
+  outline: none;
+}
+
+.admin-input:focus {
+  border-color: #777;
+}
+
+.admin-message,
+.admin-error {
+  margin: 10px 0;
+  padding: 11px 13px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.admin-message {
+  background: #102417;
+  color: #a9e7b7;
+}
+
+.admin-error {
+  background: #2b1517;
+  color: #ffb2b7;
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-list-title {
+  margin: 8px 0;
+  font-weight: 700;
+}
+
+.admin-number-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #292a30;
+  border-radius: 13px;
+  background: #111216;
+}
+
+.admin-number-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-number-main strong {
+  font-size: 16px;
+}
+
+.admin-number-main span {
+  font-weight: 700;
+}
+
+.admin-number-main small {
+  color: #85868e;
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.admin-actions button {
+  border: 1px solid #36373d;
+  border-radius: 9px;
+  padding: 8px 10px;
+  background: #1a1b20;
+  color: #fff;
+  cursor: pointer;
+}
+
+.admin-actions button.danger {
+  color: #ff9ca4;
+}
+
+@media (max-width: 600px) {
+  .admin-number-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-actions button {
+    flex: 1 1 auto;
+  }
+}
