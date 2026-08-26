@@ -826,4 +826,100 @@ body {
   .bottom-nav button span:last-child {
     font-size: 10px;
   }
+}/* ===== ФИНАЛЬНАЯ НАСТРОЙКА КАТАЛОГА ===== */
+
+.number-card {
+  min-height: 250px;
+  padding: 22px 28px 22px;
+}
+
+.numbers-list {
+  gap: 10px;
+}
+
+.catalog-header h2 {
+  margin-top: 35px;
+}
+
+.catalog-icon {
+  margin-top: 28px;
+}
+
+.search-row {
+  margin-top: 5px;
+}
+
+.filters {
+  margin-top: 4px;
+}
+
+.number-info {
+  margin-top: 8px;
+}
+
+.level {
+  font-size: 24px;
+}
+
+.category {
+  font-size: 24px;
+}
+
+.region {
+  font-size: 23px;
+}
+
+.price {
+  font-size: 25px;
+}
+
+.details-button {
+  height: 36px;
+  margin-top: 8px;
+}
+
+.bottom-nav {
+  height: 86px;
+}
+
+.app {
+  padding-bottom: 115px;
+}
+
+/* Чтобы последняя карточка никогда не уходила под меню */
+.numbers-list {
+  padding-bottom: 25px;
+}
+
+/* На большом экране не растягиваем элементы */
+.search-row input {
+  width: 300px;
+}
+
+@media (max-width: 700px) {
+  .number-card {
+    min-height: 250px;
+    padding: 20px 20px 20px;
+  }
+
+  .app {
+    padding-bottom: 105px;
+  }
+
+  .catalog-header h2 {
+    margin-top: 32px;
+  }
+
+  .level,
+  .category {
+    font-size: 22px;
+  }
+
+  .region {
+    font-size: 21px;
+  }
+
+  .price {
+    font-size: 23px;
+  }
 }
