@@ -11,6 +11,10 @@ body,
   min-height: 100%;
 }
 
+html {
+  background: #050507;
+}
+
 body {
   font-family:
     -apple-system,
@@ -22,206 +26,502 @@ body {
 
   background:
     radial-gradient(
-      circle at 75% 0%,
-      rgba(70, 55, 85, 0.35),
-      transparent 42%
+      circle at 80% -10%,
+      rgba(126, 62, 170, 0.22),
+      transparent 32%
     ),
-    linear-gradient(
-      135deg,
-      #050609 0%,
-      #09090c 55%,
-      #18141d 100%
-    );
+    radial-gradient(
+      circle at -10% 35%,
+      rgba(83, 42, 112, 0.12),
+      transparent 30%
+    ),
+    #050507;
 
   color: #f5f5f7;
 }
 
-/* =========================
+/* =========================================================
    APP
-========================= */
+========================================================= */
 
 .app {
   width: 100%;
   min-height: 100vh;
-  padding-bottom: 105px;
+  padding-bottom: 110px;
 }
 
 .content {
-  width: min(100%, 900px);
+  width: min(100%, 1050px);
   min-height: 100vh;
-
   margin: 0 auto;
-  padding: 0 32px 50px;
+  padding: 0 28px 70px;
 }
 
-/* =========================
+/* =========================================================
    HEADER
-========================= */
+========================================================= */
 
 .top-region {
-  padding-top: 5px;
+  padding-top: 18px;
 
-  font-size: 28px;
+  color: rgba(255, 255, 255, 0.56);
+
+  font-size: 17px;
   line-height: 1.2;
-  font-weight: 400;
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .main-header h1 {
-  margin: 42px 0 0;
+  margin: 18px 0 0;
 
-  font-size: 58px;
-  line-height: 1.05;
-  font-weight: 750;
-  letter-spacing: -2px;
+  max-width: 760px;
+
+  font-size: clamp(46px, 6vw, 76px);
+  line-height: 0.98;
+  font-weight: 800;
+
+  letter-spacing: -3px;
+
+  background:
+    linear-gradient(
+      100deg,
+      #ffffff 0%,
+      #eeeeef 48%,
+      #a98fc0 100%
+    );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .refresh-button {
-  width: 48px;
-  height: 38px;
+  width: 46px;
+  height: 40px;
 
-  margin-top: 46px;
+  margin-top: 28px;
 
   padding: 0;
 
-  border: 0;
-  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
 
-  background: #f3f3f4;
-  color: #202126;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
 
   font-size: 18px;
 
   cursor: pointer;
+
+  backdrop-filter: blur(14px);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
-/* =========================
+.refresh-button:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* =========================================================
+   HOME HERO
+========================================================= */
+
+.home-section {
+  padding-top: 0;
+}
+
+.hero-card {
+  position: relative;
+  isolation: isolate;
+
+  min-height: 500px;
+
+  margin-top: 30px;
+  padding: 48px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 32px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(4, 5, 8, 0.98) 0%,
+      rgba(4, 5, 8, 0.94) 28%,
+      rgba(4, 5, 8, 0.68) 54%,
+      rgba(4, 5, 8, 0.18) 100%
+    ),
+    url("https://images.pexels.com/photos/5158084/pexels-photo-5158084.jpeg?auto=compress&cs=tinysrgb&w=1800");
+
+  background-size: cover;
+  background-position: center right;
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.hero-card::before {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 82% 40%,
+      rgba(126, 62, 170, 0.30),
+      transparent 27%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(93, 42, 124, 0.12),
+      transparent 45%
+    );
+
+  pointer-events: none;
+}
+
+.hero-card::after {
+  content: "";
+
+  position: absolute;
+  z-index: 0;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.05),
+      rgba(0, 0, 0, 0.28)
+    );
+
+  pointer-events: none;
+}
+
+.hero-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-region {
+  color: rgba(255, 255, 255, 0.58);
+
+  font-size: 16px;
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero-card h1 {
+  max-width: 600px;
+
+  margin: 30px 0 0;
+
+  font-size: clamp(46px, 6vw, 72px);
+  line-height: 0.98;
+  font-weight: 800;
+
+  letter-spacing: -3px;
+}
+
+.hero-card p {
+  max-width: 470px;
+
+  margin: 22px 0 0;
+
+  color: rgba(255, 255, 255, 0.70);
+
+  font-size: 21px;
+  line-height: 1.4;
+}
+
+.hero-card button {
+  height: 46px;
+
+  margin-top: 28px;
+  padding: 0 20px;
+
+  border: 0;
+  border-radius: 13px;
+
+  background: #ffffff;
+  color: #101116;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.hero-card button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.38);
+}
+
+/* =========================================================
+   HOME STATS
+========================================================= */
+
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-top: 14px;
+}
+
+.home-stats div {
+  min-height: 94px;
+
+  padding: 20px 22px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 21px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(25, 24, 30, 0.94),
+      rgba(12, 12, 16, 0.94)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.home-stats strong {
+  display: block;
+
+  font-size: 31px;
+  line-height: 1;
+
+  font-weight: 750;
+}
+
+.home-stats span {
+  display: block;
+
+  margin-top: 9px;
+
+  color: #8f8f98;
+
+  font-size: 14px;
+}
+
+/* =========================================================
    CATALOG
-========================= */
+========================================================= */
 
 .catalog-header h2 {
-  margin: 48px 0 0;
+  margin: 52px 0 0;
 
-  font-size: 44px;
-  line-height: 1.1;
-  font-weight: 750;
-  letter-spacing: -1.5px;
+  font-size: clamp(38px, 5vw, 54px);
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: -2px;
 }
 
 .catalog-icon {
-  margin-top: 38px;
-
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 24px;
+  margin-top: 30px;
+
+  color: #a47fc0;
+
+  font-size: 25px;
 }
 
 .search-row {
   display: flex;
   align-items: center;
 
-  margin-top: 7px;
+  gap: 8px;
 
-  gap: 7px;
+  margin-top: 7px;
 }
 
 .search-icon {
-  font-size: 23px;
-  line-height: 1;
+  color: #8d8d96;
+  font-size: 22px;
 }
 
 .search-row input {
-  width: 300px;
-  height: 42px;
+  width: 320px;
+  height: 44px;
 
-  padding: 0 13px;
+  padding: 0 14px;
 
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   outline: none;
-  border-radius: 10px;
 
-  background: #f3f3f4;
-  color: #15161a;
+  border-radius: 12px;
 
-  font-size: 18px;
+  background: rgba(255, 255, 255, 0.075);
+  color: #ffffff;
+
+  font-size: 16px;
+
+  backdrop-filter: blur(12px);
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.search-row input:focus {
+  border-color: rgba(170, 112, 205, 0.65);
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .search-row input::placeholder {
-  color: #a5a5a9;
+  color: #777780;
 }
 
 .filters {
   display: flex;
-  gap: 4px;
 
-  margin-top: 5px;
+  gap: 7px;
+
+  margin-top: 8px;
 }
 
 .filters button {
-  height: 35px;
+  height: 36px;
 
   padding: 0 15px;
 
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 10px;
 
-  background: #f3f3f4;
-  color: #202126;
+  background: rgba(255, 255, 255, 0.055);
+  color: #96969e;
 
-  font-size: 17px;
+  font-size: 15px;
+
   cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.filters button:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: #ffffff;
 }
 
 .filters button.selected {
+  border-color: rgba(166, 107, 201, 0.55);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(117, 59, 151, 0.55),
+      rgba(67, 38, 82, 0.60)
+    );
+
+  color: #ffffff;
+
   font-weight: 700;
 }
 
-/* =========================
+/* =========================================================
    LIST
-========================= */
+========================================================= */
 
 .numbers-list {
   display: flex;
   flex-direction: column;
 
-  gap: 2px;
+  gap: 12px;
 
-  margin-top: 8px;
+  margin-top: 14px;
+
+  padding-bottom: 30px;
 }
 
 .empty-state {
-  padding: 24px 0;
+  padding: 30px 0;
 
-  font-size: 25px;
+  color: #8b8b94;
+
+  font-size: 20px;
 }
 
-/* =========================
-   CARD
-========================= */
+/* =========================================================
+   NUMBER CARD
+========================================================= */
 
 .number-card {
   position: relative;
+  isolation: isolate;
 
   width: 100%;
-  min-height: 300px;
+  min-height: 245px;
 
-  padding: 26px 28px 25px;
-
-  border: 1px solid #292a30;
-  border-radius: 28px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(22, 22, 27, 0.98),
-      rgba(14, 14, 18, 0.98)
-    );
+  padding: 22px 25px;
 
   overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 25px;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(113, 56, 145, 0.13),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(25, 24, 30, 0.98),
+      rgba(12, 12, 16, 0.98)
+    );
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.number-card:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(160, 102, 192, 0.35);
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.30),
+    0 0 35px rgba(103, 47, 132, 0.08);
 }
 
 .number-card-top {
@@ -230,14 +530,14 @@ body {
   width: 100%;
 }
 
-/* =========================
+/* =========================================================
    PLATE
-========================= */
+========================================================= */
 
 .plate-wrapper {
   display: block;
 
-  max-width: calc(100% - 80px);
+  max-width: calc(100% - 70px);
 }
 
 .plate {
@@ -245,18 +545,25 @@ body {
   align-items: stretch;
 
   max-width: 100%;
-  min-height: 76px;
-
-  border: 4px solid #292929;
-  border-radius: 9px;
-
-  background: #f4f4f3;
-  color: #101114;
+  min-height: 70px;
 
   overflow: hidden;
 
+  border: 3px solid #27272a;
+  border-radius: 9px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #eeeeed 100%
+    );
+
+  color: #101114;
+
   box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.35);
+    0 7px 22px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .plate-number {
@@ -267,9 +574,11 @@ body {
 
   padding: 7px 14px;
 
-  font-size: 36px;
+  font-size: 34px;
   line-height: 1;
+
   font-weight: 850;
+
   letter-spacing: -1px;
 
   white-space: nowrap;
@@ -278,26 +587,25 @@ body {
 .plate-plus {
   display: inline-block;
 
-  padding: 0 5px;
-
-  font-weight: 700;
+  padding: 0 4px;
 }
 
 .plate-region {
-  width: 78px;
-  min-width: 78px;
-
-  border-left: 4px solid #292929;
+  width: 72px;
+  min-width: 72px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  padding: 7px 4px;
+  border-left: 3px solid #292929;
 
-  font-size: 25px;
+  padding: 5px 3px;
+
+  font-size: 22px;
   line-height: 1.05;
+
   font-weight: 850;
 }
 
@@ -309,9 +617,9 @@ body {
   font-weight: 850;
 }
 
-/* =========================
+/* =========================================================
    FAVORITE
-========================= */
+========================================================= */
 
 .favorite-button {
   position: absolute;
@@ -319,34 +627,46 @@ body {
   top: 0;
   right: 0;
 
-  width: 50px;
-  height: 40px;
-
-  border: 0;
-  border-radius: 11px;
-
-  background: #f3f3f4;
-  color: #15161a;
+  width: 46px;
+  height: 39px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 23px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.075);
+  color: #d0d0d5;
+
+  font-size: 21px;
   line-height: 1;
 
   cursor: pointer;
 
-  z-index: 5;
+  backdrop-filter: blur(12px);
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.favorite-button:hover {
+  transform: scale(1.04);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .favorite-button.active {
-  color: #111;
+  color: #c285e5;
+
+  background: rgba(126, 62, 170, 0.18);
 }
 
-/* =========================
+/* =========================================================
    CARD INFO
-========================= */
+========================================================= */
 
 .number-info {
   margin-top: 10px;
@@ -357,1067 +677,217 @@ body {
 }
 
 .level {
-  font-size: 27px;
+  color: #ffffff;
+
+  font-size: 23px;
   line-height: 1.15;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .category {
-  margin-top: 4px;
+  margin-top: 3px;
 
-  font-size: 27px;
+  color: #c0c0c7;
+
+  font-size: 22px;
   line-height: 1.15;
 }
 
 .region {
-  margin-top: 4px;
+  margin-top: 3px;
 
-  font-size: 26px;
+  color: #9999a2;
+
+  font-size: 20px;
   line-height: 1.2;
 }
 
 .price {
-  margin-top: 5px;
+  margin-top: 6px;
 
-  font-size: 28px;
+  color: #ffffff;
+
+  font-size: 25px;
   line-height: 1.15;
-  font-weight: 500;
+
+  font-weight: 750;
 }
 
 .description {
+  max-width: 650px;
+
   margin-top: 7px;
 
-  font-size: 19px;
-  line-height: 1.3;
+  color: #8f8f98;
+
+  font-size: 16px;
+  line-height: 1.35;
 }
 
 .details-button {
-  height: 38px;
+  height: 37px;
 
   margin-top: 10px;
   padding: 0 15px;
 
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
 
-  background: #f3f3f4;
-  color: #202126;
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
 
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
 
   cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.details-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .details-button.disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: default;
 }
 
-/* =========================
-   HOME
-========================= */
-
-.home-section {
-  padding-top: 0;
-}
-
-.hero-card {
-  margin-top: 45px;
-}
-
-.hero-region {
-  font-size: 28px;
-}
-
-.hero-card h1 {
-  margin: 42px 0 0;
-
-  font-size: 58px;
-  line-height: 1.05;
-  letter-spacing: -2px;
-}
-
-.hero-card p {
-  margin: 42px 0 0;
-
-  font-size: 27px;
-}
-
-.hero-card button {
-  height: 40px;
-
-  margin-top: 26px;
-  padding: 0 15px;
-
-  border: 0;
-  border-radius: 10px;
-
-  background: #f3f3f4;
-  color: #202126;
-
-  font-size: 18px;
-}
-
-.home-stats {
-  display: flex;
-  gap: 35px;
-
-  margin-top: 8px;
-}
-
-.home-stats div {
-  display: flex;
-  flex-direction: column;
-}
-
-.home-stats strong,
-.home-stats span {
-  font-size: 27px;
-  line-height: 1.05;
-}
+/* =========================================================
+   OTHER PAGES
+========================================================= */
 
 .page-section {
-  padding-top: 45px;
+  padding-top: 42px;
 }
 
 .page-section h2 {
   margin: 0;
 
-  font-size: 44px;
+  font-size: clamp(34px, 5vw, 50px);
+  line-height: 1;
+
+  letter-spacing: -1.5px;
 }
 
-/* =========================
-   PROFILE
-========================= */
-
 .profile-card {
-  margin-top: 30px;
-  padding: 25px;
+  margin-top: 25px;
+  padding: 24px;
 
-  border: 1px solid #292a30;
-  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 23px;
 
-  background: #111116;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(24, 23, 29, 0.96),
+      rgba(12, 12, 16, 0.96)
+    );
 }
 
 .profile-title {
-  font-size: 26px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
 }
 
 .profile-text {
   margin-top: 10px;
-  font-size: 22px;
+
+  color: #a3a3ab;
+
+  font-size: 18px;
 }
-
-/* =========================
-   BOTTOM NAV
-========================= */
-
-.bottom-nav {
-  position: fixed;
-
-  left: 50%;
-  bottom: 0;
-
-  transform: translateX(-50%);
-
-  width: min(100%, 900px);
-  height: 94px;
-
-  padding: 9px 18px;
-
-  border-top: 1px solid #292a30;
-
-  background: rgba(8, 8, 11, 0.97);
-
-  backdrop-filter: blur(14px);
-
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-
-  z-index: 1000;
-}
-
-.bottom-nav button {
-  border: 0;
-
-  background: transparent;
-
-  color: #77777f;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 4px;
-
-  font-size: 16px;
-
-  cursor: pointer;
-}
-
-.bottom-nav button.active {
-  color: #f2f2f4;
-}
-
-.nav-icon {
-  font-size: 27px;
-  line-height: 1;
-}
-
-.bottom-nav button span:last-child {
-  font-size: 16px;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-
-/* =========================
-   MODAL
-========================= */
-
-.modal-overlay {
-  position: fixed;
-
-  inset: 0;
-
-  z-index: 2000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 20px;
-
-  background: rgba(0, 0, 0, 0.72);
-}
-
-.modal {
-  position: relative;
-
-  width: min(100%, 560px);
-  max-height: calc(100vh - 40px);
-
-  padding: 30px;
-
-  border: 1px solid #33343a;
-  border-radius: 25px;
-
-  background: #111116;
-
-  overflow-y: auto;
-}
-
-.modal-close {
-  position: absolute;
-
-  top: 16px;
-  right: 16px;
-
-  width: 40px;
-  height: 40px;
-
-  border: 0;
-  border-radius: 10px;
-
-  background: #f3f3f4;
-  color: #17181c;
-
-  font-size: 25px;
-}
-
-.modal .plate {
-  max-width: calc(100% - 50px);
-}
-
-.modal-level {
-  margin-top: 15px;
-
-  font-size: 26px;
-}
-
-.modal h3 {
-  margin: 5px 0 0;
-
-  font-size: 27px;
-}
-
-.modal-region {
-  margin-top: 5px;
-
-  font-size: 24px;
-}
-
-.modal-price {
-  margin-top: 7px;
-
-  font-size: 27px;
-}
-
-.modal-description {
-  font-size: 19px;
-  line-height: 1.4;
-}
-
-.modal-action {
-  margin-top: 18px;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 700px) {
-  .app {
-    padding-bottom: 90px;
-  }
-
-  .content {
-    width: 100%;
-    padding: 0 18px 35px;
-  }
-
-  .top-region {
-    font-size: 22px;
-  }
-
-  .main-header h1 {
-    margin-top: 35px;
-
-    font-size: 43px;
-    letter-spacing: -1.5px;
-  }
-
-  .refresh-button {
-    margin-top: 38px;
-  }
-
-  .catalog-header h2 {
-    margin-top: 43px;
-    font-size: 38px;
-  }
-
-  .catalog-icon {
-    margin-top: 32px;
-  }
-
-  .search-row input {
-    width: min(100%, 300px);
-  }
-
-  .number-card {
-    min-height: 285px;
-
-    padding: 22px 22px 23px;
-
-    border-radius: 25px;
-  }
-
-  .favorite-button {
-    width: 48px;
-    height: 39px;
-  }
-
-  .plate-wrapper {
-    max-width: calc(100% - 62px);
-  }
-
-  .plate {
-    min-height: 68px;
-  }
-
-  .plate-number {
-    padding: 6px 10px;
-
-    font-size: clamp(21px, 5vw, 31px);
-  }
-
-  .plate-region {
-    width: 67px;
-    min-width: 67px;
-
-    font-size: 22px;
-  }
-
-  .level,
-  .category {
-    font-size: 24px;
-  }
-
-  .region {
-    font-size: 23px;
-  }
-
-  .price {
-    font-size: 25px;
-  }
-
-  .bottom-nav {
-    height: 88px;
-    padding: 6px 5px;
-  }
-
-  .nav-icon {
-    font-size: 23px;
-  }
-
-  .bottom-nav button span:last-child {
-    font-size: 12px;
-  }
-}
-
-/* =========================
-   VERY SMALL
-========================= */
-
-@media (max-width: 430px) {
-  .content {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
-
-  .main-header h1 {
-    font-size: 37px;
-  }
-
-  .catalog-header h2 {
-    font-size: 34px;
-  }
-
-  .number-card {
-    padding-left: 17px;
-    padding-right: 17px;
-  }
-
-  .plate-wrapper {
-    max-width: calc(100% - 58px);
-  }
-
-  .plate-number {
-    font-size: 20px;
-  }
-
-  .plate-region {
-    width: 59px;
-    min-width: 59px;
-
-    font-size: 19px;
-  }
-
-  .favorite-button {
-    right: 0;
-  }
-
-  .level,
-  .category {
-    font-size: 21px;
-  }
-
-  .region {
-    font-size: 20px;
-  }
-
-  .price {
-    font-size: 23px;
-  }
-
-  .bottom-nav button span:last-child {
-    font-size: 10px;
-  }
-}/* ===== ФИНАЛЬНАЯ НАСТРОЙКА КАТАЛОГА ===== */
-
-.number-card {
-  min-height: 250px;
-  padding: 22px 28px 22px;
-}
-
-.numbers-list {
-  gap: 10px;
-}
-
-.catalog-header h2 {
-  margin-top: 35px;
-}
-
-.catalog-icon {
-  margin-top: 28px;
-}
-
-.search-row {
-  margin-top: 5px;
-}
-
-.filters {
-  margin-top: 4px;
-}
-
-.number-info {
-  margin-top: 8px;
-}
-
-.level {
-  font-size: 24px;
-}
-
-.category {
-  font-size: 24px;
-}
-
-.region {
-  font-size: 23px;
-}
-
-.price {
-  font-size: 25px;
-}
-
-.details-button {
-  height: 36px;
-  margin-top: 8px;
-}
-
-.bottom-nav {
-  height: 86px;
-}
-
-.app {
-  padding-bottom: 115px;
-}
-
-/* Чтобы последняя карточка никогда не уходила под меню */
-.numbers-list {
-  padding-bottom: 25px;
-}
-
-/* На большом экране не растягиваем элементы */
-.search-row input {
-  width: 300px;
-}
-
-@media (max-width: 700px) {
-  .number-card {
-    min-height: 250px;
-    padding: 20px 20px 20px;
-  }
-
-  .app {
-    padding-bottom: 105px;
-  }
-
-  .catalog-header h2 {
-    margin-top: 32px;
-  }
-
-  .level,
-  .category {
-    font-size: 22px;
-  }
-
-  .region {
-    font-size: 21px;
-  }
-
-  .price {
-    font-size: 23px;
-  }
-}/* =========================================================
-   НОВАЯ АДАПТАЦИЯ ДЛЯ ТЕЛЕФОНА
-   Вставить В САМЫЙ КОНЕЦ styles.css
-========================================================= */
-
-@media (max-width: 700px) {
-  html,
-  body,
-  #root {
-    width: 100%;
-    min-width: 0;
-    overflow-x: hidden;
-  }
-
-  .app {
-    width: 100%;
-    min-height: 100vh;
-    padding-bottom: 82px;
-  }
-
-  .content {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0 14px 30px;
-  }
-
-  /* ---------- HEADER ---------- */
-
-  .top-region {
-    padding-top: 8px;
-    font-size: 18px;
-    line-height: 1.15;
-  }
-
-  .main-header h1 {
-    margin: 28px 0 0;
-    font-size: clamp(32px, 9vw, 42px);
-    line-height: 1.05;
-    letter-spacing: -1.2px;
-  }
-
-  .refresh-button {
-    width: 46px;
-    height: 38px;
-    margin-top: 28px;
-    border-radius: 10px;
-    font-size: 16px;
-  }
-
-  /* ---------- CATALOG HEADER ---------- */
-
-  .catalog-header h2 {
-    margin: 34px 0 0;
-    font-size: clamp(30px, 8vw, 38px);
-    line-height: 1.05;
-    letter-spacing: -1px;
-  }
-
-  .catalog-icon {
-    width: 24px;
-    height: 24px;
-    margin-top: 25px;
-    font-size: 21px;
-  }
-
-  .search-row {
-    width: 100%;
-    margin-top: 7px;
-    gap: 6px;
-  }
-
-  .search-icon {
-    flex: 0 0 auto;
-    font-size: 20px;
-  }
-
-  .search-row input {
-    width: 100%;
-    max-width: none;
-    height: 42px;
-    min-width: 0;
-    padding: 0 12px;
-    border-radius: 10px;
-    font-size: 16px;
-  }
-
-  .filters {
-    width: 100%;
-    gap: 4px;
-    margin-top: 5px;
-  }
-
-  .filters button {
-    height: 36px;
-    padding: 0 14px;
-    border-radius: 10px;
-    font-size: 16px;
-  }
-
-  /* ---------- LIST ---------- */
-
-  .numbers-list {
-    width: 100%;
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  /* ---------- CARD ---------- */
-
-  .number-card {
-    width: 100%;
-    min-width: 0;
-    min-height: 0;
-
-    padding: 16px 14px 18px;
-
-    border-radius: 22px;
-  }
-
-  .number-card-top {
-    width: 100%;
-    min-width: 0;
-  }
-
-  /* ---------- PLATE ---------- */
-
-  .plate-wrapper {
-    width: calc(100% - 55px);
-    max-width: calc(100% - 55px);
-    min-width: 0;
-  }
-
-  .plate {
-    width: auto;
-    max-width: 100%;
-    min-width: 0;
-    min-height: 58px;
-
-    border-width: 3px;
-    border-radius: 7px;
-  }
-
-  .plate-number {
-    min-width: 0;
-    max-width: 100%;
-
-    padding: 5px 7px;
-
-    font-size: clamp(15px, 4.4vw, 23px);
-    line-height: 1;
-    letter-spacing: -0.5px;
-
-    white-space: nowrap;
-  }
-
-  .plate-plus {
-    padding: 0 2px;
-  }
-
-  .plate-region {
-    width: 54px;
-    min-width: 54px;
-
-    border-left-width: 3px;
-
-    padding: 4px 2px;
-
-    font-size: 17px;
-    line-height: 1;
-  }
-
-  /* ---------- FAVORITE ---------- */
-
-  .favorite-button {
-    top: 0;
-    right: 0;
-
-    width: 44px;
-    height: 36px;
-
-    border-radius: 9px;
-
-    font-size: 21px;
-  }
-
-  /* ---------- CARD INFO ---------- */
-
-  .number-info {
-    width: 100%;
-    margin-top: 8px;
-  }
-
-  .level {
-    font-size: 20px;
-    line-height: 1.15;
-  }
-
-  .category {
-    margin-top: 2px;
-    font-size: 20px;
-    line-height: 1.15;
-  }
-
-  .region {
-    margin-top: 3px;
-    font-size: 18px;
-    line-height: 1.2;
-  }
-
-  .price {
-    margin-top: 4px;
-    font-size: 20px;
-    line-height: 1.15;
-  }
-
-  .description {
-    margin-top: 5px;
-    font-size: 16px;
-    line-height: 1.3;
-  }
-
-  .details-button {
-    height: 36px;
-    margin-top: 8px;
-    padding: 0 13px;
-    border-radius: 9px;
-    font-size: 16px;
-  }
-
-  /* ---------- HOME ---------- */
-
-  .hero-card {
-    margin-top: 30px;
-  }
-
-  .hero-region {
-    font-size: 18px;
-  }
-
-  .hero-card h1 {
-    margin: 28px 0 0;
-    font-size: clamp(32px, 9vw, 42px);
-    line-height: 1.05;
-    letter-spacing: -1px;
-  }
-
-  .hero-card p {
-    margin: 24px 0 0;
-    font-size: 19px;
-    line-height: 1.25;
-  }
-
-  .hero-card button {
-    height: 38px;
-    margin-top: 18px;
-    padding: 0 14px;
-    border-radius: 9px;
-    font-size: 16px;
-  }
-
-  .home-stats {
-    gap: 25px;
-    margin-top: 12px;
-  }
-
-  .home-stats strong,
-  .home-stats span {
-    font-size: 20px;
-  }
-
-  /* ---------- PAGES ---------- */
-
-  .page-section {
-    padding-top: 32px;
-  }
-
-  .page-section h2 {
-    font-size: 30px;
-  }
-
-  /* ---------- BOTTOM NAV ---------- */
-
-  .bottom-nav {
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    transform: none;
-
-    width: 100%;
-    height: 76px;
-
-    padding: 5px 2px;
-
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-
-    border-top: 1px solid #292a30;
-  }
-
-  .bottom-nav button {
-    min-width: 0;
-    gap: 2px;
-  }
-
-  .nav-icon {
-    font-size: 21px;
-  }
-
-  .bottom-nav button span:last-child {
-    max-width: 100%;
-
-    font-size: 11px;
-    line-height: 1;
-
-    white-space: nowrap;
-  }
-
-  /* ---------- MODAL ---------- */
-
-  .modal-overlay {
-    padding: 12px;
-  }
-
-  .modal {
-    width: 100%;
-    max-width: 100%;
-    max-height: calc(100vh - 24px);
-
-    padding: 20px;
-
-    border-radius: 20px;
-  }
-
-  .modal .plate {
-    max-width: calc(100% - 45px);
-  }
-
-  .modal-level {
-    font-size: 21px;
-  }
-
-  .modal h3 {
-    font-size: 22px;
-  }
-
-  .modal-region {
-    font-size: 19px;
-  }
-
-  .modal-price {
-    font-size: 21px;
-  }
-}
-
 
 /* =========================================================
-   ОЧЕНЬ МАЛЕНЬКИЕ ТЕЛЕФОНЫ
-========================================================= */
-
-@media (max-width: 390px) {
-  .content {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .main-header h1 {
-    font-size: 31px;
-  }
-
-  .catalog-header h2 {
-    font-size: 29px;
-  }
-
-  .number-card {
-    padding: 14px 11px 16px;
-    border-radius: 19px;
-  }
-
-  .plate-wrapper {
-    width: calc(100% - 50px);
-    max-width: calc(100% - 50px);
-  }
-
-  .plate-number {
-    font-size: 14px;
-    padding-left: 6px;
-    padding-right: 6px;
-  }
-
-  .plate-region {
-    width: 49px;
-    min-width: 49px;
-    font-size: 15px;
-  }
-
-  .favorite-button {
-    width: 40px;
-    height: 34px;
-  }
-
-  .level,
-  .category {
-    font-size: 18px;
-  }
-
-  .region {
-    font-size: 16px;
-  }
-
-  .price {
-    font-size: 18px;
-  }
-
-  .bottom-nav {
-    height: 72px;
-  }
-
-  .nav-icon {
-    font-size: 19px;
-  }
-
-  .bottom-nav button span:last-child {
-    font-size: 10px;
-  }
-}/* =========================================================
-   ФИКС НАВИГАЦИИ ДЛЯ ТЕЛЕФОНА
+   BOTTOM NAV
 ========================================================= */
 
 .bottom-nav {
   position: fixed !important;
 
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
+  left: 50% !important;
+  bottom: 12px !important;
 
-  width: 100% !important;
-  max-width: none !important;
+  transform: translateX(-50%) !important;
 
-  height: calc(72px + env(safe-area-inset-bottom)) !important;
+  width: min(calc(100% - 28px), 720px) !important;
+  height: 70px !important;
 
-  padding:
-    5px 4px
-    env(safe-area-inset-bottom) !important;
-
-  margin: 0 !important;
-
-  transform: none !important;
+  padding: 5px 7px !important;
 
   display: grid !important;
   grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
 
-  background: rgba(8, 8, 11, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 23px !important;
 
-  border-top: 1px solid #292a30 !important;
+  background: rgba(12, 12, 16, 0.90) !important;
+
+  backdrop-filter: blur(22px) !important;
+  -webkit-backdrop-filter: blur(22px) !important;
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.50),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 
   z-index: 99999 !important;
 
   box-sizing: border-box !important;
-
-  isolation: isolate;
 }
 
 .bottom-nav button {
   width: 100% !important;
   min-width: 0 !important;
-  height: 100% !important;
 
-  margin: 0 !important;
-  padding: 3px 1px !important;
+  height: 100% !important;
 
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
 
-  gap: 3px !important;
+  gap: 4px !important;
+
+  padding: 3px 1px !important;
+
+  border: 0 !important;
+  border-radius: 17px !important;
 
   background: transparent !important;
-  border: 0 !important;
 
-  color: #77777f !important;
+  color: #71717a !important;
 
-  position: relative !important;
-  z-index: 100000 !important;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .bottom-nav button.active {
-  color: #f2f2f4 !important;
+  color: #ffffff !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(126, 62, 170, 0.34),
+      rgba(73, 39, 91, 0.22)
+    ) !important;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(166, 107, 201, 0.16);
 }
 
-.bottom-nav .nav-icon {
-  display: block !important;
+.bottom-nav button:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.055) !important;
+}
 
-  width: auto !important;
-  height: auto !important;
+.nav-icon {
+  display: block !important;
 
   font-size: 22px !important;
   line-height: 1 !important;
@@ -1432,59 +902,434 @@ body {
   white-space: nowrap !important;
 }
 
-/* Чтобы последний контент никогда не залезал
-   под навигацию */
-.app {
-  padding-bottom: 90px !important;
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+
+  background: rgba(0, 0, 0, 0.78);
+
+  backdrop-filter: blur(7px);
 }
 
-.content {
-  padding-bottom: 100px !important;
+.modal {
+  position: relative;
+
+  width: min(100%, 570px);
+  max-height: calc(100vh - 36px);
+
+  padding: 28px;
+
+  overflow-y: auto;
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 25px;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(126, 62, 170, 0.14),
+      transparent 40%
+    ),
+    #111116;
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.65);
 }
 
+.modal-close {
+  position: absolute;
+
+  top: 15px;
+  right: 15px;
+
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+.modal .plate {
+  max-width: calc(100% - 50px);
+}
+
+.modal-level {
+  margin-top: 15px;
+
+  color: #ffffff;
+
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.modal h3 {
+  margin: 5px 0 0;
+
+  font-size: 26px;
+}
+
+.modal-region {
+  margin-top: 5px;
+
+  color: #9999a2;
+
+  font-size: 20px;
+}
+
+.modal-price {
+  margin-top: 7px;
+
+  font-size: 25px;
+  font-weight: 750;
+}
+
+.modal-description {
+  color: #a0a0a8;
+
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.modal-action {
+  margin-top: 18px;
+}
 
 /* =========================================================
-   ТЕЛЕФОНЫ
+   MOBILE
 ========================================================= */
 
 @media (max-width: 700px) {
 
-  .bottom-nav {
-    height: calc(76px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .bottom-nav .nav-icon {
-    font-size: 23px !important;
-  }
-
-  .bottom-nav button span:last-child {
-    font-size: 11px !important;
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
   }
 
   .app {
-    padding-bottom: 95px !important;
+    padding-bottom: 95px;
   }
-}
 
+  .content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
 
-/* =========================================================
-   IPHONE / УЗКИЕ ЭКРАНЫ
-========================================================= */
+    padding:
+      0 14px
+      105px;
+  }
 
-@media (max-width: 430px) {
+  /* HERO */
+
+  .hero-card {
+    min-height: 540px;
+
+    margin-top: 25px;
+    padding: 265px 22px 24px;
+
+    border-radius: 27px;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(4, 5, 8, 0.02) 0%,
+        rgba(4, 5, 8, 0.15) 28%,
+        rgba(4, 5, 8, 0.76) 52%,
+        rgba(4, 5, 8, 0.98) 70%
+      ),
+      url("https://images.pexels.com/photos/5158084/pexels-photo-5158084.jpeg?auto=compress&cs=tinysrgb&w=1200");
+
+    background-size: cover;
+    background-position: center top;
+  }
+
+  .hero-region {
+    font-size: 13px;
+  }
+
+  .hero-card h1 {
+    margin-top: 18px;
+
+    font-size: clamp(37px, 10vw, 47px);
+    line-height: 0.98;
+
+    letter-spacing: -1.7px;
+  }
+
+  .hero-card p {
+    margin-top: 16px;
+
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  .hero-card button {
+    height: 43px;
+
+    margin-top: 19px;
+
+    padding: 0 17px;
+
+    border-radius: 11px;
+
+    font-size: 15px;
+  }
+
+  /* HEADER */
+
+  .top-region {
+    padding-top: 9px;
+
+    font-size: 14px;
+  }
+
+  .main-header h1 {
+    margin-top: 25px;
+
+    font-size: clamp(36px, 10vw, 46px);
+
+    letter-spacing: -1.8px;
+  }
+
+  .refresh-button {
+    margin-top: 24px;
+  }
+
+  /* STATS */
+
+  .home-stats {
+    gap: 8px;
+  }
+
+  .home-stats div {
+    min-height: 76px;
+
+    padding: 15px;
+
+    border-radius: 17px;
+  }
+
+  .home-stats strong {
+    font-size: 23px;
+  }
+
+  .home-stats span {
+    margin-top: 6px;
+
+    font-size: 12px;
+  }
+
+  /* CATALOG */
+
+  .catalog-header h2 {
+    margin-top: 35px;
+
+    font-size: 34px;
+
+    letter-spacing: -1.3px;
+  }
+
+  .catalog-icon {
+    margin-top: 23px;
+
+    font-size: 21px;
+  }
+
+  .search-row {
+    width: 100%;
+  }
+
+  .search-row input {
+    width: 100%;
+    min-width: 0;
+
+    height: 42px;
+
+    font-size: 15px;
+  }
+
+  .filters {
+    overflow-x: auto;
+
+    padding-bottom: 3px;
+
+    scrollbar-width: none;
+  }
+
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filters button {
+    flex: 0 0 auto;
+
+    height: 35px;
+
+    padding: 0 13px;
+
+    font-size: 14px;
+  }
+
+  /* CARDS */
+
+  .numbers-list {
+    gap: 9px;
+
+    margin-top: 11px;
+  }
+
+  .number-card {
+    min-height: 0;
+
+    padding: 17px 15px 18px;
+
+    border-radius: 21px;
+  }
+
+  .plate-wrapper {
+    width: calc(100% - 53px);
+    max-width: calc(100% - 53px);
+  }
+
+  .plate {
+    min-height: 57px;
+
+    border-width: 3px;
+
+    border-radius: 7px;
+  }
+
+  .plate-number {
+    padding: 5px 7px;
+
+    font-size: clamp(15px, 4.4vw, 23px);
+
+    letter-spacing: -0.5px;
+  }
+
+  .plate-region {
+    width: 53px;
+    min-width: 53px;
+
+    border-left-width: 3px;
+
+    font-size: 16px;
+  }
+
+  .favorite-button {
+    width: 42px;
+    height: 36px;
+
+    border-radius: 9px;
+
+    font-size: 20px;
+  }
+
+  .number-info {
+    margin-top: 8px;
+  }
+
+  .level {
+    font-size: 19px;
+  }
+
+  .category {
+    margin-top: 2px;
+
+    font-size: 19px;
+  }
+
+  .region {
+    margin-top: 3px;
+
+    font-size: 17px;
+  }
+
+  .price {
+    margin-top: 5px;
+
+    font-size: 21px;
+  }
+
+  .description {
+    margin-top: 5px;
+
+    font-size: 15px;
+  }
+
+  .details-button {
+    height: 35px;
+
+    margin-top: 8px;
+
+    padding: 0 13px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+  }
+
+  /* OTHER PAGES */
+
+  .page-section {
+    padding-top: 30px;
+  }
+
+  .page-section h2 {
+    font-size: 31px;
+  }
+
+  .profile-card {
+    padding: 20px;
+
+    border-radius: 20px;
+  }
+
+  /* NAV */
 
   .bottom-nav {
-    height: calc(74px + env(safe-area-inset-bottom)) !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 8px !important;
 
-    padding-left: 2px !important;
-    padding-right: 2px !important;
+    width: calc(100% - 16px) !important;
+    height: 68px !important;
+
+    padding: 4px !important;
+
+    border-radius: 20px !important;
   }
 
   .bottom-nav button {
-    padding: 2px 0 !important;
+    gap: 3px !important;
+
+    border-radius: 15px !important;
   }
 
-  .bottom-nav .nav-icon {
+  .nav-icon {
     font-size: 21px !important;
   }
 
@@ -1492,11 +1337,129 @@ body {
     font-size: 10px !important;
   }
 
-  .app {
-    padding-bottom: 92px !important;
+  /* MODAL */
+
+  .modal-overlay {
+    padding: 10px;
   }
 
+  .modal {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+
+    padding: 21px;
+
+    border-radius: 21px;
+  }
+
+  .modal-level {
+    font-size: 21px;
+  }
+
+  .modal h3 {
+    font-size: 22px;
+  }
+
+  .modal-region {
+    font-size: 18px;
+  }
+
+  .modal-price {
+    font-size: 22px;
+  }
+
+  .modal-description {
+    font-size: 16px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 390px) {
+
   .content {
-    padding-bottom: 100px !important;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .hero-card {
+    min-height: 515px;
+
+    padding:
+      245px
+      18px
+      21px;
+  }
+
+  .hero-card h1 {
+    font-size: 35px;
+  }
+
+  .hero-card p {
+    font-size: 16px;
+  }
+
+  .catalog-header h2 {
+    font-size: 30px;
+  }
+
+  .number-card {
+    padding: 15px 12px 17px;
+  }
+
+  .plate-wrapper {
+    width: calc(100% - 49px);
+    max-width: calc(100% - 49px);
+  }
+
+  .plate-number {
+    font-size: 14px;
+  }
+
+  .plate-region {
+    width: 48px;
+    min-width: 48px;
+
+    font-size: 14px;
+  }
+
+  .favorite-button {
+    width: 39px;
+    height: 34px;
+  }
+
+  .level,
+  .category {
+    font-size: 18px;
+  }
+
+  .region {
+    font-size: 16px;
+  }
+
+  .price {
+    font-size: 19px;
+  }
+
+  .bottom-nav {
+    left: 5px !important;
+    right: 5px !important;
+    bottom: 5px !important;
+
+    width: calc(100% - 10px) !important;
+
+    height: 66px !important;
+
+    border-radius: 18px !important;
+  }
+
+  .nav-icon {
+    font-size: 20px !important;
+  }
+
+  .bottom-nav button span:last-child {
+    font-size: 9px !important;
   }
 }
