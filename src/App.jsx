@@ -117,34 +117,48 @@ function getInitials(number) {
   return clean.slice(0, 3);
 }
 
-function getPlateRegion(part, fallbackRegionCode = "") {
-  const clean = String(part || "").replace(/\s/g, "").toUpperCase();
+function splitRussianPlate(value) {
+  const clean = String(value || "").replace(/\s/g, "").toUpperCase();
 
-  // ВАЖНО: регион берём из окончания конкретного госномера.
-  // 124 и 224 проверяем раньше, чем 24.
-  const threeDigitMatch = clean.match(/(124|224)$/);
-  if (threeDigitMatch) return threeDigitMatch[1];
+  // Российский формат: буква + 3 цифры + 2 буквы + код региона.
+  // Примеры: С333ОК24, С333ОК124.
+  const match = clean.match(/^([АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2})(\d{2,3})$/);
 
-  const twoDigitMatch = clean.match(/(24)$/);
-  if (twoDigitMatch) return twoDigitMatch[1];
+  if (!match) {
+    return { main: clean, regionCode: "" };
+  }
 
-  // Только если код действительно не указан в самом номере,
-  // используем данные записи.
-  return String(fallbackRegionCode || "");
+  return {
+    main: match[1],
+    regionCode: match[2],
+  };
 }
 
 function Plate({ number }) {
-  const parts = String(number || "").split("+");
+  const parts = String(number || "").split("+").filter(Boolean);
 
   return (
     <div className={`plate-wrap ${parts.length > 1 ? "plate-set" : ""}`}>
-      {parts.map((part, index) => (
-        <div className="plate" key={`${part}-${index}`}>
-          <div className="plate-main">
-            <div className="plate-number">{part}</div>
+      {parts.map((part, index) => {
+        const parsed = splitRussianPlate(part);
+
+        return (
+          <div className="plate" key={`${part}-${index}`}>
+            <span className="plate-screw screw-left" />
+            <div className="plate-main">
+              <div className="plate-number">{parsed.main}</div>
+              {parsed.regionCode && (
+                <div className="plate-region" aria-label={`Регион ${parsed.regionCode}`}>
+                  <strong>{parsed.regionCode}</strong>
+                  <span>RUS</span>
+                  <i aria-hidden="true">🇷🇺</i>
+                </div>
+              )}
+            </div>
+            <span className="plate-screw screw-right" />
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -173,7 +187,7 @@ function NumberCard({ item, favorite, onFavorite, onDetails }) {
         </button>
       </div>
 
-      <Plate number={item.number} regionCode={item.regionCode} />
+      <Plate number={item.number}  />
 
       <div className="number-info">
         <div className="card-tags">
@@ -968,7 +982,7 @@ function App() {
 
             <Plate
               number={selectedNumber.number}
-              regionCode={selectedNumber.regionCode}
+              
             />
 
             <div className="modal-level">
