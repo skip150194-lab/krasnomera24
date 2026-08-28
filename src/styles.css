@@ -2119,3 +2119,42 @@ body {
   }
 }
 
+
+
+/* =========================================================
+   FINAL PLATE FIX — регион берётся из самого номера
+   24 RUS только для номеров, оканчивающихся на 24.
+   124/224 RUS — для соответствующих номеров.
+   ========================================================= */
+
+.plate,
+.plate-main,
+.plate-region {
+  color: #08090b;
+}
+
+.plate {
+  background: #111;
+}
+
+.plate-main {
+  background: #f7f7f5 !important;
+  color: #08090b !important;
+  border-color: #cfcfcd;
+}
+
+.plate-number {
+  color: #08090b !important;
+  text-shadow: none !important;
+}
+
+.plate-region {
+  background: #f2f2f0 !important;
+  color: #08090b !important;
+  border-left-color: #171717 !important;
+}
+
+.plate-region strong,
+.plate-region span {
+  color: #08090b !important;
+}
