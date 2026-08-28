@@ -4,462 +4,63 @@ import "./styles.css";
 import "./admin-panel.css";
 
 const SUPABASE_URL = "https://tjxumwgktffnfgpdka.supabase.co";
-const SUPABASE_KEY =
-  "sb_publishable_29-OjXwd3B9rGcPg06If4Q_1R8-DjQh";
-
+const SUPABASE_KEY = "sb_publishable_29-OjXwd3B9rGcPg06If4Q_1R8-DjQh";
 const API_URL = SUPABASE_URL + "/rest/v1/numbers";
 
 const ADMIN_PASSWORD = "124124";
 const LOCAL_NUMBERS_KEY = "grz124-admin-numbers";
 const FAVORITES_KEY = "beautiful-numbers-favorites";
 
-/* =========================================================
-   КАТАЛОГ
-   image можно менять у каждого номера.
-   Если image пустой — используется общий фон.
-   ========================================================= */
-
 const FALLBACK_NUMBERS = [
-  {
-    id: "number-1",
-    number: "У001ЕТ24",
-    price: 550000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-2",
-    number: "О003МС124",
-    price: 210000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-3",
-    number: "В009РР124",
-    price: 250000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-4",
-    number: "У011ВН124",
-    price: 90000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-5",
-    number: "Т020РА24",
-    price: 75000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-6",
-    number: "Н024ОС24",
-    price: 165000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-7",
-    number: "В024СМ24",
-    price: 185000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-8",
-    number: "Р027ОМ124",
-    price: 70000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-9",
-    number: "Е032КО24",
-    price: 55000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-10",
-    number: "М035ТВ124",
-    price: 40000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-11",
-    number: "К066НХ24",
-    price: 85000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-12",
-    number: "М093ТВ124",
-    price: 40000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-13",
-    number: "М094ТВ124",
-    price: 40000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-14",
-    number: "Н111ХЕ124",
-    price: 300000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-15",
-    number: "М333УМ24",
-    price: 280000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "reserved",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-16",
-    number: "С555МЕ124",
-    price: 285000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-17",
-    number: "У666ТА124",
-    price: 250000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-18",
-    number: "Е666РЕ124",
-    price: 350000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-19",
-    number: "Р888УХ24",
-    price: 430000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-20",
-    number: "В888МК24",
-    price: 500000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-21",
-    number: "У999ТТ24",
-    price: 550000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-22",
-    number: "А731АА24+А731АА124",
-    price: 375000,
-    category: "Комплекты",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-23",
-    number: "С333ОК24+С333ОК124",
-    price: 1300000,
-    category: "Комплекты",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-24",
-    number: "Х200НУ24",
-    price: 120000,
-    category: "Сотни",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-25",
-    number: "Р014РР24",
-    price: 250000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-26",
-    number: "У116УУ24",
-    price: 140000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-27",
-    number: "В391ВВ124",
-    price: 125000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-28",
-    number: "Е426ЕЕ124",
-    price: 105000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-29",
-    number: "О482ОО24",
-    price: 380000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-30",
-    number: "А742АА124",
-    price: 140000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-31",
-    number: "Р803РР24",
-    price: 100000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-32",
-    number: "А820АА24",
-    price: 175000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-33",
-    number: "В922ВВ124",
-    price: 100000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-34",
-    number: "Х124УВ124",
-    price: 155000,
-    category: "124/124;224/224",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-35",
-    number: "Н121УМ124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-36",
-    number: "У121УС124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-37",
-    number: "Т161ТС124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-38",
-    number: "Х181УН124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-39",
-    number: "В181НЕ124",
-    price: 60000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-40",
-    number: "Р191УУ124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
-  {
-    id: "number-41",
-    number: "Т212УХ124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/audi-rs.jpg",
-  },
-  {
-    id: "number-42",
-    number: "Е292УМ124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/land-cruiser.jpg",
-  },
-  {
-    id: "number-43",
-    number: "У363УН124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/bmw-m.jpg",
-  },
-  {
-    id: "number-44",
-    number: "О373ХА224",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-    image: "/cars/mercedes.jpg",
-  },
+  { id: "number-1", number: "У001ЕТ24", price: 550000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-2", number: "О003МС124", price: 210000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-3", number: "В009РР124", price: 250000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-4", number: "У011ВН124", price: 90000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-5", number: "Т020РА24", price: 75000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-6", number: "Н024ОС24", price: 165000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-7", number: "В024СМ24", price: 185000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-8", number: "Р027ОМ124", price: 70000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-9", number: "Е032КО24", price: 55000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-10", number: "М035ТВ124", price: 40000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-11", number: "К066НХ24", price: 85000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-12", number: "М093ТВ124", price: 40000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-13", number: "М094ТВ124", price: 40000, category: "Первая сотня", region: "Красноярский край", regionCode: "24", status: "available" },
+
+  { id: "number-14", number: "Н111ХЕ124", price: 300000, category: "Одинаковые цифры", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-15", number: "М333УМ24", price: 280000, category: "Одинаковые цифры", region: "Красноярский край", regionCode: "24", status: "reserved" },
+  { id: "number-16", number: "С555МЕ124", price: 285000, category: "Одинаковые цифры", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-17", number: "У666ТА124", price: 250000, category: "Одинаковые цифры", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-18", number: "Е666РЕ124", price: 350000, category: "Одинаковые цифры", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-19", number: "Р888УХ24", price: 430000, category: "Одинаковые цифры", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-20", number: "В888МК24", price: 500000, category: "Одинаковые цифры", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-21", number: "У999ТТ24", price: 550000, category: "Одинаковые цифры", region: "Красноярский край", regionCode: "24", status: "available" },
+
+  { id: "number-22", number: "А731АА24+А731АА124", price: 375000, category: "Комплекты", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-23", number: "С333ОК24+С333ОК124", price: 1300000, category: "Комплекты", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-24", number: "Х200НУ24", price: 120000, category: "Сотни", region: "Красноярский край", regionCode: "24", status: "available" },
+
+  { id: "number-25", number: "Р014РР24", price: 250000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-26", number: "У116УУ24", price: 140000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-27", number: "В391ВВ124", price: 125000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-28", number: "Е426ЕЕ124", price: 105000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-29", number: "О482ОО24", price: 380000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-30", number: "А742АА124", price: 140000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-31", number: "Р803РР24", price: 100000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-32", number: "А820АА24", price: 175000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-33", number: "В922ВВ124", price: 100000, category: "Буквы", region: "Красноярский край", regionCode: "24", status: "available" },
+
+  { id: "number-34", number: "Х124УВ124", price: 155000, category: "124/124;224/224", region: "Красноярский край", regionCode: "24", status: "available" },
+
+  { id: "number-35", number: "Н121УМ124", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-36", number: "У121УС124", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-37", number: "Т161ТС124", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-38", number: "Х181УН124", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-39", number: "В181НЕ124", price: 60000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-40", number: "Р191УУ124", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-41", number: "Т212УХ124", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-42", number: "Е292УМ124", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-43", number: "У363УН124", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
+  { id: "number-44", number: "О373ХА224", price: 39000, category: "Зеркала", region: "Красноярский край", regionCode: "24", status: "available" },
 ];
 
 function normalizeNumber(item) {
@@ -477,7 +78,6 @@ function normalizeNumber(item) {
     regionCode: String(item.regionCode ?? item.region_code ?? "24"),
     status: String(item.status ?? "available"),
     description: item.description ?? "",
-    image: item.image ?? "",
   };
 }
 
@@ -487,7 +87,6 @@ function removeDuplicates(list) {
   for (const item of list) {
     const normalized = normalizeNumber(item);
     const key = normalized.number.replace(/\s/g, "").toUpperCase();
-
     if (!key) continue;
     map.set(key, normalized);
   }
@@ -508,29 +107,29 @@ function isReserved(item) {
 function getLevel(item) {
   const price = Number(item.price || 0);
 
-  if (item.category === "Комплекты" || price >= 500000) {
-    return "VIP";
-  }
-
-  if (item.category === "Одинаковые цифры" || price >= 250000) {
-    return "Premium";
-  }
-
+  if (item.category === "Комплекты" || price >= 500000) return "VIP";
+  if (item.category === "Одинаковые цифры" || price >= 250000) return "Premium";
   return "";
 }
 
+function getInitials(number) {
+  const clean = String(number || "").replace(/\+/g, " / ");
+  return clean.slice(0, 3);
+}
+
 function Plate({ number, regionCode }) {
-  const text = String(number || "");
-  const parts = text.split("+");
+  const parts = String(number || "").split("+");
 
   return (
-    <div className="plate-wrap">
+    <div className={`plate-wrap ${parts.length > 1 ? "plate-set" : ""}`}>
       {parts.map((part, index) => (
         <div className="plate" key={`${part}-${index}`}>
-          <div className="plate-number">{part}</div>
-          <div className="plate-region">
-            <strong>{regionCode}</strong>
-            <span>RUS</span>
+          <div className="plate-main">
+            <div className="plate-number">{part}</div>
+            <div className="plate-region">
+              <strong>{regionCode}</strong>
+              <span>RUS</span>
+            </div>
           </div>
         </div>
       ))}
@@ -538,116 +137,86 @@ function Plate({ number, regionCode }) {
   );
 }
 
-/* =========================================================
-   КАРТОЧКА С ИЗОБРАЖЕНИЕМ
-   ========================================================= */
-
 function NumberCard({ item, favorite, onFavorite, onDetails }) {
   const level = getLevel(item);
   const reserved = isReserved(item);
 
   return (
-    <article className="number-card">
-      <div
-        className="number-card-image"
-        style={
-          item.image
-            ? { backgroundImage: `url("${item.image}")` }
-            : undefined
-        }
-        aria-hidden="true"
-      >
-        <div className="number-card-image-overlay" />
-      </div>
+    <article className={`number-card ${reserved ? "is-reserved" : ""}`}>
+      <div className="card-glow" />
 
-      <div className="number-card-content">
-        <div className="number-card-top">
-          <Plate number={item.number} regionCode={item.regionCode} />
-
-          <button
-            type="button"
-            className={`favorite-button ${favorite ? "active" : ""}`}
-            onClick={() => onFavorite(item.id)}
-            aria-label="Избранное"
-          >
-            {favorite ? "♥" : "♡"}
-          </button>
+      <div className="number-card-top">
+        <div className="card-index">
+          <span>GRZ</span>
+          <strong>{getInitials(item.number)}</strong>
         </div>
 
-        <div className="number-info">
-          {level && (
-            <div className={`level level-${level.toLowerCase()}`}>
-              {level}
-            </div>
-          )}
+        <button
+          type="button"
+          className={`favorite-button ${favorite ? "active" : ""}`}
+          onClick={() => onFavorite(item.id)}
+          aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"}
+        >
+          {favorite ? "♥" : "♡"}
+        </button>
+      </div>
 
-          <div className="category">{item.category}</div>
+      <Plate number={item.number} regionCode={item.regionCode} />
 
-          <div className="region">
-            {item.region} · регион {item.regionCode}
+      <div className="number-info">
+        <div className="card-tags">
+          {level && <span className={`level level-${level.toLowerCase()}`}>{level}</span>}
+          <span className="category-pill">{item.category}</span>
+        </div>
+
+        <div className="region">{item.region} · регион {item.regionCode}</div>
+
+        <div className="card-bottom">
+          <div>
+            <div className="price-label">Стоимость</div>
+            <div className="price">{formatPrice(item.price)}</div>
           </div>
 
-          <div className="price">{formatPrice(item.price)}</div>
-
-          {item.description && (
-            <div className="description">{item.description}</div>
-          )}
-
           {reserved ? (
-            <button
-              type="button"
-              className="details-button disabled"
-              disabled
-            >
+            <button type="button" className="details-button disabled" disabled>
               Занято
             </button>
           ) : (
-            <button
-              type="button"
-              className="details-button"
-              onClick={() => onDetails(item)}
-            >
+            <button type="button" className="details-button" onClick={() => onDetails(item)}>
               Подробнее
             </button>
           )}
         </div>
+
+        {item.description && <div className="description">{item.description}</div>}
       </div>
     </article>
   );
 }
-
-/* =========================================================
-   АДМИН
-   ========================================================= */
 
 function AdminPanel({ numbers, onChangeNumbers, onClose }) {
   const [authorized, setAuthorized] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [editingId, setEditingId] = useState(null);
-
   const [form, setForm] = useState({
     number: "",
     price: "",
     category: "Одинаковые цифры",
     status: "available",
     description: "",
-    image: "",
   });
-
   const [message, setMessage] = useState("");
 
   function login(event) {
     event.preventDefault();
-
     if (password === ADMIN_PASSWORD) {
       setAuthorized(true);
       setPassword("");
       setPasswordError("");
-      return;
+    } else {
+      setPasswordError("Неверный пароль");
     }
-
-    setPasswordError("Неверный пароль");
   }
 
   function resetForm() {
@@ -658,7 +227,6 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
       category: "Одинаковые цифры",
       status: "available",
       description: "",
-      image: "",
     });
   }
 
@@ -670,15 +238,12 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
       category: item.category,
       status: item.status,
       description: item.description || "",
-      image: item.image || "",
     });
-
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function saveNumbers(next) {
     onChangeNumbers(next);
-
     try {
       localStorage.setItem(LOCAL_NUMBERS_KEY, JSON.stringify(next));
     } catch {}
@@ -702,7 +267,6 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
         regionCode: item.regionCode,
         status: item.status,
         description: item.description,
-        image: item.image,
       };
 
       if (isNew) {
@@ -723,7 +287,6 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
             regionCode: item.regionCode,
             status: item.status,
             description: item.description,
-            image: item.image,
           }),
         });
       }
@@ -752,7 +315,6 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
 
     if (editingId) {
       const oldItem = numbers.find((item) => item.id === editingId);
-
       const updated = {
         ...(oldItem || {}),
         id: editingId,
@@ -763,15 +325,9 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
         regionCode: "24",
         status: form.status,
         description: form.description.trim(),
-        image: form.image.trim(),
       };
 
-      saveNumbers(
-        numbers.map((item) =>
-          item.id === editingId ? updated : item
-        )
-      );
-
+      saveNumbers(numbers.map((item) => (item.id === editingId ? updated : item)));
       await saveToSupabase(updated, false);
       setMessage("Номер изменён");
       resetForm();
@@ -787,12 +343,10 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
       regionCode: "24",
       status: form.status,
       description: form.description.trim(),
-      image: form.image.trim(),
     };
 
     saveNumbers(removeDuplicates([...numbers, newItem]));
     await saveToSupabase(newItem, true);
-
     setMessage("Номер добавлен");
     resetForm();
   }
@@ -823,12 +377,7 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
       status: item.status === "reserved" ? "available" : "reserved",
     };
 
-    saveNumbers(
-      numbers.map((number) =>
-        number.id === item.id ? updated : number
-      )
-    );
-
+    saveNumbers(numbers.map((number) => (number.id === item.id ? updated : number)));
     saveToSupabase(updated, false);
 
     setMessage(
@@ -846,7 +395,6 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
             <h2>Админ-панель</h2>
             <div className="region">GRZ124 · управление номерами</div>
           </div>
-
           <button type="button" className="details-button" onClick={onClose}>
             Назад
           </button>
@@ -854,7 +402,6 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
 
         <form className="admin-form" onSubmit={login}>
           <h3>Вход администратора</h3>
-
           <input
             className="admin-input"
             type="password"
@@ -863,14 +410,8 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
             placeholder="Пароль"
             autoFocus
           />
-
-          {passwordError && (
-            <div className="admin-error">{passwordError}</div>
-          )}
-
-          <button type="submit" className="details-button">
-            Войти
-          </button>
+          {passwordError && <div className="admin-error">{passwordError}</div>}
+          <button type="submit" className="details-button">Войти</button>
         </form>
       </section>
     );
@@ -883,7 +424,6 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
           <h2>Админ-панель</h2>
           <div className="region">Номеров: {numbers.length}</div>
         </div>
-
         <button type="button" className="details-button" onClick={onClose}>
           Закрыть
         </button>
@@ -895,9 +435,7 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
         <input
           className="admin-input"
           value={form.number}
-          onChange={(event) =>
-            setForm({ ...form, number: event.target.value })
-          }
+          onChange={(event) => setForm({ ...form, number: event.target.value })}
           placeholder="Номер, например У999ТТ24"
         />
 
@@ -905,18 +443,14 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
           className="admin-input"
           type="number"
           value={form.price}
-          onChange={(event) =>
-            setForm({ ...form, price: event.target.value })
-          }
+          onChange={(event) => setForm({ ...form, price: event.target.value })}
           placeholder="Цена"
         />
 
         <select
           className="admin-input"
           value={form.category}
-          onChange={(event) =>
-            setForm({ ...form, category: event.target.value })
-          }
+          onChange={(event) => setForm({ ...form, category: event.target.value })}
         >
           <option>Одинаковые цифры</option>
           <option>Первая сотня</option>
@@ -930,9 +464,7 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
         <select
           className="admin-input"
           value={form.status}
-          onChange={(event) =>
-            setForm({ ...form, status: event.target.value })
-          }
+          onChange={(event) => setForm({ ...form, status: event.target.value })}
         >
           <option value="available">Доступен</option>
           <option value="reserved">Занят</option>
@@ -941,19 +473,8 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
         <input
           className="admin-input"
           value={form.description}
-          onChange={(event) =>
-            setForm({ ...form, description: event.target.value })
-          }
+          onChange={(event) => setForm({ ...form, description: event.target.value })}
           placeholder="Описание (необязательно)"
-        />
-
-        <input
-          className="admin-input"
-          value={form.image}
-          onChange={(event) =>
-            setForm({ ...form, image: event.target.value })
-          }
-          placeholder="Фото: /cars/audi-rs.jpg"
         />
 
         {message && <div className="admin-message">{message}</div>}
@@ -962,11 +483,8 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
           <button type="submit">
             {editingId ? "Сохранить изменения" : "Добавить номер"}
           </button>
-
           {editingId && (
-            <button type="button" onClick={resetForm}>
-              Отмена
-            </button>
+            <button type="button" onClick={resetForm}>Отмена</button>
           )}
         </div>
       </form>
@@ -980,25 +498,16 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
               <strong>{item.number}</strong>
               <span>{formatPrice(item.price)}</span>
               <small>
-                {item.category} ·{" "}
-                {item.status === "reserved" ? "Занят" : "Доступен"}
+                {item.category} · {item.status === "reserved" ? "Занят" : "Доступен"}
               </small>
             </div>
 
             <div className="admin-actions">
-              <button type="button" onClick={() => editNumber(item)}>
-                Изменить
-              </button>
-
+              <button type="button" onClick={() => editNumber(item)}>Изменить</button>
               <button type="button" onClick={() => toggleReserved(item)}>
                 {item.status === "reserved" ? "Освободить" : "Занять"}
               </button>
-
-              <button
-                type="button"
-                className="danger"
-                onClick={() => deleteNumber(item)}
-              >
+              <button type="button" className="danger" onClick={() => deleteNumber(item)}>
                 Удалить
               </button>
             </div>
@@ -1008,10 +517,6 @@ function AdminPanel({ numbers, onChangeNumbers, onClose }) {
     </section>
   );
 }
-
-/* =========================================================
-   APP
-   ========================================================= */
 
 function App() {
   const [numbers, setNumbers] = useState([]);
@@ -1029,14 +534,13 @@ function App() {
   });
 
   const [selectedNumber, setSelectedNumber] = useState(null);
-  const [activeTab, setActiveTab] = useState("catalog");
+  const [activeTab, setActiveTab] = useState("home");
   const [adminOpen, setAdminOpen] = useState(false);
 
   function getLocalNumbers() {
     try {
       const saved = localStorage.getItem(LOCAL_NUMBERS_KEY);
       if (!saved) return [];
-
       const parsed = JSON.parse(saved);
       return Array.isArray(parsed) ? parsed.map(normalizeNumber) : [];
     } catch {
@@ -1051,26 +555,19 @@ function App() {
     const baseNumbers = localNumbers.length ? localNumbers : FALLBACK_NUMBERS;
 
     try {
-      const response = await fetch(
-        API_URL + "?select=*&order=price.desc",
-        {
-          method: "GET",
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(API_URL + "?select=*&order=price.desc", {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (!response.ok) {
-        throw new Error(`Supabase error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
 
       const data = await response.json();
-      const remoteNumbers = Array.isArray(data)
-        ? data.map(normalizeNumber)
-        : [];
+      const remoteNumbers = Array.isArray(data) ? data.map(normalizeNumber) : [];
 
       setNumbers(removeDuplicates([...baseNumbers, ...remoteNumbers]));
     } catch (error) {
@@ -1135,55 +632,103 @@ function App() {
   );
 
   function renderHome() {
+    const vipCount = numbers.filter((item) => getLevel(item) === "VIP").length;
+    const premiumCount = numbers.filter((item) => getLevel(item) === "Premium").length;
+
     return (
       <section className="home-section">
-        <div className="hero-visual">
-          <div className="hero-visual-image" />
-          <div className="hero-visual-overlay" />
+        <div className="hero-card">
+          <div className="hero-orb orb-one" />
+          <div className="hero-orb orb-two" />
 
-          <div className="hero-content">
-            <div className="hero-region">КРАСНОЯРСКИЙ КРАЙ</div>
-
-            <div className="hero-eyebrow">
-              GRZ124 · КОЛЛЕКЦИЯ НОМЕРОВ
-            </div>
-
-            <h2>Номер, который<br />запомнят.</h2>
-
-            <p>
-              Подберите выразительный номер<br />
-              для автомобиля в регионе 24.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab("catalog")}
-            >
-              Смотреть каталог <span>→</span>
-            </button>
+          <div className="hero-topline">
+            <span className="brand-mark">GRZ124</span>
+            <span className="hero-region">КРАСНОЯРСКИЙ КРАЙ · 24</span>
           </div>
 
-          <div className="hero-bottom-line">
-            <span>PREMIUM NUMBERS</span>
-            <span>24 · RUS</span>
+          <div className="hero-content">
+            <div className="hero-kicker">НОМЕР, КОТОРЫЙ ЗАПОМИНАЮТ</div>
+            <h1>
+              Красивые
+              <span> номера 24</span>
+            </h1>
+            <p>
+              Подберите номер для автомобиля с характером.
+              Премиальные сочетания, редкие серии и комплекты.
+            </p>
+
+            <div className="hero-actions">
+              <button type="button" className="hero-button" onClick={() => setActiveTab("catalog")}>
+                Смотреть каталог <span>→</span>
+              </button>
+              <div className="hero-note">
+                <span className="status-dot" />
+                Актуальные номера
+              </div>
+            </div>
+          </div>
+
+          <div className="hero-plate">
+            <div className="hero-plate-caption">SELECTED · 24 RUS</div>
+            <Plate number="У999ТТ24" regionCode="24" />
           </div>
         </div>
 
         <div className="home-stats">
-          <div>
+          <div className="stat-card">
+            <span>Каталог</span>
             <strong>{numbers.length}</strong>
-            <span>номеров в каталоге</span>
+            <small>номеров</small>
           </div>
+          <div className="stat-card">
+            <span>Premium</span>
+            <strong>{premiumCount}</strong>
+            <small>выразительных</small>
+          </div>
+          <div className="stat-card">
+            <span>VIP</span>
+            <strong>{vipCount}</strong>
+            <small>эксклюзивных</small>
+          </div>
+        </div>
 
+        <div className="home-section-head">
           <div>
-            <strong>{favoriteNumbers.length}</strong>
-            <span>в избранном</span>
+            <span className="eyebrow">ВЫБОР GRZ124</span>
+            <h2>Подберите свой стиль</h2>
           </div>
+          <button type="button" onClick={() => setActiveTab("catalog")}>
+            Весь каталог →
+          </button>
+        </div>
 
-          <div>
-            <strong>24</strong>
-            <span>регион</span>
-          </div>
+        <div className="style-grid">
+          <button type="button" className="style-card style-card-dark" onClick={() => { setFilter("VIP"); setActiveTab("catalog"); }}>
+            <span className="style-number">01</span>
+            <div>
+              <strong>VIP</strong>
+              <small>Максимально заметные сочетания</small>
+            </div>
+            <span className="style-arrow">↗</span>
+          </button>
+
+          <button type="button" className="style-card style-card-purple" onClick={() => { setFilter("Premium"); setActiveTab("catalog"); }}>
+            <span className="style-number">02</span>
+            <div>
+              <strong>Premium</strong>
+              <small>Повторяющиеся и редкие цифры</small>
+            </div>
+            <span className="style-arrow">↗</span>
+          </button>
+
+          <button type="button" className="style-card style-card-outline" onClick={() => { setFilter("Все"); setActiveTab("catalog"); }}>
+            <span className="style-number">03</span>
+            <div>
+              <strong>Весь каталог</strong>
+              <small>Все доступные категории</small>
+            </div>
+            <span className="style-arrow">↗</span>
+          </button>
         </div>
       </section>
     );
@@ -1193,22 +738,30 @@ function App() {
     return (
       <>
         <section className="catalog-header">
-          <div className="section-kicker">GRZ124 · КОЛЛЕКЦИЯ</div>
-          <h2>Каталог номеров</h2>
-
-          <p className="catalog-subtitle">
-            Выберите сочетание, которое подходит именно вашему автомобилю.
-          </p>
+          <div className="section-title-row">
+            <div>
+              <span className="eyebrow">GRZ124 · CATALOG</span>
+              <h2>Каталог номеров</h2>
+            </div>
+            <div className="catalog-counter">
+              <strong>{filteredNumbers.length}</strong>
+              <span>найдено</span>
+            </div>
+          </div>
 
           <div className="search-row">
             <span className="search-icon">⌕</span>
-
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Поиск: 777, 001..."
+              placeholder="Поиск: 777, 001, буквы..."
             />
+            {search && (
+              <button type="button" className="clear-search" onClick={() => setSearch("")}>
+                ×
+              </button>
+            )}
           </div>
 
           <div className="filters">
@@ -1227,7 +780,10 @@ function App() {
 
         <section className="numbers-list">
           {loading ? (
-            <div className="empty-state">Загрузка номеров...</div>
+            <div className="empty-state loading-state">
+              <span className="loader" />
+              Загрузка номеров...
+            </div>
           ) : filteredNumbers.length === 0 ? (
             <div className="empty-state">
               {search
@@ -1253,12 +809,23 @@ function App() {
   function renderFavorites() {
     return (
       <section className="page-section">
-        <div className="section-kicker">GRZ124</div>
-        <h2>Избранное</h2>
+        <div className="section-title-row">
+          <div>
+            <span className="eyebrow">YOUR SELECTION</span>
+            <h2>Избранное</h2>
+          </div>
+          <div className="catalog-counter">
+            <strong>{favoriteNumbers.length}</strong>
+            <span>номеров</span>
+          </div>
+        </div>
 
         {favoriteNumbers.length === 0 ? (
           <div className="empty-state">
             Здесь пока нет избранных номеров.
+            <button type="button" className="empty-action" onClick={() => setActiveTab("catalog")}>
+              Перейти в каталог →
+            </button>
           </div>
         ) : (
           <div className="numbers-list">
@@ -1266,7 +833,7 @@ function App() {
               <NumberCard
                 key={item.id}
                 item={item}
-                favorite={true}
+                favorite
                 onFavorite={toggleFavorite}
                 onDetails={setSelectedNumber}
               />
@@ -1279,18 +846,19 @@ function App() {
 
   function renderRequests() {
     return (
-      <section className="page-section">
-        <div className="section-kicker">GRZ124</div>
+      <section className="page-section requests-page">
+        <span className="eyebrow">GRZ124 · REQUEST</span>
         <h2>Заявки</h2>
-
         <div className="request-card">
-          <div className="request-card-icon">↗</div>
-          <h3>Выберите номер</h3>
-          <p>
-            Для оформления номера откройте карточку и нажмите
-            «Подробнее».
-          </p>
+          <div className="request-icon">✓</div>
+          <div>
+            <strong>Оформление номера</strong>
+            <p>Выберите номер в каталоге и откройте карточку «Подробнее».</p>
+          </div>
         </div>
+        <button type="button" className="hero-button request-button" onClick={() => setActiveTab("catalog")}>
+          Перейти к номерам <span>→</span>
+        </button>
       </section>
     );
   }
@@ -1298,25 +866,20 @@ function App() {
   function renderProfile() {
     return (
       <section className="page-section">
-        <div className="section-kicker">GRZ124</div>
+        <span className="eyebrow">GRZ124 · PROFILE</span>
         <h2>Профиль</h2>
 
         <div className="profile-card">
-          <div className="profile-title">Красивые номера 24</div>
-
-          <div className="profile-text">
-            Красноярский край · регион 24
+          <div className="profile-avatar">24</div>
+          <div>
+            <div className="profile-title">Красивые номера 24</div>
+            <div className="profile-text">Красноярский край · регион 24</div>
           </div>
-
-          <button
-            type="button"
-            className="details-button"
-            style={{ marginTop: 16 }}
-            onClick={() => setAdminOpen(true)}
-          >
-            ⚙ Админ-панель
-          </button>
         </div>
+
+        <button type="button" className="admin-open-button" onClick={() => setAdminOpen(true)}>
+          ⚙ Админ-панель
+        </button>
       </section>
     );
   }
@@ -1326,7 +889,6 @@ function App() {
       <div className="app">
         <main className="content">
           <div className="top-region">КРАСНОЯРСКИЙ КРАЙ</div>
-
           <AdminPanel
             numbers={numbers}
             onChangeNumbers={setNumbers}
@@ -1343,16 +905,12 @@ function App() {
         <div className="top-region">КРАСНОЯРСКИЙ КРАЙ</div>
 
         <header className="main-header">
-          <h1>
-            Красивые номера <span>24</span>
-          </h1>
+          <button type="button" className="brand-button" onClick={() => setActiveTab("home")}>
+            <span className="brand-mini">GRZ124</span>
+            <span>Красивые номера <b>24</b></span>
+          </button>
 
-          <button
-            type="button"
-            className="refresh-button"
-            onClick={loadNumbers}
-            aria-label="Обновить"
-          >
+          <button type="button" className="refresh-button" onClick={loadNumbers} aria-label="Обновить">
             ⟳
           </button>
         </header>
@@ -1365,127 +923,71 @@ function App() {
       </main>
 
       <nav className="bottom-nav">
-        <button
-          type="button"
-          className={activeTab === "home" ? "active" : ""}
-          onClick={() => setActiveTab("home")}
-        >
-          <span className="nav-icon">⌂</span>
-          <span>Главная</span>
-        </button>
-
-        <button
-          type="button"
-          className={activeTab === "catalog" ? "active" : ""}
-          onClick={() => setActiveTab("catalog")}
-        >
-          <span className="nav-icon">▦</span>
-          <span>Каталог</span>
-        </button>
-
-        <button
-          type="button"
-          className={activeTab === "favorites" ? "active" : ""}
-          onClick={() => setActiveTab("favorites")}
-        >
-          <span className="nav-icon">♡</span>
-          <span>Избранное</span>
-        </button>
-
-        <button
-          type="button"
-          className={activeTab === "requests" ? "active" : ""}
-          onClick={() => setActiveTab("requests")}
-        >
-          <span className="nav-icon">□</span>
-          <span>Заявки</span>
-        </button>
-
-        <button
-          type="button"
-          className={activeTab === "profile" ? "active" : ""}
-          onClick={() => setActiveTab("profile")}
-        >
-          <span className="nav-icon">♙</span>
-          <span>Профиль</span>
-        </button>
+        {[
+          ["home", "⌂", "Главная"],
+          ["catalog", "▦", "Каталог"],
+          ["favorites", "♡", "Избранное"],
+          ["requests", "□", "Заявки"],
+          ["profile", "♙", "Профиль"],
+        ].map(([tab, icon, label]) => (
+          <button
+            key={tab}
+            type="button"
+            className={activeTab === tab ? "active" : ""}
+            onClick={() => setActiveTab(tab)}
+          >
+            <span className="nav-icon">{tab === "favorites" && favorites.length > 0 ? "♥" : icon}</span>
+            <span>{label}</span>
+            {tab === "favorites" && favorites.length > 0 && (
+              <i className="nav-badge">{favorites.length}</i>
+            )}
+          </button>
+        ))}
       </nav>
 
       {selectedNumber && (
-        <div
-          className="modal-overlay"
-          onClick={() => setSelectedNumber(null)}
-        >
-          <div
-            className="modal"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div
-              className="modal-image"
-              style={
-                selectedNumber.image
-                  ? {
-                      backgroundImage: `url("${selectedNumber.image}")`,
-                    }
-                  : undefined
-              }
-            />
-
-            <button
-              type="button"
-              className="modal-close"
-              onClick={() => setSelectedNumber(null)}
-            >
+        <div className="modal-overlay" onClick={() => setSelectedNumber(null)}>
+          <div className="modal" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="modal-close" onClick={() => setSelectedNumber(null)}>
               ×
             </button>
 
-            <div className="modal-content">
-              <Plate
-                number={selectedNumber.number}
-                regionCode={selectedNumber.regionCode}
-              />
+            <div className="modal-eyebrow">GRZ124 · SELECTED NUMBER</div>
 
-              {getLevel(selectedNumber) && (
-                <div className="modal-level">
-                  {getLevel(selectedNumber)}
-                </div>
-              )}
+            <Plate
+              number={selectedNumber.number}
+              regionCode={selectedNumber.regionCode}
+            />
 
-              <h3>{selectedNumber.category}</h3>
-
-              <div className="modal-region">
-                {selectedNumber.region} · регион{" "}
-                {selectedNumber.regionCode}
-              </div>
-
-              <div className="modal-price">
-                {formatPrice(selectedNumber.price)}
-              </div>
-
-              {selectedNumber.description && (
-                <p className="modal-description">
-                  {selectedNumber.description}
-                </p>
-              )}
-
-              <button
-                type="button"
-                className="details-button modal-action"
-                onClick={() => toggleFavorite(selectedNumber.id)}
-              >
-                {favorites.includes(selectedNumber.id)
-                  ? "Убрать из избранного"
-                  : "Добавить в избранное"}
-              </button>
-
-              <button
-                type="button"
-                className="details-button"
-                onClick={() => setSelectedNumber(null)}
-              >
-                Закрыть
-              </button>
+            <div className="modal-level">
+              {getLevel(selectedNumber)}
             </div>
+
+            <h3>{selectedNumber.category}</h3>
+
+            <div className="modal-region">
+              {selectedNumber.region} · регион {selectedNumber.regionCode}
+            </div>
+
+            <div className="modal-price">{formatPrice(selectedNumber.price)}</div>
+
+            {selectedNumber.description && (
+              <p className="modal-description">{selectedNumber.description}</p>
+            )}
+
+            <button
+              type="button"
+              className="details-button modal-action"
+              onClick={() => toggleFavorite(selectedNumber.id)}
+            >
+              {favorites.includes(selectedNumber.id)
+                ? "♥ Убрать из избранного"
+                : "♡ Добавить в избранное"}
+            </button>
+
+            <button type="button" className="details-button secondary" onClick={() => setSelectedNumber(null)}>
+              Закрыть
+            </button>
           </div>
         </div>
       )}
