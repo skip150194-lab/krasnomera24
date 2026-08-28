@@ -1571,3 +1571,551 @@ h2 {
     font-size: 22px;
   }
 }
+
+
+/* =========================================================
+   GRZ124 FINAL VISUAL OVERRIDES
+   Премиальное оформление без фотографий
+   ========================================================= */
+
+:root {
+  --bg: #050507;
+  --surface: #0b0b10;
+  --surface-2: #101016;
+  --line: rgba(255,255,255,.10);
+  --purple: #9a68ff;
+  --purple-2: #c7a9ff;
+  --nav-height: 82px;
+}
+
+/* Общая композиция */
+body {
+  background:
+    radial-gradient(circle at 50% -18%, rgba(142, 83, 255, .15), transparent 38rem),
+    #050507;
+}
+
+.app {
+  background:
+    radial-gradient(circle at 90% 20%, rgba(128, 73, 255, .055), transparent 30rem),
+    #050507;
+}
+
+.content {
+  width: min(1280px, calc(100% - 64px));
+  padding-top: 22px;
+  padding-bottom: calc(var(--nav-height) + 54px + env(safe-area-inset-bottom));
+}
+
+.top-region {
+  margin-bottom: 20px;
+  color: #777783;
+  font-size: 11px;
+  letter-spacing: .34em;
+}
+
+.main-header {
+  margin-bottom: 54px;
+}
+
+.main-header h1 {
+  margin: 0;
+  font-size: clamp(32px, 3.5vw, 48px);
+  line-height: 1;
+  letter-spacing: -.055em;
+  font-weight: 800;
+}
+
+.refresh-button {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: rgba(17,17,22,.92);
+}
+
+/* Заголовок каталога */
+.catalog-header {
+  margin-bottom: 30px;
+}
+
+.catalog-header h2 {
+  margin-bottom: 22px;
+  font-size: clamp(38px, 5vw, 62px);
+  letter-spacing: -.065em;
+}
+
+.catalog-icon {
+  display: none;
+}
+
+.search-row {
+  width: min(720px, 100%);
+  height: 58px;
+  border-radius: 18px;
+  background: #0c0c11;
+}
+
+/* Кнопки фильтра */
+.filters {
+  margin-top: 14px;
+  gap: 9px;
+}
+
+.filters button {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 14px;
+  background: #0c0c11;
+}
+
+.filters button.selected {
+  background: linear-gradient(145deg, rgba(142,84,255,.24), rgba(72,39,122,.16));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 8px 25px rgba(93,48,170,.12);
+}
+
+/* =========================================================
+   НОМЕРНАЯ КАРТОЧКА — НОВЫЙ ВИД
+   ========================================================= */
+
+.numbers-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.number-card {
+  min-height: 365px;
+  padding: 22px;
+  border-radius: 26px;
+  border: 1px solid rgba(255,255,255,.095);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(144,85,255,.10), transparent 12rem),
+    linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.008) 42%, transparent 75%),
+    #0b0b10;
+  box-shadow:
+    0 24px 80px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.number-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(164,115,255,.38);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.42),
+    0 0 0 1px rgba(142,84,255,.07);
+}
+
+.number-card-top {
+  margin-bottom: 18px;
+}
+
+.card-index {
+  gap: 10px;
+  font-size: 9px;
+  letter-spacing: .18em;
+}
+
+.card-index span {
+  color: #77727f;
+}
+
+.card-index strong {
+  color: #c2b2d9;
+  font-size: 9px;
+}
+
+.favorite-button {
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background: rgba(8,8,12,.72);
+}
+
+/* =========================================================
+   БЕЛЫЙ РЕАЛИСТИЧНЫЙ НОМЕРНОЙ ЗНАК
+   ========================================================= */
+
+.plate-wrap {
+  width: 100%;
+  gap: 12px;
+}
+
+.plate {
+  padding: 0;
+  border: 1px solid rgba(0,0,0,.82);
+  border-radius: 10px;
+  background: #111;
+  box-shadow:
+    0 8px 20px rgba(0,0,0,.34),
+    0 1px 0 rgba(255,255,255,.25) inset;
+}
+
+.plate-main {
+  min-height: 78px;
+  border: 2px solid #d4d4d2;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f2 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.13),
+    inset 0 -2px 0 rgba(0,0,0,.08);
+}
+
+.plate-number {
+  min-width: 0;
+  flex: 1;
+  padding: 0 14px;
+  color: #08090b;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(29px, 3.1vw, 43px);
+  font-weight: 900;
+  letter-spacing: -.065em;
+  text-shadow: 0 .5px 0 rgba(255,255,255,.6);
+}
+
+.plate-region {
+  flex: 0 0 58px;
+  width: 58px;
+  border-left: 2px solid #171717;
+  background: linear-gradient(180deg, #fff, #eeeeec);
+  color: #08090b;
+}
+
+.plate-region strong {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.plate-region span {
+  margin-top: 4px;
+  color: #151515;
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.plate-set {
+  gap: 12px;
+}
+
+.plate-set .plate {
+  flex: 1 1 300px;
+}
+
+.plate-set .plate-number {
+  min-width: 0;
+  font-size: clamp(25px, 2.7vw, 38px);
+}
+
+/* Информация карточки */
+.number-info {
+  margin-top: 20px;
+}
+
+.card-tags {
+  min-height: 26px;
+}
+
+.level,
+.category-pill {
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 9px;
+}
+
+.level {
+  background: rgba(155,102,255,.18);
+  color: #cbb0ff;
+  border: 1px solid rgba(155,102,255,.18);
+}
+
+.category-pill {
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.065);
+  color: #a8a8b2;
+}
+
+.region {
+  margin-top: 9px;
+  color: #70707b;
+  font-size: 11px;
+}
+
+.card-bottom {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.065);
+}
+
+.price-label {
+  margin-bottom: 3px;
+  color: #696974;
+  font-size: 9px;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.price {
+  color: #ffffff;
+  font-size: clamp(25px, 2.5vw, 34px);
+  line-height: 1;
+  letter-spacing: -.045em;
+  font-weight: 800;
+}
+
+.details-button {
+  min-height: 44px;
+  padding: 0 19px;
+  border-radius: 13px;
+  background: #f3f2f5;
+  color: #0a0a0d;
+  box-shadow: 0 7px 20px rgba(0,0,0,.18);
+}
+
+.details-button:hover {
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   НИЖНЯЯ НАВИГАЦИЯ
+   ========================================================= */
+
+.bottom-nav {
+  width: min(850px, calc(100% - 44px));
+  height: var(--nav-height);
+  bottom: max(16px, env(safe-area-inset-bottom));
+  padding: 6px;
+  border-radius: 24px;
+  background: rgba(10,10,14,.92);
+  border: 1px solid rgba(255,255,255,.11);
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.bottom-nav button {
+  border-radius: 18px;
+}
+
+.bottom-nav button.active {
+  background:
+    linear-gradient(145deg, rgba(145,84,255,.30), rgba(73,40,125,.19));
+  color: #eee6fb;
+}
+
+.nav-icon {
+  font-size: 20px;
+}
+
+/* =========================================================
+   АДАПТИВ
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .content {
+    width: min(100% - 40px, 720px);
+  }
+
+  .numbers-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  :root {
+    --nav-height: 70px;
+  }
+
+  .content {
+    width: calc(100% - 24px);
+    padding-top: 12px;
+    padding-bottom: calc(var(--nav-height) + 62px + env(safe-area-inset-bottom));
+  }
+
+  .top-region {
+    margin-bottom: 15px;
+    font-size: 8px;
+    letter-spacing: .27em;
+  }
+
+  .main-header {
+    margin-bottom: 34px;
+  }
+
+  .main-header h1 {
+    font-size: 30px;
+  }
+
+  .refresh-button {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+
+  .catalog-header h2 {
+    margin-bottom: 17px;
+    font-size: 42px;
+  }
+
+  .search-row {
+    height: 52px;
+    border-radius: 16px;
+  }
+
+  .filters {
+    margin-top: 10px;
+  }
+
+  .filters button {
+    height: 40px;
+    padding: 0 16px;
+  }
+
+  .numbers-list {
+    gap: 13px;
+  }
+
+  .number-card {
+    min-height: 0;
+    padding: 15px;
+    border-radius: 21px;
+  }
+
+  .number-card-top {
+    margin-bottom: 14px;
+  }
+
+  .favorite-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+  }
+
+  .plate-main {
+    min-height: 68px;
+    border-radius: 8px;
+  }
+
+  .plate-number {
+    padding: 0 9px;
+    font-size: clamp(25px, 8.8vw, 34px);
+    letter-spacing: -.07em;
+  }
+
+  .plate-region {
+    flex-basis: 48px;
+    width: 48px;
+  }
+
+  .plate-region strong {
+    font-size: 17px;
+  }
+
+  .plate-region span {
+    font-size: 6px;
+  }
+
+  .plate-set {
+    gap: 8px;
+  }
+
+  .plate-set .plate {
+    flex-basis: 100%;
+  }
+
+  .plate-set .plate-number {
+    font-size: clamp(22px, 7vw, 30px);
+  }
+
+  .number-info {
+    margin-top: 15px;
+  }
+
+  .region {
+    font-size: 10px;
+  }
+
+  .card-bottom {
+    align-items: center;
+  }
+
+  .price {
+    font-size: 25px;
+  }
+
+  .details-button {
+    min-height: 42px;
+    padding: 0 15px;
+  }
+
+  .bottom-nav {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    height: var(--nav-height);
+    bottom: max(8px, env(safe-area-inset-bottom));
+    border-radius: 20px;
+    padding: 5px;
+  }
+
+  .bottom-nav button {
+    gap: 3px;
+    border-radius: 15px;
+    font-size: 8px;
+  }
+
+  .nav-icon {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 390px) {
+  .content {
+    width: calc(100% - 18px);
+  }
+
+  .main-header h1 {
+    font-size: 27px;
+  }
+
+  .catalog-header h2 {
+    font-size: 36px;
+  }
+
+  .number-card {
+    padding: 13px;
+  }
+
+  .plate-main {
+    min-height: 63px;
+  }
+
+  .plate-number {
+    font-size: 23px;
+  }
+
+  .plate-region {
+    flex-basis: 45px;
+    width: 45px;
+  }
+
+  .card-bottom {
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .details-button {
+    width: 100%;
+  }
+
+  .bottom-nav {
+    left: 6px;
+    right: 6px;
+  }
+
+  .bottom-nav button {
+    font-size: 7px;
+  }
+}
+
