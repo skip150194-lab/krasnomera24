@@ -147,8 +147,8 @@ function NumberCard({ item, favorite, onFavorite, onDetails }) {
 
       <div className="number-card-top">
         <div className="card-index">
-          <span>GRZ</span>
-          <strong>{getInitials(item.number)}</strong>
+          <span>GRZ124</span>
+          <strong>{reserved ? "ЗАНЯТ" : "В НАЛИЧИИ"}</strong>
         </div>
 
         <button
