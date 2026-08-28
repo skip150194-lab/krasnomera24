@@ -117,22 +117,43 @@ function getInitials(number) {
   return clean.slice(0, 3);
 }
 
+function getPlateRegion(part, fallbackRegionCode = "24") {
+  const clean = String(part || "").replace(/\s/g, "").toUpperCase();
+
+  // Сначала проверяем трёхзначные коды, чтобы 124/224 не определялись как 24.
+  const threeDigitMatch = clean.match(/(124|224)$/);
+  if (threeDigitMatch) {
+    return threeDigitMatch[1];
+  }
+
+  const twoDigitMatch = clean.match(/(24)$/);
+  if (twoDigitMatch) {
+    return twoDigitMatch[1];
+  }
+
+  return String(fallbackRegionCode || "24");
+}
+
 function Plate({ number, regionCode }) {
   const parts = String(number || "").split("+");
 
   return (
     <div className={`plate-wrap ${parts.length > 1 ? "plate-set" : ""}`}>
-      {parts.map((part, index) => (
-        <div className="plate" key={`${part}-${index}`}>
-          <div className="plate-main">
-            <div className="plate-number">{part}</div>
-            <div className="plate-region">
-              <strong>{regionCode}</strong>
-              <span>RUS</span>
+      {parts.map((part, index) => {
+        const actualRegion = getPlateRegion(part, regionCode);
+
+        return (
+          <div className="plate" key={`${part}-${index}`}>
+            <div className="plate-main">
+              <div className="plate-number">{part}</div>
+              <div className="plate-region">
+                <strong>{actualRegion}</strong>
+                <span>RUS</span>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -169,7 +190,7 @@ function NumberCard({ item, favorite, onFavorite, onDetails }) {
           <span className="category-pill">{item.category}</span>
         </div>
 
-        <div className="region">{item.region} · регион {item.regionCode}</div>
+        <div className="region">{item.region} · регион {getPlateRegion(item.number, item.regionCode)}</div>
 
         <div className="card-bottom">
           <div>
