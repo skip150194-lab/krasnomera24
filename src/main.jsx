@@ -179,34 +179,15 @@ function isReserved(item) {
    НОМЕРНОЙ ЗНАК
    ========================================================= */
 
-function Plate({ number, regionCode }) {
-  const text = String(number || "");
-  const parts = text.split("+");
-
+function Plate({ number }) {
   return (
     <div className="plate-wrap">
-      {parts.map((part, index) => (
-        <div
-          className="plate"
-          key={`${part}-${index}`}
-        >
-          <div className="plate-number">
-            {part}
-          </div>
-
-          <div className="plate-region">
-            <strong>{regionCode}</strong>
-            <span>RUS</span>
-          </div>
-        </div>
-      ))}
+      <div className="plate">
+        <div className="plate-number">{String(number || "")}</div>
+      </div>
     </div>
   );
 }
-
-/* =========================================================
-   КАРТОЧКА НОМЕРА
-   ========================================================= */
 
 function NumberCard({
   item,
