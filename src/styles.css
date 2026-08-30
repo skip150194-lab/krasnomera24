@@ -47,175 +47,11 @@ button,input,select{font:inherit}button{-webkit-tap-highlight-color:transparent}
 .number-card-premium .card-badge{border-color:rgba(155,108,255,.25);background:rgba(155,108,255,.1);color:#bda8ff}
 .number-card-vip .card-badge{border-color:rgba(205,160,255,.32);background:rgba(190,125,255,.13);color:#d8b9ff}
 .number-card-reserved .card-badge{border-color:rgba(255,100,100,.2);background:rgba(255,100,100,.08);color:#ff8585}
-.plate-wrap{
-  position:relative;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  flex-wrap:wrap;
-  gap:12px;
-  max-width:100%;
-}
-
-.plate{
-  position:relative;
-  display:flex;
-  align-items:stretch;
-  width:360px;
-  height:78px;
-  min-width:0;
-  padding:0;
-  box-sizing:border-box;
-  border:1px solid #a8a8a8;
-  border-radius:6px;
-  overflow:hidden;
-  background:
-    linear-gradient(180deg,#ffffff 0%,#f8f8f8 48%,#eeeeee 100%);
-  color:#090909;
-  box-shadow:
-    0 2px 2px rgba(0,0,0,.24),
-    0 0 0 1px rgba(255,255,255,.95) inset,
-    0 0 0 2px rgba(0,0,0,.06) inset;
-}
-
-.plate::before{
-  content:"";
-  position:absolute;
-  inset:3px;
-  border:1px solid rgba(0,0,0,.12);
-  border-radius:3px;
-  pointer-events:none;
-}
-
-.plate-standard{
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-.plate-main{
-  flex:1;
-  min-width:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:1px;
-  padding:0 10px 0 13px;
-  font-family:Arial,Helvetica,sans-serif;
-  font-size:46px;
-  line-height:1;
-  font-weight:700;
-  letter-spacing:-1.8px;
-  white-space:nowrap;
-  transform:scaleX(.94);
-  transform-origin:center;
-}
-
-.plate-letter,
-.plate-digits,
-.plate-letters{
-  display:inline-block;
-}
-
-.plate-digits{
-  letter-spacing:-2.6px;
-}
-
-.plate-region{
-  flex:0 0 62px;
-  width:62px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  border-left:1px solid #8d8d8d;
-  background:linear-gradient(180deg,#ffffff,#f1f1f1);
-  color:#090909;
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-.plate-region strong{
-  display:block;
-  font-size:25px;
-  line-height:.95;
-  font-weight:700;
-  letter-spacing:-.7px;
-}
-
-.plate-region span{
-  display:block;
-  margin-top:5px;
-  font-size:9px;
-  line-height:1;
-  font-weight:700;
-  letter-spacing:.2px;
-}
-
-.plate-standard::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:linear-gradient(90deg,rgba(255,255,255,.35),transparent 16%,transparent 84%,rgba(255,255,255,.22));
-}
-
-.plate-number{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  min-height:54px;
-  color:#101010;
-  font-family:Arial,Helvetica,sans-serif;
-  font-size:clamp(24px,3vw,34px);
-  line-height:1;
-  font-weight:700;
-  letter-spacing:.5px;
-}
-
-.plate-wrap-set{
-  justify-content:flex-start;
-  gap:10px;
-}
-
-.plate-wrap-special .plate{
-  width:330px;
-  height:74px;
-}
-
-.plate-special-main{
-  flex:1;
-  min-width:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:20px;
-  padding-left:13px;
-  font-family:Arial,Helvetica,sans-serif;
-  font-size:38px;
-  line-height:1;
-  font-weight:700;
-  letter-spacing:-1px;
-  white-space:nowrap;
-}
-
-.plate-special .plate-region{
-  flex-basis:54px;
-  width:54px;
-}
-
-.plate-special .plate-region strong{
-  font-size:23px;
-}
-
-.plate-special .plate-region span{
-  font-size:8px;
-}
-
-.plate-fallback .plate-number{
-  padding:0 12px;
-  font-size:34px;
-}
-
+.plate-wrap{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:8px;max-width:calc(100% - 70px)}
+.plate{display:inline-flex;align-items:stretch;min-height:69px;border:3px solid #29292c;border-radius:9px;overflow:hidden;background:#f4f4f2;color:#0d0d0f;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.plate-number{display:flex;align-items:center;padding:5px 12px;font-size:clamp(24px,3vw,34px);line-height:1;font-weight:900;letter-spacing:-1px;white-space:nowrap}
+.plate-region{width:66px;min-width:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:3px solid #29292c;font-size:18px;line-height:1.05;font-weight:900}
+.plate-region span{margin-top:2px;font-size:9px;letter-spacing:1px}
 .favorite-button{position:absolute;top:0;right:0;z-index:10;width:42px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:10px;background:#15151a;color:#77777f;font-size:20px;line-height:1;cursor:pointer}
 .favorite-button.active{color:#d9bdff;border-color:rgba(155,108,255,.35);background:rgba(155,108,255,.12)}
 .number-info{position:relative;z-index:2;margin-top:17px}
@@ -276,20 +112,11 @@ button,input,select{font:inherit}button{-webkit-tap-highlight-color:transparent}
   .numbers-list{gap:9px;margin-top:14px}
   .number-card{padding:17px;border-radius:20px}
   .number-card-top{min-height:59px}
-  .plate-wrap{max-width:calc(100% - 54px);gap:6px}
-  .plate{width:100%;max-width:360px;height:64px;border-width:1px}
-  .plate-main{font-size:34px;letter-spacing:-1.2px;padding-left:9px}
-  .plate-digits{letter-spacing:-1.8px}
-  .plate-region{flex-basis:50px;width:50px}
-  .plate-region strong{font-size:20px}
-  .plate-region span{margin-top:4px;font-size:7px}
-  .plate-wrap-set{gap:5px}
-  .plate-wrap-set .plate{max-width:100%}
-  .plate-wrap-special .plate{width:100%;max-width:330px;height:60px}
-  .plate-special-main{font-size:29px;gap:14px}
-  .plate-special .plate-region{flex-basis:46px;width:46px}
-  .plate-special .plate-region strong{font-size:19px}
-  .plate-fallback .plate-number{font-size:24px}
+  .plate-wrap{max-width:calc(100% - 54px);gap:5px}
+  .plate{min-height:55px;border-width:2px}
+  .plate-number{padding:4px 7px;font-size:clamp(15px,5vw,23px);letter-spacing:-.5px}
+  .plate-region{width:49px;min-width:49px;border-left-width:2px;font-size:15px}
+  .plate-region span{font-size:7px}
   .favorite-button{width:39px;height:33px;border-radius:9px;font-size:18px}
   .card-badge{top:38px;right:0;height:21px;padding:0 7px;font-size:7px}
   .number-info{margin-top:15px}
@@ -310,14 +137,8 @@ button,input,select{font:inherit}button{-webkit-tap-highlight-color:transparent}
   .main-header h1{font-size:32px}
   .number-card{padding:14px}
   .plate-wrap{max-width:calc(100% - 49px)}
-  .plate{height:59px}
-  .plate-main{font-size:29px;padding-left:6px}
-  .plate-region{flex-basis:45px;width:45px}
-  .plate-region strong{font-size:18px}
-  .plate-region span{font-size:6px}
-  .plate-special-main{font-size:25px;gap:10px}
-  .plate-special .plate-region{flex-basis:41px;width:41px}
-  .plate-fallback .plate-number{font-size:21px}
+  .plate-number{font-size:14px}
+  .plate-region{width:44px;min-width:44px;font-size:13px}
   .category{font-size:17px}
   .price{font-size:21px}
   .bottom-nav{left:7px!important;right:7px!important;bottom:7px!important;height:62px!important}
