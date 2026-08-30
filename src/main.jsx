@@ -11,7 +11,7 @@ const SUPABASE_KEY =
 const API_URL = SUPABASE_URL + "/rest/v1/numbers";
 
 const ADMIN_PASSWORD = "124124";
-const LOCAL_NUMBERS_KEY = "grz124-admin-numbers";
+const LOCAL_NUMBERS_KEY = "grz124-admin-numbers-v3";
 const FAVORITES_KEY = "beautiful-numbers-favorites";
 
 /* =========================================================
@@ -19,408 +19,107 @@ const FAVORITES_KEY = "beautiful-numbers-favorites";
    ========================================================= */
 
 const FALLBACK_NUMBERS = [
-  {
-    id: "number-1",
-    number: "У001ЕТ24",
-    price: 550000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-2",
-    number: "О003МС124",
-    price: 210000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-3",
-    number: "В009РР124",
-    price: 250000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-4",
-    number: "У011ВН124",
-    price: 90000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-5",
-    number: "Т020РА24",
-    price: 75000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-6",
-    number: "Н024ОС24",
-    price: 165000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-7",
-    number: "В024СМ24",
-    price: 185000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-8",
-    number: "Р027ОМ124",
-    price: 70000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-9",
-    number: "Е032КО24",
-    price: 55000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-10",
-    number: "М035ТВ124",
-    price: 40000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-11",
-    number: "К066НХ24",
-    price: 85000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-12",
-    number: "М093ТВ124",
-    price: 40000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-13",
-    number: "М094ТВ124",
-    price: 40000,
-    category: "Первая сотня",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
+  // Первая сотня — 11
+  { id:"number-1", number:"У001ЕТ24", price:550000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-2", number:"О003МС124", price:210000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-3", number:"У011ВН124", price:90000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-4", number:"Т020РА24", price:75000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-5", number:"Н024ОС24", price:165000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-6", number:"В024СМ24", price:185000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-7", number:"Е032КО24", price:55000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-8", number:"М035ТВ124", price:40000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-9", number:"К066НХ24", price:85000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-10", number:"М093ТВ124", price:40000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-11", number:"М094ТВ124", price:40000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
 
-  {
-    id: "number-14",
-    number: "Н111ХЕ124",
-    price: 300000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-15",
-    number: "М333УМ24",
-    price: 280000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "reserved",
-  },
-  {
-    id: "number-16",
-    number: "С555МЕ124",
-    price: 285000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-17",
-    number: "У666ТА124",
-    price: 250000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-18",
-    number: "Е666РЕ124",
-    price: 350000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-19",
-    number: "Р888УХ24",
-    price: 430000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-20",
-    number: "В888МК24",
-    price: 500000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-21",
-    number: "У999ТТ24",
-    price: 550000,
-    category: "Одинаковые цифры",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
+  // Одинаковые цифры — 6
+  { id:"number-12", number:"Н111ХЕ124", price:300000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-13", number:"У666ТА124", price:250000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-14", number:"Е666РЕ124", price:350000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-15", number:"Р888УХ24", price:430000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-16", number:"В888МК24", price:500000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-17", number:"У999ТТ24", price:550000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"24", status:"available" },
 
-  {
-    id: "number-22",
-    number: "А731АА24+А731АА124",
-    price: 375000,
-    category: "Комплекты",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-23",
-    number: "С333ОК24+С333ОК124",
-    price: 1300000,
-    category: "Комплекты",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
+  // Комплекты — 2
+  { id:"number-18", number:"А731АА24+А731АА124", price:375000, category:"Комплекты", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-19", number:"С333ОК24+С333ОК124", price:1300000, category:"Комплекты", region:"Красноярский край", regionCode:"24", status:"available" },
 
-  {
-    id: "number-24",
-    number: "Х200НУ24",
-    price: 120000,
-    category: "Сотни",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
+  // Сотни — 1
+  { id:"number-20", number:"Х200НУ24", price:120000, category:"Сотни", region:"Красноярский край", regionCode:"24", status:"available" },
 
-  {
-    id: "number-25",
-    number: "Р014РР24",
-    price: 250000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-26",
-    number: "У116УУ24",
-    price: 140000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-27",
-    number: "В391ВВ124",
-    price: 125000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-28",
-    number: "Е426ЕЕ124",
-    price: 105000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-29",
-    number: "О482ОО24",
-    price: 380000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-30",
-    number: "А742АА124",
-    price: 140000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-31",
-    number: "Р803РР24",
-    price: 100000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-32",
-    number: "А820АА24",
-    price: 175000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-33",
-    number: "В922ВВ124",
-    price: 100000,
-    category: "Буквы",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
+  // Буквы — 9
+  { id:"number-21", number:"Р014РР24", price:250000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-22", number:"У116УУ24", price:140000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-23", number:"В391ВВ124", price:125000, category:"Буквы", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-24", number:"Е426ЕЕ124", price:105000, category:"Буквы", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-25", number:"О482ОО24", price:380000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-26", number:"А742АА124", price:140000, category:"Буквы", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-27", number:"Р803РР24", price:100000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-28", number:"А820АА24", price:175000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-29", number:"В922ВВ124", price:100000, category:"Буквы", region:"Красноярский край", regionCode:"124", status:"available" },
 
-  {
-    id: "number-34",
-    number: "Х124УВ124",
-    price: 155000,
-    category: "124/124;224/224",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
+  // 124/124;224/224 — 1
+  { id:"number-30", number:"Х124УВ124", price:155000, category:"124/124;224/224", region:"Красноярский край", regionCode:"124", status:"available" },
 
-  {
-    id: "number-35",
-    number: "Н121УМ124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-36",
-    number: "У121УС124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-37",
-    number: "Т161ТС124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-38",
-    number: "Х181УН124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-39",
-    number: "В181НЕ124",
-    price: 60000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-40",
-    number: "Р191УУ124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-41",
-    number: "Т212УХ124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-42",
-    number: "Е292УМ124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-43",
-    number: "У363УН124",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
-  {
-    id: "number-44",
-    number: "О373ХА224",
-    price: 39000,
-    category: "Зеркала",
-    region: "Красноярский край",
-    regionCode: "24",
-    status: "available",
-  },
+  // Зеркала — 26
+  { id:"number-31", number:"У121ХА224", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"224", status:"available" },
+  { id:"number-32", number:"Н121УМ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-33", number:"У121УС124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-34", number:"Т161ТС124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-35", number:"Х181УН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-36", number:"В181НЕ124", price:60000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-37", number:"Р191УУ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-38", number:"Т212УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-39", number:"Е292УМ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-40", number:"У363УН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-41", number:"О373ХА224", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"224", status:"available" },
+  { id:"number-42", number:"О373УН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-43", number:"Е393УУ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-44", number:"С484ХН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-45", number:"В484ХН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-46", number:"К545УР124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-47", number:"Т595УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-48", number:"С646ХН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-49", number:"В656УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-50", number:"Н656УР124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-51", number:"К686УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-52", number:"С787УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-53", number:"В808ХН124", price:100000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-54", number:"Т828УС124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-55", number:"У898НТ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-56", number:"С949УУ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
+
+  // Прочее — 11
+  { id:"number-57", number:"Е110УТ124", price:35000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-58", number:"Х150АН224", price:85000, category:"Прочее", region:"Красноярский край", regionCode:"224", status:"available" },
+  { id:"number-59", number:"Т221УР124", price:35000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-60", number:"Х227АН224", price:45000, category:"Прочее", region:"Красноярский край", regionCode:"224", status:"available" },
+  { id:"number-61", number:"О321ХА224", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"224", status:"available" },
+  { id:"number-62", number:"М359УР124", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-63", number:"М389УР124", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-64", number:"М398УР124", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-65", number:"В440УС124", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-66", number:"К567УР124", price:35000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
+  { id:"number-67", number:"О877ХА224", price:25000, category:"Прочее", region:"Красноярский край", regionCode:"224", status:"available" },
+
+  // Прицеп — 12
+  { id:"number-68", number:"НВ 7878 24", price:50000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-69", number:"ОВ 0999 24", price:175000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-70", number:"ОВ 0990 24", price:120000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-71", number:"ОВ 0969 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-72", number:"ОВ 0828 24", price:55000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-73", number:"НК 6066 24", price:55000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-74", number:"НК 7666 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-75", number:"НК 7667 24", price:50000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-76", number:"НЕ 7333 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-77", number:"НК 2929 24", price:45000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-78", number:"ОВ 2999 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-79", number:"ОВ 4774 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
+
+  // Мото — 3
+  { id:"number-80", number:"АК 0200 24", price:160000, category:"Мото", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-81", number:"ВА 4666 24", price:60000, category:"Мото", region:"Красноярский край", regionCode:"24", status:"available" },
+  { id:"number-82", number:"АМ 3993 24", price:60000, category:"Мото", region:"Красноярский край", regionCode:"24", status:"available" },
 ];
 
 /* =========================================================
@@ -475,25 +174,6 @@ function isReserved(item) {
   return item.status === "reserved";
 }
 
-function getLevel(item) {
-  const price = Number(item.price || 0);
-
-  if (
-    item.category === "Комплекты" ||
-    price >= 500000
-  ) {
-    return "VIP";
-  }
-
-  if (
-    item.category === "Одинаковые цифры" ||
-    price >= 250000
-  ) {
-    return "Premium";
-  }
-
-  return "";
-}
 
 /* =========================================================
    НОМЕРНОЙ ЗНАК
@@ -534,7 +214,6 @@ function NumberCard({
   onFavorite,
   onDetails,
 }) {
-  const level = getLevel(item);
   const reserved = isReserved(item);
 
   return (
@@ -558,13 +237,6 @@ function NumberCard({
       </div>
 
       <div className="number-info">
-        {level && (
-          <div
-            className={`level level-${level.toLowerCase()}`}
-          >
-            {level}
-          </div>
-        )}
 
         <div className="category">
           {item.category}
@@ -1307,19 +979,9 @@ function App() {
   const filteredNumbers =
     useMemo(() => {
       let result = [...numbers];
-
-      if (filter === "VIP") {
+      if (filter !== "Все") {
         result = result.filter(
-          (item) =>
-            getLevel(item) === "VIP"
-        );
-      }
-
-      if (filter === "Premium") {
-        result = result.filter(
-          (item) =>
-            getLevel(item) ===
-            "Premium"
+          (item) => item.category === filter
         );
       }
 
@@ -1439,28 +1101,38 @@ function App() {
               placeholder="Поиск: 777, 001..."
             />
           </div>
-
           <div className="filters">
             {[
               "Все",
-              "Premium",
-              "VIP",
-            ].map((name) => (
-              <button
-                key={name}
-                type="button"
-                className={
-                  filter === name
-                    ? "selected"
-                    : ""
-                }
-                onClick={() =>
-                  setFilter(name)
-                }
-              >
-                {name}
-              </button>
-            ))}
+              "Первая сотня",
+              "Одинаковые цифры",
+              "Комплекты",
+              "Сотни",
+              "Буквы",
+              "124/124;224/224",
+              "Зеркала",
+              "Прочее",
+              "Прицеп",
+              "Мото",
+            ].map((name) => {
+              const count =
+                name === "Все"
+                  ? numbers.length
+                  : numbers.filter(
+                      (item) => item.category === name
+                    ).length;
+
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  className={filter === name ? "selected" : ""}
+                  onClick={() => setFilter(name)}
+                >
+                  {name} — {count}
+                </button>
+              );
+            })}
           </div>
         </section>
 
@@ -1762,12 +1434,6 @@ function App() {
                 selectedNumber.regionCode
               }
             />
-
-            <div className="modal-level">
-              {getLevel(
-                selectedNumber
-              )}
-            </div>
 
             <h3>
               {selectedNumber.category}
