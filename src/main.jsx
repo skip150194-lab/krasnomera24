@@ -1,278 +1,954 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
-import "./admin-panel.css";
 
 const SUPABASE_URL = "https://tjxumwgktffnfgpdka.supabase.co";
-const SUPABASE_KEY =
-  "sb_publishable_29-OjXwd3B9rGcPg06If4Q_1R8-DjQh";
+const SUPABASE_KEY = "sb_publishable_29-OjXwd3B9rGcPg06If4Q_1R8-DjQh";
+const API_URL = `${SUPABASE_URL}/rest/v1/numbers`;
 
-// ВАЖНО: без template literal, чтобы Vite не ловил ошибку с $
-const API_URL = SUPABASE_URL + "/rest/v1/numbers";
-
-const ADMIN_PASSWORD = "124124";
-const LOCAL_NUMBERS_KEY = "grz124-admin-numbers-v3";
-const FAVORITES_KEY = "beautiful-numbers-favorites";
-
-/* =========================================================
-   ПОЛНЫЙ КАТАЛОГ
-   ========================================================= */
-
+/*
+ * ПОЛНЫЙ КАТАЛОГ GRZ124.
+ * Supabase теперь ДОПОЛНЯЕТ этот список, а не заменяет его.
+ * Поэтому даже если в базе сейчас только 3 записи,
+ * приложение всё равно покажет весь каталог.
+ */
 const FALLBACK_NUMBERS = [
-  // Первая сотня — 11
-  { id:"number-1", number:"У001ЕТ24", price:550000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-2", number:"О003МС124", price:210000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-3", number:"У011ВН124", price:90000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-4", number:"Т020РА24", price:75000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-5", number:"Н024ОС24", price:165000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-6", number:"В024СМ24", price:185000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-7", number:"Е032КО24", price:55000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-8", number:"М035ТВ124", price:40000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-9", number:"К066НХ24", price:85000, category:"Первая сотня", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-10", number:"М093ТВ124", price:40000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-11", number:"М094ТВ124", price:40000, category:"Первая сотня", region:"Красноярский край", regionCode:"124", status:"available" },
-
-  // Одинаковые цифры — 6
-  { id:"number-12", number:"Н111ХЕ124", price:300000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-13", number:"У666ТА124", price:250000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-14", number:"Е666РЕ124", price:350000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-15", number:"Р888УХ24", price:430000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-16", number:"В888МК24", price:500000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-17", number:"У999ТТ24", price:550000, category:"Одинаковые цифры", region:"Красноярский край", regionCode:"24", status:"available" },
-
-  // Комплекты — 2
-  { id:"number-18", number:"А731АА24+А731АА124", price:375000, category:"Комплекты", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-19", number:"С333ОК24+С333ОК124", price:1300000, category:"Комплекты", region:"Красноярский край", regionCode:"24", status:"available" },
-
-  // Сотни — 1
-  { id:"number-20", number:"Х200НУ24", price:120000, category:"Сотни", region:"Красноярский край", regionCode:"24", status:"available" },
-
-  // Буквы — 9
-  { id:"number-21", number:"Р014РР24", price:250000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-22", number:"У116УУ24", price:140000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-23", number:"В391ВВ124", price:125000, category:"Буквы", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-24", number:"Е426ЕЕ124", price:105000, category:"Буквы", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-25", number:"О482ОО24", price:380000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-26", number:"А742АА124", price:140000, category:"Буквы", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-27", number:"Р803РР24", price:100000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-28", number:"А820АА24", price:175000, category:"Буквы", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-29", number:"В922ВВ124", price:100000, category:"Буквы", region:"Красноярский край", regionCode:"124", status:"available" },
-
-  // 124/124;224/224 — 1
-  { id:"number-30", number:"Х124УВ124", price:155000, category:"124/124;224/224", region:"Красноярский край", regionCode:"124", status:"available" },
-
-  // Зеркала — 26
-  { id:"number-31", number:"У121ХА224", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"224", status:"available" },
-  { id:"number-32", number:"Н121УМ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-33", number:"У121УС124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-34", number:"Т161ТС124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-35", number:"Х181УН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-36", number:"В181НЕ124", price:60000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-37", number:"Р191УУ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-38", number:"Т212УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-39", number:"Е292УМ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-40", number:"У363УН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-41", number:"О373ХА224", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"224", status:"available" },
-  { id:"number-42", number:"О373УН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-43", number:"Е393УУ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-44", number:"С484ХН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-45", number:"В484ХН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-46", number:"К545УР124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-47", number:"Т595УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-48", number:"С646ХН124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-49", number:"В656УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-50", number:"Н656УР124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-51", number:"К686УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-52", number:"С787УХ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-53", number:"В808ХН124", price:100000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-54", number:"Т828УС124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-55", number:"У898НТ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-56", number:"С949УУ124", price:39000, category:"Зеркала", region:"Красноярский край", regionCode:"124", status:"available" },
-
-  // Прочее — 11
-  { id:"number-57", number:"Е110УТ124", price:35000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-58", number:"Х150АН224", price:85000, category:"Прочее", region:"Красноярский край", regionCode:"224", status:"available" },
-  { id:"number-59", number:"Т221УР124", price:35000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-60", number:"Х227АН224", price:45000, category:"Прочее", region:"Красноярский край", regionCode:"224", status:"available" },
-  { id:"number-61", number:"О321ХА224", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"224", status:"available" },
-  { id:"number-62", number:"М359УР124", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-63", number:"М389УР124", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-64", number:"М398УР124", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-65", number:"В440УС124", price:30000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-66", number:"К567УР124", price:35000, category:"Прочее", region:"Красноярский край", regionCode:"124", status:"available" },
-  { id:"number-67", number:"О877ХА224", price:25000, category:"Прочее", region:"Красноярский край", regionCode:"224", status:"available" },
-
-  // Прицеп — 12
-  { id:"number-68", number:"НВ 7878 24", price:50000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-69", number:"ОВ 0999 24", price:175000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-70", number:"ОВ 0990 24", price:120000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-71", number:"ОВ 0969 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-72", number:"ОВ 0828 24", price:55000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-73", number:"НК 6066 24", price:55000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-74", number:"НК 7666 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-75", number:"НК 7667 24", price:50000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-76", number:"НЕ 7333 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-77", number:"НК 2929 24", price:45000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-78", number:"ОВ 2999 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-79", number:"ОВ 4774 24", price:75000, category:"Прицеп", region:"Красноярский край", regionCode:"24", status:"available" },
-
-  // Мото — 3
-  { id:"number-80", number:"АК 0200 24", price:160000, category:"Мото", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-81", number:"ВА 4666 24", price:60000, category:"Мото", region:"Красноярский край", regionCode:"24", status:"available" },
-  { id:"number-82", number:"АМ 3993 24", price:60000, category:"Мото", region:"Красноярский край", regionCode:"24", status:"available" },
+  {
+    "id": "number-1",
+    "number": "У001ЕТ24",
+    "price": 550000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-2",
+    "number": "О003МС124",
+    "price": 210000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-3",
+    "number": "В009РР124",
+    "price": 250000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-4",
+    "number": "У011ВН124",
+    "price": 90000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-5",
+    "number": "Т020РА24",
+    "price": 75000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-6",
+    "number": "Н024ОС24",
+    "price": 165000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-7",
+    "number": "В024СМ24",
+    "price": 185000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-8",
+    "number": "Р027ОМ124",
+    "price": 70000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-9",
+    "number": "Е032КО24",
+    "price": 55000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-10",
+    "number": "М035ТВ124",
+    "price": 40000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-11",
+    "number": "К066НХ24",
+    "price": 85000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-12",
+    "number": "М093ТВ124",
+    "price": 40000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-13",
+    "number": "М094ТВ124",
+    "price": 40000,
+    "category": "Первая сотня",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-14",
+    "number": "Н111ХЕ124",
+    "price": 300000,
+    "category": "Одинаковые цифры",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-15",
+    "number": "М333УМ24",
+    "price": 280000,
+    "category": "Одинаковые цифры",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "reserved"
+  },
+  {
+    "id": "number-16",
+    "number": "С555МЕ124",
+    "price": 285000,
+    "category": "Одинаковые цифры",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-17",
+    "number": "У666ТА124",
+    "price": 250000,
+    "category": "Одинаковые цифры",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-18",
+    "number": "Е666РЕ124",
+    "price": 350000,
+    "category": "Одинаковые цифры",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-19",
+    "number": "Р888УХ24",
+    "price": 430000,
+    "category": "Одинаковые цифры",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-20",
+    "number": "В888МК24",
+    "price": 500000,
+    "category": "Одинаковые цифры",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-21",
+    "number": "У999ТТ24",
+    "price": 550000,
+    "category": "Одинаковые цифры",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-22",
+    "number": "А731АА24+А731АА124",
+    "price": 375000,
+    "category": "Комплекты",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-23",
+    "number": "С333ОК24+С333ОК124",
+    "price": 1300000,
+    "category": "Комплекты",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-24",
+    "number": "Х200НУ24",
+    "price": 120000,
+    "category": "Сотни",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-25",
+    "number": "Р014РР24",
+    "price": 250000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-26",
+    "number": "У116УУ24",
+    "price": 140000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-27",
+    "number": "В391ВВ124",
+    "price": 125000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-28",
+    "number": "Е426ЕЕ124",
+    "price": 105000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-29",
+    "number": "О482ОО24",
+    "price": 380000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-30",
+    "number": "А742АА124",
+    "price": 140000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-31",
+    "number": "Р803РР24",
+    "price": 100000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-32",
+    "number": "А820АА24",
+    "price": 175000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-33",
+    "number": "В922ВВ124",
+    "price": 100000,
+    "category": "Буквы",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-34",
+    "number": "Х124УВ124",
+    "price": 155000,
+    "category": "124/124;224/224",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-35",
+    "number": "Н121УМ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-36",
+    "number": "У121УС124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-37",
+    "number": "Т161ТС124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-38",
+    "number": "Х181УН124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-39",
+    "number": "В181НЕ124",
+    "price": 60000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-40",
+    "number": "Р191УУ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-41",
+    "number": "Т212УХ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-42",
+    "number": "Е292УМ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-43",
+    "number": "У363УН124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-44",
+    "number": "О373ХА224",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-45",
+    "number": "О373УН124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-46",
+    "number": "Е393УУ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-47",
+    "number": "С484ХН124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-48",
+    "number": "В484ХН124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-49",
+    "number": "К545УР124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-50",
+    "number": "Т595УХ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-51",
+    "number": "С646ХН124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-52",
+    "number": "В656УХ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-53",
+    "number": "Н656УР124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-54",
+    "number": "К686УХ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-55",
+    "number": "С787УХ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-56",
+    "number": "В808ХН124",
+    "price": 100000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-57",
+    "number": "Т828УС124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-58",
+    "number": "У898НТ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-59",
+    "number": "С949УУ124",
+    "price": 39000,
+    "category": "Зеркала",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-60",
+    "number": "Е110УТ124",
+    "price": 35000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-61",
+    "number": "Х150АН224",
+    "price": 85000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-62",
+    "number": "Т221УР124",
+    "price": 35000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-63",
+    "number": "Х227АН224",
+    "price": 45000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-64",
+    "number": "О321ХА224",
+    "price": 30000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-65",
+    "number": "М359УР124",
+    "price": 30000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-66",
+    "number": "М389УР124",
+    "price": 30000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-67",
+    "number": "М398УР124",
+    "price": 30000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-68",
+    "number": "В440УС124",
+    "price": 30000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-69",
+    "number": "К567УР124",
+    "price": 35000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-70",
+    "number": "О877ХА224",
+    "price": 25000,
+    "category": "Прочее",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-71",
+    "number": "НВ 7878 24",
+    "price": 50000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-72",
+    "number": "ОВ 0999 24",
+    "price": 175000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-73",
+    "number": "ОВ 0990 24",
+    "price": 120000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-74",
+    "number": "ОВ 0969 24",
+    "price": 75000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-75",
+    "number": "ОВ 0828 24",
+    "price": 55000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-76",
+    "number": "НК 6066 24",
+    "price": 55000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-77",
+    "number": "НК 7666 24",
+    "price": 75000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-78",
+    "number": "НК 7667 24",
+    "price": 50000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-79",
+    "number": "НЕ 7333 24",
+    "price": 75000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-80",
+    "number": "НК 2929 24",
+    "price": 45000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-81",
+    "number": "ОВ 2999 24",
+    "price": 75000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-82",
+    "number": "ОВ 4774 24",
+    "price": 75000,
+    "category": "Прицеп",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-83",
+    "number": "АК 0200 24",
+    "price": 160000,
+    "category": "Мото",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-84",
+    "number": "ВА 4666 24",
+    "price": 60000,
+    "category": "Мото",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  },
+  {
+    "id": "number-85",
+    "number": "АМ 3993 24",
+    "price": 60000,
+    "category": "Мото",
+    "region": "Красноярский край",
+    "regionCode": "24",
+    "status": "available"
+  }
 ];
 
-/* =========================================================
-   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-   ========================================================= */
+function formatPrice(price) {
+  return `${Number(price || 0).toLocaleString("ru-RU")} ₽`;
+}
 
-function normalizeNumber(item) {
+function getLevel(item) {
+  const price = Number(item?.price || 0);
+  if (price >= 400000) return "VIP";
+  if (price >= 200000) return "Premium";
+  return "";
+}
+
+function normalizeCategory(category) {
+  if (!category) return "Другие";
+
+  const value = String(category).trim();
+  const aliases = {
+    "первая сотня": "Первая сотня",
+    "одинаковые цифры": "Одинаковые цифры",
+    "комплекты": "Комплекты",
+    "красивые буквы": "Красивые буквы",
+    "буквы": "Буквы",
+    "зеркальные": "Зеркала",
+    "зеркала": "Зеркала",
+  };
+
+  return aliases[value.toLowerCase()] || value;
+}
+
+function normalizeNumber(item, index) {
   return {
-    id: String(
-      item.id ??
-        (typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `number-${Date.now()}-${Math.random()}`)
+    id: item?.id ?? `${item?.number || item?.plate || "number"}-${index}`,
+    number:
+      item?.number ??
+      item?.plate ??
+      item?.name ??
+      item?.["номер"] ??
+      "",
+    price: Number(item?.price ?? 0),
+    category: normalizeCategory(
+      item?.category ?? item?.type ?? item?.category_name
     ),
-    number: String(item.number ?? ""),
-    price: Number(item.price ?? 0),
-    category: String(item.category ?? "Красивые номера"),
-    region: String(item.region ?? "Красноярский край"),
-    regionCode: String(
-      item.regionCode ?? item.region_code ?? "24"
-    ),
-    status: String(item.status ?? "available"),
-    description: item.description ?? "",
+    region:
+      item?.region ??
+      item?.region_name ??
+      "Красноярский край",
+    regionCode:
+      item?.region_code ??
+      item?.regionCode ??
+      item?.code ??
+      "24",
+    reserved:
+      Boolean(item?.reserved) ||
+      item?.status === "reserved" ||
+      item?.status === "Продан",
+    description: item?.description ?? "",
+    phone: item?.phone ?? "",
+    telegram: item?.telegram ?? "",
   };
 }
 
-function removeDuplicates(list) {
-  const map = new Map();
+/*
+ * Удаляем только реальные дубли одного и того же номера.
+ * Цена и категория не создают вторую карточку.
+ */
+function removeDuplicates(items) {
+  const result = [];
+  const keys = new Set();
 
-  for (const item of list) {
-    const normalized = normalizeNumber(item);
+  for (const item of items) {
+    const number = String(item.number || "")
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, " ");
 
-    const key = normalized.number
-      .replace(/\s/g, "")
-      .toUpperCase();
+    if (!number || keys.has(number)) continue;
 
-    if (!key) continue;
-
-    map.set(key, normalized);
+    keys.add(number);
+    result.push(item);
   }
 
-  return Array.from(map.values()).sort(
-    (a, b) => Number(b.price) - Number(a.price)
-  );
-}
-
-function formatPrice(value) {
-  return `${Number(value || 0).toLocaleString("ru-RU")} ₽`;
+  return result;
 }
 
 function isReserved(item) {
-  return item.status === "reserved";
+  return Boolean(
+    item?.reserved === true ||
+    item?.status === "reserved" ||
+    item?.status === "Продан"
+  );
 }
 
+function Plate({ number, regionCode, category }) {
+  const text = String(number || "").trim();
+  const parts = text.split("+").map((part) => part.trim()).filter(Boolean);
 
-/* =========================================================
-   НОМЕРНОЙ ЗНАК
-   ========================================================= */
-
-function Plate({ number }) {
-  const value = String(number || "").trim();
-
-  // Комплект: каждый номер остаётся отдельной физической пластиной.
-  if (value.includes("+")) {
+  if (parts.length > 1) {
     return (
-      <div className="plate-wrap plate-wrap-set" aria-label={value}>
-        {value.split("+").map((part, index) => (
-          <Plate key={`${part}-${index}`} number={part} />
+      <div className="plate-set">
+        {parts.map((part, index) => (
+          <Plate
+            key={`${part}-${index}`}
+            number={part}
+            regionCode={regionCode}
+            category={category}
+          />
         ))}
       </div>
     );
   }
 
-  // Обычный российский знак: одна буква + 3 цифры + 2 буквы + регион.
-  // Регион всегда берётся из самого номера — ничего дополнительно не подставляем.
-  const standard = value.match(/^([А-ЯЁ])([0-9]{3})([А-ЯЁ]{2})([0-9]{2,3})$/i);
+  // Российский автомобильный знак: буква + 3 цифры + 2 буквы + регион.
+  const standard = text.match(/^([А-ЯЁ])(\d{3})([А-ЯЁ]{2})(\d{2,3})$/i);
 
   if (standard) {
-    const [, firstLetter, digits, lastLetters, regionCode] = standard;
+    const [, firstLetter, digits, lastLetters, actualRegion] = standard;
 
     return (
-      <div className="plate-wrap">
-        <div className="plate plate-standard" aria-label={value}>
-          <span className="plate-hole plate-hole-left" aria-hidden="true" />
-
-          <div className="plate-main" aria-hidden="true">
-            <span className="plate-char plate-letter">{firstLetter}</span>
-            <span className="plate-char plate-digits">{digits}</span>
-            <span className="plate-char plate-letters">{lastLetters}</span>
+      <div className="plate-wrapper">
+        <div className="plate plate-standard" aria-label={text}>
+          <div className="plate-main">
+            <span className="plate-letter">{firstLetter}</span>
+            <span className="plate-digits">{digits}</span>
+            <span className="plate-letters">{lastLetters}</span>
           </div>
 
-          <div className="plate-region" aria-hidden="true">
-            <strong>{regionCode}</strong>
-            <div className="plate-rus-row">
-              <span>RUS</span>
-              <i className="plate-flag" />
-            </div>
+          <div className="plate-region">
+            <strong>{actualRegion}</strong>
+            <span>RUS</span>
           </div>
-
-          <span className="plate-hole plate-hole-right" aria-hidden="true" />
         </div>
       </div>
     );
   }
 
-  // Прицепы и мотоциклетные номера: сохраняем исходную запись и не превращаем
-  // её в обычный автомобильный формат.
-  const special = value.match(/^([А-ЯЁ]{2})\s*([0-9]{4})\s*([0-9]{2,3})$/i);
+  // Прицепы/мото: сохраняем исходную запись и показываем регион,
+  // который реально указан в номере.
+  const special = text.match(/^([А-ЯЁ]{2})\s+(\d{4})\s+(\d{2,3})$/i);
 
   if (special) {
-    const [, letters, digits, regionCode] = special;
+    const [, letters, digits, actualRegion] = special;
 
     return (
-      <div className="plate-wrap plate-wrap-special">
-        <div className="plate plate-special" aria-label={value}>
-          <span className="plate-hole plate-hole-left" aria-hidden="true" />
-
-          <div className="plate-special-main" aria-hidden="true">
+      <div className="plate-wrapper plate-wrapper-special">
+        <div className="plate plate-special" aria-label={text}>
+          <div className="plate-special-main">
             <span>{letters}</span>
             <span>{digits}</span>
           </div>
 
-          <div className="plate-region" aria-hidden="true">
-            <strong>{regionCode}</strong>
-            <div className="plate-rus-row">
-              <span>RUS</span>
-              <i className="plate-flag" />
-            </div>
+          <div className="plate-region">
+            <strong>{actualRegion}</strong>
+            <span>RUS</span>
           </div>
-
-          <span className="plate-hole plate-hole-right" aria-hidden="true" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="plate-wrap">
-      <div className="plate plate-fallback" aria-label={value}>
-        <span className="plate-hole plate-hole-left" aria-hidden="true" />
-        <div className="plate-number">{value}</div>
-        <span className="plate-hole plate-hole-right" aria-hidden="true" />
+    <div className="plate-wrapper">
+      <div className="plate plate-fallback" aria-label={text}>
+        <span className="plate-number">{text}</span>
       </div>
     </div>
   );
 }
 
-function NumberCard({
-  item,
-  favorite,
-  onFavorite,
-  onDetails,
-}) {
+function NumberCardfunction NumberCard({ item, favorite, onFavorite, onDetails }) {
+  const level = getLevel(item);
   const reserved = isReserved(item);
 
   return (
@@ -281,13 +957,12 @@ function NumberCard({
         <Plate
           number={item.number}
           regionCode={item.regionCode}
+          category={item.category}
         />
 
         <button
           type="button"
-          className={`favorite-button ${
-            favorite ? "active" : ""
-          }`}
+          className={`favorite-button ${favorite ? "active" : ""}`}
           onClick={() => onFavorite(item.id)}
           aria-label="Избранное"
         >
@@ -296,10 +971,13 @@ function NumberCard({
       </div>
 
       <div className="number-info">
+        {level && (
+          <div className={`level level-${level.toLowerCase()}`}>
+            {level}
+          </div>
+        )}
 
-        <div className="category">
-          {item.category}
-        </div>
+        <div className="category">{item.category}</div>
 
         <div className="region">
           {item.region} · регион {item.regionCode}
@@ -337,642 +1015,45 @@ function NumberCard({
   );
 }
 
-/* =========================================================
-   АДМИН-ПАНЕЛЬ
-   ========================================================= */
-
-function AdminPanel({
-  numbers,
-  onChangeNumbers,
-  onClose,
-}) {
-  const [authorized, setAuthorized] =
-    useState(false);
-
-  const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] =
-    useState("");
-
-  const [editingId, setEditingId] =
-    useState(null);
-
-  const [form, setForm] = useState({
-    number: "",
-    price: "",
-    category: "Одинаковые цифры",
-    status: "available",
-    description: "",
-  });
-
-  const [message, setMessage] = useState("");
-
-  function login(event) {
-    event.preventDefault();
-
-    if (password === ADMIN_PASSWORD) {
-      setAuthorized(true);
-      setPassword("");
-      setPasswordError("");
-      return;
-    }
-
-    setPasswordError("Неверный пароль");
-  }
-
-  function resetForm() {
-    setEditingId(null);
-
-    setForm({
-      number: "",
-      price: "",
-      category: "Одинаковые цифры",
-      status: "available",
-      description: "",
-    });
-  }
-
-  function editNumber(item) {
-    setEditingId(item.id);
-
-    setForm({
-      number: item.number,
-      price: String(item.price),
-      category: item.category,
-      status: item.status,
-      description: item.description || "",
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }
-
-  function saveNumbers(next) {
-    onChangeNumbers(next);
-
-    try {
-      localStorage.setItem(
-        LOCAL_NUMBERS_KEY,
-        JSON.stringify(next)
-      );
-    } catch {
-      // localStorage unavailable
-    }
-  }
-
-  async function saveToSupabase(item, isNew) {
-    try {
-      const headers = {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      };
-
-      const body = {
-        id: item.id,
-        number: item.number,
-        price: item.price,
-        category: item.category,
-        region: item.region,
-        regionCode: item.regionCode,
-        status: item.status,
-        description: item.description,
-      };
-
-      if (isNew) {
-        await fetch(API_URL, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-        });
-      } else {
-        await fetch(
-          `${API_URL}?id=eq.${encodeURIComponent(
-            item.id
-          )}`,
-          {
-            method: "PATCH",
-            headers,
-            body: JSON.stringify({
-              number: item.number,
-              price: item.price,
-              category: item.category,
-              region: item.region,
-              regionCode: item.regionCode,
-              status: item.status,
-              description: item.description,
-            }),
-          }
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Supabase admin error:",
-        error
-      );
-    }
-  }
-
-  async function submitForm(event) {
-    event.preventDefault();
-
-    const cleanNumber =
-      form.number.trim();
-
-    const price = Number(
-      String(form.price)
-        .replace(/\s/g, "")
-        .replace(/₽/g, "")
-    );
-
-    if (!cleanNumber) {
-      setMessage("Введите номер");
-      return;
-    }
-
-    if (!price || price < 0) {
-      setMessage("Введите корректную цену");
-      return;
-    }
-
-    if (editingId) {
-      const oldItem = numbers.find(
-        (item) => item.id === editingId
-      );
-
-      const updated = {
-        ...(oldItem || {}),
-        id: editingId,
-        number: cleanNumber,
-        price,
-        category: form.category,
-        region: "Красноярский край",
-        regionCode: "24",
-        status: form.status,
-        description: form.description.trim(),
-      };
-
-      const next = numbers.map((item) =>
-        item.id === editingId
-          ? updated
-          : item
-      );
-
-      saveNumbers(next);
-      await saveToSupabase(updated, false);
-
-      setMessage("Номер изменён");
-      resetForm();
-      return;
-    }
-
-    const newItem = {
-      id: `admin-${Date.now()}`,
-      number: cleanNumber,
-      price,
-      category: form.category,
-      region: "Красноярский край",
-      regionCode: "24",
-      status: form.status,
-      description: form.description.trim(),
-    };
-
-    const next = removeDuplicates([
-      ...numbers,
-      newItem,
-    ]);
-
-    saveNumbers(next);
-    await saveToSupabase(newItem, true);
-
-    setMessage("Номер добавлен");
-    resetForm();
-  }
-
-  async function deleteNumber(item) {
-    const confirmed =
-      window.confirm(
-        `Удалить номер ${item.number}?`
-      );
-
-    if (!confirmed) return;
-
-    const next = numbers.filter(
-      (number) => number.id !== item.id
-    );
-
-    saveNumbers(next);
-
-    try {
-      await fetch(
-        `${API_URL}?id=eq.${encodeURIComponent(
-          item.id
-        )}`,
-        {
-          method: "DELETE",
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-          },
-        }
-      );
-    } catch (error) {
-      console.error(error);
-    }
-
-    setMessage("Номер удалён");
-  }
-
-  function toggleReserved(item) {
-    const updated = {
-      ...item,
-      status:
-        item.status === "reserved"
-          ? "available"
-          : "reserved",
-    };
-
-    const next = numbers.map(
-      (number) =>
-        number.id === item.id
-          ? updated
-          : number
-    );
-
-    saveNumbers(next);
-    saveToSupabase(updated, false);
-
-    setMessage(
-      updated.status === "reserved"
-        ? "Номер отмечен как занятый"
-        : "Номер снова доступен"
-    );
-  }
-
-  if (!authorized) {
-    return (
-      <section className="page-section admin-page">
-        <div className="admin-header">
-          <div>
-            <h2>Админ-панель</h2>
-
-            <div className="region">
-              GRZ124 · управление номерами
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="details-button"
-            onClick={onClose}
-          >
-            Назад
-          </button>
-        </div>
-
-        <form
-          className="admin-form"
-          onSubmit={login}
-        >
-          <h3>
-            Вход администратора
-          </h3>
-
-          <input
-            className="admin-input"
-            type="password"
-            value={password}
-            onChange={(event) =>
-              setPassword(
-                event.target.value
-              )
-            }
-            placeholder="Пароль"
-            autoFocus
-          />
-
-          {passwordError && (
-            <div className="admin-error">
-              {passwordError}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="details-button"
-          >
-            Войти
-          </button>
-        </form>
-      </section>
-    );
-  }
-
-  return (
-    <section className="page-section admin-page">
-      <div className="admin-header">
-        <div>
-          <h2>Админ-панель</h2>
-
-          <div className="region">
-            Номеров: {numbers.length}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className="details-button"
-          onClick={onClose}
-        >
-          Закрыть
-        </button>
-      </div>
-
-      <form
-        className="admin-form"
-        onSubmit={submitForm}
-      >
-        <h3>
-          {editingId
-            ? "Редактировать номер"
-            : "Добавить номер"}
-        </h3>
-
-        <input
-          className="admin-input"
-          value={form.number}
-          onChange={(event) =>
-            setForm({
-              ...form,
-              number: event.target.value,
-            })
-          }
-          placeholder="Номер, например У999ТТ24"
-        />
-
-        <input
-          className="admin-input"
-          type="number"
-          value={form.price}
-          onChange={(event) =>
-            setForm({
-              ...form,
-              price: event.target.value,
-            })
-          }
-          placeholder="Цена"
-        />
-
-        <select
-          className="admin-input"
-          value={form.category}
-          onChange={(event) =>
-            setForm({
-              ...form,
-              category: event.target.value,
-            })
-          }
-        >
-          <option>
-            Одинаковые цифры
-          </option>
-
-          <option>
-            Первая сотня
-          </option>
-
-          <option>
-            Комплекты
-          </option>
-
-          <option>
-            Сотни
-          </option>
-
-          <option>
-            Буквы
-          </option>
-
-          <option>
-            Зеркала
-          </option>
-
-          <option>
-            124/124;224/224
-          </option>
-        </select>
-
-        <select
-          className="admin-input"
-          value={form.status}
-          onChange={(event) =>
-            setForm({
-              ...form,
-              status: event.target.value,
-            })
-          }
-        >
-          <option value="available">
-            Доступен
-          </option>
-
-          <option value="reserved">
-            Занят
-          </option>
-        </select>
-
-        <input
-          className="admin-input"
-          value={form.description}
-          onChange={(event) =>
-            setForm({
-              ...form,
-              description:
-                event.target.value,
-            })
-          }
-          placeholder="Описание (необязательно)"
-        />
-
-        {message && (
-          <div className="admin-message">
-            {message}
-          </div>
-        )}
-
-        <div className="admin-actions">
-          <button type="submit">
-            {editingId
-              ? "Сохранить изменения"
-              : "Добавить номер"}
-          </button>
-
-          {editingId && (
-            <button
-              type="button"
-              onClick={resetForm}
-            >
-              Отмена
-            </button>
-          )}
-        </div>
-      </form>
-
-      <div className="admin-list">
-        <div className="admin-list-title">
-          Все номера
-        </div>
-
-        {numbers.map((item) => (
-          <div
-            className="admin-number-row"
-            key={item.id}
-          >
-            <div className="admin-number-main">
-              <strong>
-                {item.number}
-              </strong>
-
-              <span>
-                {formatPrice(item.price)}
-              </span>
-
-              <small>
-                {item.category} ·{" "}
-                {item.status === "reserved"
-                  ? "Занят"
-                  : "Доступен"}
-              </small>
-            </div>
-
-            <div className="admin-actions">
-              <button
-                type="button"
-                onClick={() =>
-                  editNumber(item)
-                }
-              >
-                Изменить
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  toggleReserved(item)
-                }
-              >
-                {item.status === "reserved"
-                  ? "Освободить"
-                  : "Занять"}
-              </button>
-
-              <button
-                type="button"
-                className="danger"
-                onClick={() =>
-                  deleteNumber(item)
-                }
-              >
-                Удалить
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* =========================================================
-   ОСНОВНОЕ ПРИЛОЖЕНИЕ
-   ========================================================= */
-
 function App() {
-  const [numbers, setNumbers] =
-    useState([]);
+  const [numbers, setNumbers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("Все");
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [search, setSearch] =
-    useState("");
-
-  const [filter, setFilter] =
-    useState("Все");
-
-  const [favorites, setFavorites] =
-    useState(() => {
-      try {
-        const saved =
-          localStorage.getItem(
-            FAVORITES_KEY
-          );
-
-        return saved
-          ? JSON.parse(saved)
-          : [];
-      } catch {
-        return [];
-      }
-    });
-
-  const [selectedNumber, setSelectedNumber] =
-    useState(null);
-
-  const [activeTab, setActiveTab] =
-    useState("catalog");
-
-  const [adminOpen, setAdminOpen] =
-    useState(false);
-
-  function getLocalNumbers() {
+  const [favorites, setFavorites] = useState(() => {
     try {
-      const saved =
-        localStorage.getItem(
-          LOCAL_NUMBERS_KEY
-        );
+      const saved = localStorage.getItem(
+        "beautiful-numbers-favorites"
+      );
 
-      if (!saved) return [];
-
-      const parsed = JSON.parse(saved);
-
-      return Array.isArray(parsed)
-        ? parsed.map(normalizeNumber)
-        : [];
+      return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
-  }
+  });
+
+  const [selectedNumber, setSelectedNumber] = useState(null);
+  const [activeTab, setActiveTab] = useState("catalog");
 
   async function loadNumbers() {
     setLoading(true);
 
     const localNumbers =
-      getLocalNumbers();
-
-    const baseNumbers =
-      localNumbers.length
-        ? localNumbers
-        : FALLBACK_NUMBERS;
+      FALLBACK_NUMBERS.map(normalizeNumber);
 
     try {
-      const response =
-        await fetch(
-          API_URL +
-            "?select=*&order=price.desc",
-          {
-            method: "GET",
-            headers: {
-              apikey: SUPABASE_KEY,
-              Authorization:
-                `Bearer ${SUPABASE_KEY}`,
-              "Content-Type":
-                "application/json",
-            },
-          }
-        );
+      const response = await fetch(
+        `${API_URL}?select=*&order=price.desc`,
+        {
+          method: "GET",
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(
@@ -980,17 +1061,20 @@ function App() {
         );
       }
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
-      const remoteNumbers =
-        Array.isArray(data)
-          ? data.map(normalizeNumber)
-          : [];
+      const remoteNumbers = Array.isArray(data)
+        ? data.map(normalizeNumber)
+        : [];
 
+      /*
+       * КЛЮЧЕВОЕ ИЗМЕНЕНИЕ:
+       * полный локальный список + данные Supabase.
+       * База больше не может скрыть остальные номера.
+       */
       setNumbers(
         removeDuplicates([
-          ...baseNumbers,
+          ...localNumbers,
           ...remoteNumbers,
         ])
       );
@@ -1001,7 +1085,7 @@ function App() {
       );
 
       setNumbers(
-        removeDuplicates(baseNumbers)
+        removeDuplicates(localNumbers)
       );
     } finally {
       setLoading(false);
@@ -1015,11 +1099,11 @@ function App() {
   useEffect(() => {
     try {
       localStorage.setItem(
-        FAVORITES_KEY,
+        "beautiful-numbers-favorites",
         JSON.stringify(favorites)
       );
     } catch {
-      // ignore
+      // localStorage недоступен
     }
   }, [favorites]);
 
@@ -1035,54 +1119,53 @@ function App() {
     });
   }
 
-  const filteredNumbers =
-    useMemo(() => {
-      let result = [...numbers];
-      if (filter !== "Все") {
-        result = result.filter(
-          (item) => item.category === filter
-        );
-      }
+  const filteredNumbers = useMemo(() => {
+    let result = [...numbers];
 
-      const query =
-        search.trim().toLowerCase();
-
-      if (query) {
-        result = result.filter(
-          (item) => {
-            const number =
-              String(
-                item.number || ""
-              ).toLowerCase();
-
-            const category =
-              String(
-                item.category || ""
-              ).toLowerCase();
-
-            const region =
-              String(
-                item.region || ""
-              ).toLowerCase();
-
-            return (
-              number.includes(query) ||
-              category.includes(query) ||
-              region.includes(query)
-            );
-          }
-        );
-      }
-
-      return result;
-    }, [numbers, filter, search]);
-
-  const favoriteNumbers =
-    useMemo(() => {
-      return numbers.filter((item) =>
-        favorites.includes(item.id)
+    if (filter === "VIP") {
+      result = result.filter(
+        (item) => getLevel(item) === "VIP"
       );
-    }, [numbers, favorites]);
+    }
+
+    if (filter === "Premium") {
+      result = result.filter(
+        (item) => getLevel(item) === "Premium"
+      );
+    }
+
+    const query = search.trim().toLowerCase();
+
+    if (query) {
+      result = result.filter((item) => {
+        const number = String(
+          item.number || ""
+        ).toLowerCase();
+
+        const category = String(
+          item.category || ""
+        ).toLowerCase();
+
+        const region = String(
+          item.region || ""
+        ).toLowerCase();
+
+        return (
+          number.includes(query) ||
+          category.includes(query) ||
+          region.includes(query)
+        );
+      });
+    }
+
+    return result;
+  }, [numbers, filter, search]);
+
+  const favoriteNumbers = useMemo(() => {
+    return numbers.filter((item) =>
+      favorites.includes(item.id)
+    );
+  }, [numbers, favorites]);
 
   function renderHome() {
     return (
@@ -1092,13 +1175,10 @@ function App() {
             КРАСНОЯРСКИЙ КРАЙ
           </div>
 
-          <h1>
-            Красивые номера 24
-          </h1>
+          <h1>Красивые номера 24</h1>
 
           <p>
-            Подберите номер, который
-            запомнят.
+            Подберите номер, который запомнят.
           </p>
 
           <button
@@ -1113,10 +1193,7 @@ function App() {
 
         <div className="home-stats">
           <div>
-            <strong>
-              {numbers.length}
-            </strong>
-
+            <strong>{numbers.length}</strong>
             <span>номеров</span>
           </div>
 
@@ -1124,7 +1201,6 @@ function App() {
             <strong>
               {favoriteNumbers.length}
             </strong>
-
             <span>избранных</span>
           </div>
         </div>
@@ -1136,9 +1212,7 @@ function App() {
     return (
       <>
         <section className="catalog-header">
-          <h2>
-            Каталог номеров
-          </h2>
+          <h2>Каталог номеров</h2>
 
           <div className="catalog-icon">
             ▦
@@ -1153,45 +1227,31 @@ function App() {
               type="text"
               value={search}
               onChange={(event) =>
-                setSearch(
-                  event.target.value
-                )
+                setSearch(event.target.value)
               }
               placeholder="Поиск: 777, 001..."
             />
           </div>
-          <div className="filters">
-            {[
-              "Все",
-              "Первая сотня",
-              "Одинаковые цифры",
-              "Комплекты",
-              "Сотни",
-              "Буквы",
-              "124/124;224/224",
-              "Зеркала",
-              "Прочее",
-              "Прицеп",
-              "Мото",
-            ].map((name) => {
-              const count =
-                name === "Все"
-                  ? numbers.length
-                  : numbers.filter(
-                      (item) => item.category === name
-                    ).length;
 
-              return (
+          <div className="filters">
+            {["Все", "Premium", "VIP"].map(
+              (name) => (
                 <button
                   key={name}
                   type="button"
-                  className={filter === name ? "selected" : ""}
-                  onClick={() => setFilter(name)}
+                  className={
+                    filter === name
+                      ? "selected"
+                      : ""
+                  }
+                  onClick={() =>
+                    setFilter(name)
+                  }
                 >
-                  {name} — {count}
+                  {name}
                 </button>
-              );
-            })}
+              )
+            )}
           </div>
         </section>
 
@@ -1200,31 +1260,24 @@ function App() {
             <div className="empty-state">
               Загрузка номеров...
             </div>
-          ) : filteredNumbers.length ===
-            0 ? (
+          ) : filteredNumbers.length === 0 ? (
             <div className="empty-state">
               {search
                 ? "Номеров по вашему запросу не найдено."
                 : "Номера пока не добавлены."}
             </div>
           ) : (
-            filteredNumbers.map(
-              (item) => (
-                <NumberCard
-                  key={item.id}
-                  item={item}
-                  favorite={favorites.includes(
-                    item.id
-                  )}
-                  onFavorite={
-                    toggleFavorite
-                  }
-                  onDetails={
-                    setSelectedNumber
-                  }
-                />
-              )
-            )
+            filteredNumbers.map((item) => (
+              <NumberCard
+                key={item.id}
+                item={item}
+                favorite={favorites.includes(
+                  item.id
+                )}
+                onFavorite={toggleFavorite}
+                onDetails={setSelectedNumber}
+              />
+            ))
           )}
         </section>
       </>
@@ -1236,29 +1289,21 @@ function App() {
       <section className="page-section">
         <h2>Избранное</h2>
 
-        {favoriteNumbers.length ===
-        0 ? (
+        {favoriteNumbers.length === 0 ? (
           <div className="empty-state">
-            Здесь пока нет избранных
-            номеров.
+            Здесь пока нет избранных номеров.
           </div>
         ) : (
           <div className="numbers-list">
-            {favoriteNumbers.map(
-              (item) => (
-                <NumberCard
-                  key={item.id}
-                  item={item}
-                  favorite={true}
-                  onFavorite={
-                    toggleFavorite
-                  }
-                  onDetails={
-                    setSelectedNumber
-                  }
-                />
-              )
-            )}
+            {favoriteNumbers.map((item) => (
+              <NumberCard
+                key={item.id}
+                item={item}
+                favorite={true}
+                onFavorite={toggleFavorite}
+                onDetails={setSelectedNumber}
+              />
+            ))}
           </div>
         )}
       </section>
@@ -1271,9 +1316,8 @@ function App() {
         <h2>Заявки</h2>
 
         <div className="empty-state">
-          Для оформления номера
-          нажмите «Подробнее» в
-          каталоге.
+          Для оформления номера нажмите
+          «Подробнее» в каталоге.
         </div>
       </section>
     );
@@ -1292,43 +1336,8 @@ function App() {
           <div className="profile-text">
             Красноярский край · регион 24
           </div>
-
-          <button
-            type="button"
-            className="details-button"
-            style={{
-              marginTop: 16,
-            }}
-            onClick={() =>
-              setAdminOpen(true)
-            }
-          >
-            ⚙ Админ-панель
-          </button>
         </div>
       </section>
-    );
-  }
-
-  if (adminOpen) {
-    return (
-      <div className="app">
-        <main className="content">
-          <div className="top-region">
-            КРАСНОЯРСКИЙ КРАЙ
-          </div>
-
-          <AdminPanel
-            numbers={numbers}
-            onChangeNumbers={
-              setNumbers
-            }
-            onClose={() =>
-              setAdminOpen(false)
-            }
-          />
-        </main>
-      </div>
     );
   }
 
@@ -1340,9 +1349,7 @@ function App() {
         </div>
 
         <header className="main-header">
-          <h1>
-            Красивые номера 24
-          </h1>
+          <h1>Красивые номера 24</h1>
 
           <button
             type="button"
@@ -1378,14 +1385,9 @@ function App() {
               ? "active"
               : ""
           }
-          onClick={() =>
-            setActiveTab("home")
-          }
+          onClick={() => setActiveTab("home")}
         >
-          <span className="nav-icon">
-            ⌂
-          </span>
-
+          <span className="nav-icon">⌂</span>
           <span>Главная</span>
         </button>
 
@@ -1400,10 +1402,7 @@ function App() {
             setActiveTab("catalog")
           }
         >
-          <span className="nav-icon">
-            ▦
-          </span>
-
+          <span className="nav-icon">▦</span>
           <span>Каталог</span>
         </button>
 
@@ -1418,10 +1417,7 @@ function App() {
             setActiveTab("favorites")
           }
         >
-          <span className="nav-icon">
-            ♡
-          </span>
-
+          <span className="nav-icon">♡</span>
           <span>Избранное</span>
         </button>
 
@@ -1436,10 +1432,7 @@ function App() {
             setActiveTab("requests")
           }
         >
-          <span className="nav-icon">
-            □
-          </span>
-
+          <span className="nav-icon">□</span>
           <span>Заявки</span>
         </button>
 
@@ -1454,10 +1447,7 @@ function App() {
             setActiveTab("profile")
           }
         >
-          <span className="nav-icon">
-            ♙
-          </span>
-
+          <span className="nav-icon">♙</span>
           <span>Профиль</span>
         </button>
       </nav>
@@ -1486,13 +1476,15 @@ function App() {
             </button>
 
             <Plate
-              number={
-                selectedNumber.number
-              }
+              number={selectedNumber.number}
               regionCode={
                 selectedNumber.regionCode
               }
             />
+
+            <div className="modal-level">
+              {getLevel(selectedNumber)}
+            </div>
 
             <h3>
               {selectedNumber.category}
@@ -1512,20 +1504,18 @@ function App() {
 
             {selectedNumber.description && (
               <p className="modal-description">
-                {
-                  selectedNumber.description
-                }
+                {selectedNumber.description}
               </p>
             )}
 
             <button
               type="button"
               className="details-button modal-action"
-              onClick={() =>
+              onClick={() => {
                 toggleFavorite(
                   selectedNumber.id
-                )
-              }
+                );
+              }}
             >
               {favorites.includes(
                 selectedNumber.id
@@ -1549,10 +1539,6 @@ function App() {
     </div>
   );
 }
-
-/* =========================================================
-   ЗАПУСК
-   ========================================================= */
 
 const rootElement =
   document.getElementById("root");
