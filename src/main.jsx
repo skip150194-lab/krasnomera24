@@ -182,10 +182,10 @@ function isReserved(item) {
 function Plate({ number }) {
   const value = String(number || "").trim();
 
-  // Комплект: каждый госномер отображается как отдельная физическая пластина.
+  // Комплект: каждый номер остаётся отдельной физической пластиной.
   if (value.includes("+")) {
     return (
-      <div className="plate-wrap plate-wrap-set">
+      <div className="plate-wrap plate-wrap-set" aria-label={value}>
         {value.split("+").map((part, index) => (
           <Plate key={`${part}-${index}`} number={part} />
         ))}
@@ -193,8 +193,9 @@ function Plate({ number }) {
     );
   }
 
-  // Обычный автомобильный знак: X000XX24 / X000XX124 / X000XX224.
-  const standard = value.match(/^([А-ЯЁ])(\d{3})([А-ЯЁ]{2})(\d{2,3})$/i);
+  // Обычный российский знак: одна буква + 3 цифры + 2 буквы + регион.
+  // Регион всегда берётся из самого номера — ничего дополнительно не подставляем.
+  const standard = value.match(/^([А-ЯЁ])([0-9]{3})([А-ЯЁ]{2})([0-9]{2,3})$/i);
 
   if (standard) {
     const [, firstLetter, digits, lastLetters, regionCode] = standard;
@@ -202,24 +203,31 @@ function Plate({ number }) {
     return (
       <div className="plate-wrap">
         <div className="plate plate-standard" aria-label={value}>
-          <div className="plate-main">
-            <span className="plate-letter">{firstLetter}</span>
-            <span className="plate-digits">{digits}</span>
-            <span className="plate-letters">{lastLetters}</span>
+          <span className="plate-hole plate-hole-left" aria-hidden="true" />
+
+          <div className="plate-main" aria-hidden="true">
+            <span className="plate-char plate-letter">{firstLetter}</span>
+            <span className="plate-char plate-digits">{digits}</span>
+            <span className="plate-char plate-letters">{lastLetters}</span>
           </div>
 
-          <div className="plate-region">
+          <div className="plate-region" aria-hidden="true">
             <strong>{regionCode}</strong>
-            <span>RUS</span>
+            <div className="plate-rus-row">
+              <span>RUS</span>
+              <i className="plate-flag" />
+            </div>
           </div>
+
+          <span className="plate-hole plate-hole-right" aria-hidden="true" />
         </div>
       </div>
     );
   }
 
-  // Прицепы и мото: сохраняем именно исходный формат из каталога,
-  // но оформляем его как отдельный светлый регистрационный знак.
-  const special = value.match(/^([А-ЯЁ]{2})\s+(\d{4})\s+(\d{2,3})$/i);
+  // Прицепы и мотоциклетные номера: сохраняем исходную запись и не превращаем
+  // её в обычный автомобильный формат.
+  const special = value.match(/^([А-ЯЁ]{2})\s*([0-9]{4})\s*([0-9]{2,3})$/i);
 
   if (special) {
     const [, letters, digits, regionCode] = special;
@@ -227,14 +235,22 @@ function Plate({ number }) {
     return (
       <div className="plate-wrap plate-wrap-special">
         <div className="plate plate-special" aria-label={value}>
-          <div className="plate-special-main">
+          <span className="plate-hole plate-hole-left" aria-hidden="true" />
+
+          <div className="plate-special-main" aria-hidden="true">
             <span>{letters}</span>
             <span>{digits}</span>
           </div>
-          <div className="plate-region">
+
+          <div className="plate-region" aria-hidden="true">
             <strong>{regionCode}</strong>
-            <span>RUS</span>
+            <div className="plate-rus-row">
+              <span>RUS</span>
+              <i className="plate-flag" />
+            </div>
           </div>
+
+          <span className="plate-hole plate-hole-right" aria-hidden="true" />
         </div>
       </div>
     );
@@ -243,7 +259,9 @@ function Plate({ number }) {
   return (
     <div className="plate-wrap">
       <div className="plate plate-fallback" aria-label={value}>
+        <span className="plate-hole plate-hole-left" aria-hidden="true" />
         <div className="plate-number">{value}</div>
+        <span className="plate-hole plate-hole-right" aria-hidden="true" />
       </div>
     </div>
   );
