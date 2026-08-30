@@ -180,10 +180,13 @@ function isReserved(item) {
    ========================================================= */
 
 function Plate({ number }) {
+  const value = String(number || "");
+  const special = value.includes(" ");
+
   return (
-    <div className="plate-wrap">
-      <div className="plate">
-        <div className="plate-number">{String(number || "")}</div>
+    <div className={`plate-wrap ${special ? "plate-wrap-special" : ""}`}>
+      <div className={`plate ${special ? "plate-special" : ""}`}>
+        <div className="plate-number">{value}</div>
       </div>
     </div>
   );
