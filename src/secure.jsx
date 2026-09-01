@@ -31,11 +31,22 @@ function splitPlate(raw) {
   return match ? { main: match[1].trim(), region: match[2] } : { main: value, region: "" };
 }
 
+function formatPlateMain(main) {
+  const clean = String(main || "").replace(/\s+/g, "").toUpperCase();
+  const standard = clean.match(/^([А-ЯA-Z])(\d{3})([А-ЯA-Z]{2})$/u);
+  if (!standard) return <span className="plate-raw">{main}</span>;
+  return <>
+    <span className="plate-letter plate-first">{standard[1]}</span>
+    <span className="plate-digits">{standard[2]}</span>
+    <span className="plate-letter plate-last">{standard[3]}</span>
+  </>;
+}
+
 function PlateSingle({ value }) {
   const { main, region } = splitPlate(value);
   return (
     <div className="plate">
-      <div className="plate-main">{main}</div>
+      <div className="plate-main">{formatPlateMain(main)}</div>
       {region && (
         <div className="plate-side">
           <div className="plate-region">{region}</div>
@@ -294,7 +305,7 @@ function App() {
     <div className="app-shell">
       <main className="content">
         <header className="topbar">
-          <button className="brand" onClick={ownerSecretTap} aria-label="GRZ124"><span className="brand-dot" /><span><b>GRZ124</b><small>Красноярский край</small></span></button>
+          <button className="brand" onClick={ownerSecretTap} aria-label="GRZ124"><span className="brand-dot" /><span><b>GRZ124</b><small>Премиальные номера Красноярска</small></span></button>
           <button className="round-btn" onClick={loadNumbers}>↻</button>
         </header>
 
