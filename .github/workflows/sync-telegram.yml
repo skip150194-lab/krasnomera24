@@ -41,3 +41,5 @@ jobs:
           git add public/numbers.json data/telegram-sync-state.json
           git commit -m "Daily catalog sync from Telegram Bot API"
           git push
+
+# manual sync trigger: 2026-09-01
