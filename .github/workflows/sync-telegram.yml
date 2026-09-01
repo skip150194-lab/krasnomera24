@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "15 2 * * *"
+  push:
+    paths:
+      - ".github/workflows/sync-telegram.yml"
+      - "scripts/sync_telegram.py"
 
 permissions:
   contents: write
