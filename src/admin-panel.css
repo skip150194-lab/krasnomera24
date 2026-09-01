@@ -1,122 +1,230 @@
-/* Дополнительные стили админ-панели */
+/* GRZ124 — admin panel */
 
-.admin-page {
-  padding-bottom: 80px;
+.admin-content {
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
 }
 
-.admin-header {
+.admin-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.admin-head h1,
+.admin-login-card h1 {
+  margin: 7px 0 0;
+  font-size: clamp(28px, 8vw, 42px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.admin-note,
+.admin-message {
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  background: rgba(255,255,255,.035);
+  padding: 13px 14px;
+  color: rgba(255,255,255,.64);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.admin-message {
+  margin-top: 10px;
+  border-color: rgba(141,92,255,.24);
+  background: rgba(141,92,255,.08);
+  color: #d6c8ff;
 }
 
 .admin-form {
-  max-width: 680px;
-  margin-top: 28px;
-  padding: 25px;
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 24px;
-  background: #101015;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 22px;
+  background: #0f1117;
 }
 
 .admin-form h3 {
-  margin: 0 0 18px;
-  font-size: 22px;
+  margin: 0 0 14px;
+  font-size: 20px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: rgba(255,255,255,.58);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .admin-input {
   width: 100%;
-  height: 48px;
-  margin-top: 10px;
-  padding: 0 14px;
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 12px;
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 13px;
   outline: 0;
-  background: #0a0a0e;
-  color: #f5f4f7;
+  background: #090b10;
+  color: #f6f6f7;
+  font: inherit;
+}
+
+.admin-input:focus {
+  border-color: rgba(141,92,255,.55);
+  box-shadow: 0 0 0 3px rgba(141,92,255,.09);
 }
 
 .admin-input::placeholder {
-  color: #66636d;
+  color: rgba(255,255,255,.28);
+}
+
+.admin-primary-btn {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 14px;
+  background: #f4f3f6;
+  color: #090a0d;
+  font-weight: 850;
+}
+
+.admin-primary-btn:disabled {
+  opacity: .55;
 }
 
 .admin-error {
-  margin-top: 10px;
-  color: #ef8c9a;
-}
-
-.admin-message {
-  margin-top: 12px;
-  color: #bca6d9;
-}
-
-.admin-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 15px;
-}
-
-.admin-actions button {
-  min-height: 40px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: 10px;
-  background: #eeeef0;
-  color: #17171b;
-  cursor: pointer;
-}
-
-.admin-actions .danger {
-  background: #4b1e27;
-  color: #ffdfe3;
+  margin-top: 9px;
+  color: #ff8c97;
+  font-size: 13px;
 }
 
 .admin-list {
-  margin-top: 30px;
+  margin-top: 22px;
 }
 
 .admin-list-title {
-  margin-bottom: 10px;
-  color: #aaa7b0;
-  font-weight: 750;
+  margin-bottom: 8px;
+  color: rgba(255,255,255,.48);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .1em;
 }
 
 .admin-number-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(255,255,255,.08);
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255,255,255,.07);
 }
 
 .admin-number-main {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .admin-number-main strong {
-  font-size: 20px;
+  overflow-wrap: anywhere;
+  font-size: 19px;
+  letter-spacing: .01em;
 }
 
 .admin-number-main span {
-  color: #ddd9e2;
+  color: rgba(255,255,255,.82);
+  font-size: 14px;
 }
 
 .admin-number-main small {
-  color: #77747e;
+  color: rgba(255,255,255,.4);
+  font-size: 12px;
 }
 
-@media (max-width: 700px) {
-  .admin-header {
-    flex-direction: column;
-  }
+.admin-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+}
 
-  .admin-form {
-    padding: 18px;
+.admin-actions button {
+  min-height: 39px;
+  padding: 0 12px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 11px;
+  background: #171a22;
+  color: #f2f2f4;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.admin-actions button.danger {
+  border-color: rgba(255,87,103,.2);
+  background: rgba(255,87,103,.11);
+  color: #ffb2b9;
+}
+
+.admin-actions button:disabled {
+  opacity: .45;
+}
+
+.admin-login-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.admin-login-card {
+  position: relative;
+  width: min(100%, 430px);
+  padding: 24px;
+  border: 1px solid rgba(141,92,255,.22);
+  border-radius: 26px;
+  background: radial-gradient(circle at 90% 0, rgba(141,92,255,.16), transparent 180px), #0f1117;
+  box-shadow: 0 26px 80px rgba(0,0,0,.4);
+}
+
+.admin-login-card p {
+  margin: 12px 0 18px;
+  color: rgba(255,255,255,.55);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.admin-login-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  background: rgba(255,255,255,.04);
+  color: #fff;
+  font-size: 22px;
+}
+
+.admin-password-input {
+  text-align: center;
+  font-size: 21px;
+  letter-spacing: .22em;
+}
+
+@media (max-width: 640px) {
+  .admin-form-grid {
+    grid-template-columns: 1fr;
   }
 
   .admin-number-row {
@@ -124,7 +232,15 @@
     flex-direction: column;
   }
 
-  .admin-number-row .admin-actions {
+  .admin-actions {
     width: 100%;
+  }
+
+  .admin-actions button {
+    flex: 1;
+  }
+
+  .admin-login-card {
+    padding: 21px;
   }
 }
