@@ -871,7 +871,7 @@ function isReserved(item) {
   );
 }
 
-function parsePlatePart(part, fallbackRegionCode) {
+function parsePlatePart(part) {
   const raw = String(part || "").trim().toUpperCase();
   const compact = raw.replace(/\s+/g, "");
 
@@ -901,12 +901,12 @@ function parsePlatePart(part, fallbackRegionCode) {
 
   return {
     main: raw,
-    region: String(fallbackRegionCode || "").trim(),
+    region: "",
     variant: "unknown",
   };
 }
 
-function Plate({ number, regionCode }) {
+function Plate({ number }) {
   const parts = String(number || "")
     .split("+")
     .map((part) => part.trim())
@@ -915,13 +915,11 @@ function Plate({ number, regionCode }) {
   return (
     <div className="plate-wrap">
       {parts.map((part, index) => {
-        const parsed = parsePlatePart(part, regionCode);
+        const parsed = parsePlatePart(part);
         const hasRegion = Boolean(parsed.region);
 
         return (
           <React.Fragment key={`${part}-${index}`}>
-            {index > 0 && <span className="plate-plus">+</span>}
-
             <div
               className={`plate plate--${parsed.variant}`}
               aria-label={`Государственный номер ${part}`}
@@ -948,8 +946,8 @@ function Plate({ number, regionCode }) {
                 <div className="plate-region">
                   <strong>{parsed.region}</strong>
                   <div className="plate-rus">
-                    <span className="plate-flag" aria-hidden="true" />
                     <span>RUS</span>
+                    <span className="plate-flag" aria-hidden="true" />
                   </div>
                 </div>
               )}
@@ -970,7 +968,6 @@ function NumberCard({ item, favorite, onFavorite, onDetails }) {
       <div className="number-card-top">
         <Plate
           number={item.number}
-          regionCode={item.regionCode}
         />
 
         <button
@@ -1490,9 +1487,6 @@ function App() {
 
             <Plate
               number={selectedNumber.number}
-              regionCode={
-                selectedNumber.regionCode
-              }
             />
 
             <div className="modal-level">
