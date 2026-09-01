@@ -30,8 +30,8 @@ function reorderCategories() {
 
 function polishBrand() {
   const brandSmall = document.querySelector('.brand small');
-  if (brandSmall && brandSmall.textContent !== 'Премиальные государственные номера') {
-    brandSmall.textContent = 'Премиальные государственные номера';
+  if (brandSmall && brandSmall.textContent !== 'Выбери себе свой стиль!') {
+    brandSmall.textContent = 'Выбери себе свой стиль!';
   }
 
   const heroTitle = document.querySelector('.hero-compact h1');
