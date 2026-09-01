@@ -876,11 +876,14 @@ function parsePlatePart(part, fallbackRegionCode) {
   const compact = raw.replace(/\s+/g, "");
 
   // Обычный российский автомобильный номер: буква + 3 цифры + 2 буквы + регион.
-  const carMatch = compact.match(/^([А-ЯA-Z]\d{3}[А-ЯA-Z]{2})(\d{2,3})$/);
+  const carMatch = compact.match(/^([А-ЯA-Z])(\d{3})([А-ЯA-Z]{2})(\d{2,3})$/);
   if (carMatch) {
     return {
-      main: carMatch[1],
-      region: carMatch[2],
+      firstLetter: carMatch[1],
+      digits: carMatch[2],
+      lastLetters: carMatch[3],
+      main: `${carMatch[1]}${carMatch[2]}${carMatch[3]}`,
+      region: carMatch[4],
       variant: "car",
     };
   }
@@ -924,7 +927,21 @@ function Plate({ number, regionCode }) {
               aria-label={`Государственный номер ${part}`}
             >
               <div className="plate-main">
-                <span className="plate-main-text">{parsed.main}</span>
+                {parsed.variant === "car" ? (
+                  <span className="plate-main-text plate-main-text--car">
+                    <span className="plate-char plate-char--letter">
+                      {parsed.firstLetter}
+                    </span>
+                    <span className="plate-char plate-char--digits">
+                      {parsed.digits}
+                    </span>
+                    <span className="plate-char plate-char--letters">
+                      {parsed.lastLetters}
+                    </span>
+                  </span>
+                ) : (
+                  <span className="plate-main-text">{parsed.main}</span>
+                )}
               </div>
 
               {hasRegion && (
