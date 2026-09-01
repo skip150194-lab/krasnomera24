@@ -1,0 +1,36 @@
+name: Sync Telegram Catalog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 2 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Read Telegram post and rebuild catalog
+        run: python scripts/sync_telegram.py
+
+      - name: Commit catalog update
+        run: |
+          if git diff --quiet -- public/numbers.json; then
+            echo "Catalog has not changed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/numbers.json
+          git commit -m "Daily catalog sync from Telegram"
+          git push
