@@ -571,22 +571,21 @@ button:disabled {
 }
 
 /* =========================================================
-   ГОСНОМЕР
+   ГОСНОМЕР — финальная геометрия
    ========================================================= */
 
 .plate-wrap {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   min-width: 0;
 }
 
 /*
- * Визуальный стиль российского госномера:
- * белая отражающая поверхность, тонкая металлическая рамка,
- * внутренняя рамка и отдельное поле региона.
+ * Пропорции близки к автомобильному знаку 520×112:
+ * 430×92 = 4.67:1.
  */
 .plate {
   position: relative;
@@ -599,40 +598,35 @@ button:disabled {
   height: 92px;
 
   overflow: hidden;
-  border: 1px solid #8f9295;
-  border-radius: 6px;
 
-  background: #fff;
-  color: #080808;
+  border: 2px solid #676a6d;
+  border-radius: 5px;
+
+  background:
+    linear-gradient(180deg, #fff 0%, #fdfdfd 52%, #f5f5f5 100%);
+
+  color: #050505;
 
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.96),
-    inset 0 0 0 3px rgba(0, 0, 0, 0.045),
-    inset 0 0 18px rgba(0, 0, 0, 0.025),
-    0 1px 3px rgba(0, 0, 0, 0.28),
-    0 5px 12px rgba(0, 0, 0, 0.12);
+    inset 0 0 0 2px rgba(255, 255, 255, 0.92),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.04),
+    0 2px 4px rgba(0, 0, 0, 0.28),
+    0 8px 18px rgba(0, 0, 0, 0.14);
 }
 
+/* Внутренняя тонкая рамка металла */
 .plate::before {
   content: "";
   position: absolute;
-  inset: 3px;
-  z-index: 1;
+  inset: 4px;
+  z-index: 5;
   pointer-events: none;
 
-  border: 1px solid rgba(90, 92, 95, 0.22);
-  border-radius: 3px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.72),
-      rgba(255, 255, 255, 0) 18%,
-      rgba(255, 255, 255, 0) 82%,
-      rgba(230, 230, 230, 0.16)
-    );
+  border: 1px solid rgba(60, 63, 66, 0.18);
+  border-radius: 2px;
 }
 
+/* Очень слабый блик, без затемнения белой пластины */
 .plate::after {
   content: "";
   position: absolute;
@@ -643,9 +637,9 @@ button:disabled {
   background:
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0.36) 0%,
       rgba(255, 255, 255, 0) 24%,
-      rgba(0, 0, 0, 0.018) 100%
+      rgba(0, 0, 0, 0.012) 100%
     );
 }
 
@@ -660,130 +654,146 @@ button:disabled {
   align-items: center;
   justify-content: center;
 
-  padding: 0 10px 2px 14px;
-  background: #fff;
+  padding: 0 10px 1px 13px;
 }
 
+/*
+ * Основная надпись.
+ * Не сжимаем весь номер целиком — это и давало "кривой" вид.
+ * Буквы чуть уже цифр, как на реальном знаке.
+ */
 .plate-main-text {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   max-width: 100%;
-  overflow: hidden;
 
   color: #050505;
 
-  /*
-   * Более узкая штатная типографика: без Arial Black и без
-   * чрезмерной жирности. Если DIN/Roboto Condensed доступны,
-   * они используются первыми; scaleX делает результат
-   * стабильным даже без установленного шрифта.
-   */
   font-family:
-    "DIN 1451 Mittelschrift",
-    "DIN 1451",
-    "Roboto Condensed",
     "Arial Narrow",
+    "Roboto Condensed",
     "Helvetica Neue",
     Arial,
     sans-serif;
 
-  font-size: clamp(31px, 3.35vw, 47px);
+  font-size: clamp(36px, 3.55vw, 50px);
   font-weight: 700;
-  line-height: 0.94;
-  letter-spacing: -0.025em;
-  text-align: center;
+  line-height: 0.9;
+  letter-spacing: 0;
+
   white-space: nowrap;
   text-rendering: geometricPrecision;
+  font-variant-numeric: tabular-nums;
+}
 
-  transform: scaleX(0.84);
+.plate-main-text--car {
+  gap: 1px;
+}
+
+.plate-char {
+  display: inline-block;
   transform-origin: center;
 }
 
+/* Буквы на ГОСТ-номерах визуально уже цифр */
+.plate-char--letter,
+.plate-char--letters {
+  transform: scaleX(0.80);
+}
+
+.plate-char--digits {
+  margin: 0 -2px;
+  transform: scaleX(0.94);
+}
+
+/* Правый блок региона сделан уже — как у реальной пластины */
 .plate-region {
   position: relative;
   z-index: 3;
 
-  flex: 0 0 78px;
+  flex: 0 0 62px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
 
-  border-left: 1px solid #9da0a3;
-  background: #fff;
+  border-left: 1.5px solid #737679;
 
-  color: #080808;
-  font-family: Arial, "Helvetica Neue", sans-serif;
+  background:
+    linear-gradient(180deg, #fff 0%, #fdfdfd 58%, #f6f6f6 100%);
+
+  color: #050505;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Убираем лишнюю прямоугольную рамку внутри региона */
 .plate-region::before {
-  content: "";
-  position: absolute;
-  inset: 9px 7px;
-
-  border: 1px solid rgba(105, 107, 110, 0.24);
-  pointer-events: none;
+  content: none;
 }
 
 .plate-region strong {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 
-  margin-top: 2px;
+  display: block;
+  margin: 0 0 5px;
 
-  font-size: 28px;
+  font-size: 25px;
   font-weight: 700;
-  line-height: 0.9;
-  letter-spacing: -0.045em;
+  line-height: 0.88;
+  letter-spacing: -0.055em;
 }
 
 .plate-rus {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
 
-  font-size: 8px;
+  font-size: 7px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
 }
 
 .plate-flag {
-  width: 15px;
-  height: 9px;
+  width: 14px;
+  height: 8px;
+
   display: inline-block;
 
-  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  border: 0.5px solid rgba(0, 0, 0, 0.18);
 
   background:
     linear-gradient(
       to bottom,
       #fff 0 33.333%,
       #2458a6 33.333% 66.666%,
-      #d62f3f 66.666% 100%
+      #d52b3e 66.666% 100%
     );
 }
 
+/* Прицеп / мото / неизвестный спецформат */
 .plate--special {
   width: min(100%, 365px);
 }
 
 .plate--special .plate-main-text {
-  font-size: clamp(28px, 3vw, 41px);
+  font-size: clamp(31px, 3vw, 43px);
   letter-spacing: -0.015em;
-  transform: scaleX(0.86);
 }
 
 .plate-plus {
   flex: 0 0 auto;
 
   color: #777a82;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
 }
 
@@ -1356,31 +1366,34 @@ button:disabled {
   .plate {
     width: min(100%, 355px);
     min-width: 0;
-    height: 78px;
-    border-radius: 6px;
+    height: 76px;
   }
 
   .plate-main {
-    padding-left: 10px;
+    padding-left: 9px;
     padding-right: 7px;
   }
 
   .plate-main-text {
-    font-size: 35px;
-    transform: scaleX(0.82);
+    font-size: 40px;
   }
 
   .plate-region {
-    flex-basis: 65px;
-    gap: 5px;
-  }
-
-  .plate-region::before {
-    inset: 8px 6px;
+    flex-basis: 53px;
   }
 
   .plate-region strong {
-    font-size: 24px;
+    margin-bottom: 4px;
+    font-size: 21px;
+  }
+
+  .plate-rus {
+    font-size: 6px;
+  }
+
+  .plate-flag {
+    width: 12px;
+    height: 7px;
   }
 
   .plate-rus {
@@ -1483,40 +1496,34 @@ button:disabled {
   }
 
   .plate {
-    height: 68px;
-    border-radius: 5px;
+    height: 65px;
   }
 
   .plate-main {
-    padding-left: 7px;
+    padding-left: 6px;
     padding-right: 5px;
   }
 
   .plate-main-text {
-    font-size: 29px;
-    transform: scaleX(0.80);
+    font-size: 34px;
   }
 
   .plate-region {
-    flex-basis: 57px;
-    gap: 4px;
-  }
-
-  .plate-region::before {
-    inset: 7px 5px;
+    flex-basis: 47px;
   }
 
   .plate-region strong {
-    font-size: 20px;
+    margin-bottom: 3px;
+    font-size: 18px;
   }
 
   .plate-rus {
-    font-size: 7px;
+    font-size: 6px;
   }
 
   .plate-flag {
-    width: 12px;
-    height: 7px;
+    width: 11px;
+    height: 6px;
   }
 
   .number-card {
