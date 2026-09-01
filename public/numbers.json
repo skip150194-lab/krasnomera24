@@ -1,6 +1,499 @@
 {
   "source": "https://t.me/grz124/451",
-  "updated_at": null,
-  "count": 0,
-  "items": []
+  "updated_at": "2026-09-01T07:49:06.504862+00:00",
+  "count": 82,
+  "items": [
+    {
+      "number": "У001ЕТ24",
+      "price": 550000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "О003МС124",
+      "price": 210000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "У011ВН124",
+      "price": 90000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "Т020РА24",
+      "price": 75000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "Н024ОС24",
+      "price": 165000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "В024СМ24",
+      "price": 185000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "Е032КО24",
+      "price": 55000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "М035ТВ124",
+      "price": 40000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "К066НХ24",
+      "price": 85000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "М093ТВ124",
+      "price": 40000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "М094ТВ124",
+      "price": 40000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "Н111ХЕ124",
+      "price": 300000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "У666ТА124",
+      "price": 250000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "Е666РЕ124",
+      "price": 350000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "Р888УХ24",
+      "price": 430000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "В888МК24",
+      "price": 500000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "У999ТТ24",
+      "price": 550000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "А731АА24+А731АА124",
+      "price": 375000,
+      "category": "Комплекты",
+      "status": "available"
+    },
+    {
+      "number": "С333ОК24+С333ОК124",
+      "price": 1300000,
+      "category": "Комплекты",
+      "status": "available"
+    },
+    {
+      "number": "Х200НУ24",
+      "price": 120000,
+      "category": "Сотни",
+      "status": "available"
+    },
+    {
+      "number": "Р014РР24",
+      "price": 250000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "У116УУ24",
+      "price": 140000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "В391ВВ124",
+      "price": 125000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "Е426ЕЕ124",
+      "price": 105000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "О482ОО24",
+      "price": 380000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "А742АА124",
+      "price": 140000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "Р803РР24",
+      "price": 100000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "А820АА24",
+      "price": 175000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "В922ВВ124",
+      "price": 100000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "Х124УВ124",
+      "price": 155000,
+      "category": "124/124;224/224",
+      "status": "available"
+    },
+    {
+      "number": "У121ХА224",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Н121УМ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "У121УС124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Т161ТС124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Х181УН124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "В181НЕ124",
+      "price": 60000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Р191УУ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Т212УХ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Е292УМ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "У363УН124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "О373ХА224",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "О373УН124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Е393УУ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "С484ХН124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "В484ХН124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "К545УР124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Т595УХ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "С646ХН124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "В656УХ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Н656УР124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "К686УХ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "С787УХ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "В808ХН124",
+      "price": 100000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Т828УС124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "У898НТ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "С949УУ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Е110УТ124",
+      "price": 35000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "Х150АН224",
+      "price": 85000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "Т221УР124",
+      "price": 35000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "Х227АН224",
+      "price": 45000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "О321ХА224",
+      "price": 30000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "М359УР124",
+      "price": 30000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "М389УР124",
+      "price": 30000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "М398УР124",
+      "price": 30000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "В440УС124",
+      "price": 30000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "К567УР124",
+      "price": 35000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "О877ХА224",
+      "price": 25000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "НВ 7878 24",
+      "price": 50000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "ОВ 0999 24",
+      "price": 175000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "ОВ 0990 24",
+      "price": 120000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "ОВ 0969 24",
+      "price": 75000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "ОВ 0828 24",
+      "price": 55000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "НК 6066 24",
+      "price": 55000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "НК 7666 24",
+      "price": 75000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "НК 7667 24",
+      "price": 50000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "НЕ 7333 24",
+      "price": 75000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "НК 2929 24",
+      "price": 45000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "ОВ 2999 24",
+      "price": 75000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "ОВ 4774 24",
+      "price": 75000,
+      "category": "Прицеп",
+      "status": "available"
+    },
+    {
+      "number": "АК 0200 24",
+      "price": 160000,
+      "category": "Мото",
+      "status": "available"
+    },
+    {
+      "number": "ВА 4666 24",
+      "price": 60000,
+      "category": "Мото",
+      "status": "available"
+    },
+    {
+      "number": "АМ 3993 24",
+      "price": 60000,
+      "category": "Мото",
+      "status": "available"
+    }
+  ]
 }
