@@ -33,6 +33,16 @@ function polishBrand() {
   if (brandSmall && brandSmall.textContent !== 'Премиальные государственные номера') {
     brandSmall.textContent = 'Премиальные государственные номера';
   }
+
+  const heroTitle = document.querySelector('.hero-compact h1');
+  if (heroTitle && heroTitle.textContent.trim() !== 'GRZ124') {
+    heroTitle.textContent = 'GRZ124';
+  }
+
+  const heroEyebrow = document.querySelector('.hero-compact .eyebrow');
+  if (heroEyebrow && heroEyebrow.textContent !== 'ПРЕМИАЛЬНЫЕ ГОСУДАРСТВЕННЫЕ НОМЕРА') {
+    heroEyebrow.textContent = 'ПРЕМИАЛЬНЫЕ ГОСУДАРСТВЕННЫЕ НОМЕРА';
+  }
 }
 
 let queued = false;
