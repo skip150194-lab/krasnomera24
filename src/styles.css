@@ -574,123 +574,199 @@ button:disabled {
    ГОСНОМЕР
    ========================================================= */
 
- .plate-wrap {
+.plate-wrap {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   min-width: 0;
 }
 
-/* Реалистичный макет российского госномера без затемнения пластины. */
+/*
+ * Визуальный стиль российского госномера:
+ * белая отражающая поверхность, тонкая металлическая рамка,
+ * внутренняя рамка и отдельное поле региона.
+ */
 .plate {
   position: relative;
   display: flex;
   align-items: stretch;
   flex: 0 1 auto;
+
   width: min(100%, 430px);
   min-width: 260px;
   height: 92px;
+
   overflow: hidden;
-  border: 1px solid #9b9da0;
-  border-radius: 7px;
-  background: #ffffff;
+  border: 1px solid #8f9295;
+  border-radius: 6px;
+
+  background: #fff;
   color: #080808;
+
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.92),
-    inset 0 0 0 3px rgba(0, 0, 0, 0.055),
-    0 2px 5px rgba(0, 0, 0, 0.22),
-    0 9px 18px rgba(0, 0, 0, 0.16);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.96),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.045),
+    inset 0 0 18px rgba(0, 0, 0, 0.025),
+    0 1px 3px rgba(0, 0, 0, 0.28),
+    0 5px 12px rgba(0, 0, 0, 0.12);
+}
+
+.plate::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  z-index: 1;
+  pointer-events: none;
+
+  border: 1px solid rgba(90, 92, 95, 0.22);
+  border-radius: 3px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.72),
+      rgba(255, 255, 255, 0) 18%,
+      rgba(255, 255, 255, 0) 82%,
+      rgba(230, 230, 230, 0.16)
+    );
 }
 
 .plate::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 6;
   pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.32) 0%,
-    rgba(255, 255, 255, 0) 28%,
-    rgba(0, 0, 0, 0.025) 100%
-  );
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0) 24%,
+      rgba(0, 0, 0, 0.018) 100%
+    );
 }
 
 .plate-main {
   position: relative;
   z-index: 2;
+
   flex: 1 1 auto;
   min-width: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px 1px 15px;
-  background: #ffffff;
+
+  padding: 0 10px 2px 14px;
+  background: #fff;
 }
 
 .plate-main-text {
   display: block;
   max-width: 100%;
   overflow: hidden;
+
   color: #050505;
-  font-family: "Arial Narrow", "Roboto Condensed", Arial, Helvetica, sans-serif;
-  font-size: clamp(31px, 3.35vw, 49px);
-  font-stretch: condensed;
-  font-weight: 900;
-  line-height: 0.92;
-  letter-spacing: -0.065em;
+
+  /*
+   * Более узкая штатная типографика: без Arial Black и без
+   * чрезмерной жирности. Если DIN/Roboto Condensed доступны,
+   * они используются первыми; scaleX делает результат
+   * стабильным даже без установленного шрифта.
+   */
+  font-family:
+    "DIN 1451 Mittelschrift",
+    "DIN 1451",
+    "Roboto Condensed",
+    "Arial Narrow",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  font-size: clamp(31px, 3.35vw, 47px);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.025em;
   text-align: center;
   white-space: nowrap;
   text-rendering: geometricPrecision;
+
+  transform: scaleX(0.84);
+  transform-origin: center;
 }
 
 .plate-region {
   position: relative;
   z-index: 3;
+
   flex: 0 0 78px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  border-left: 1px solid #9fa2a5;
-  background: #ffffff;
-  color: #090909;
-  font-family: Arial, Helvetica, sans-serif;
+  gap: 6px;
+
+  border-left: 1px solid #9da0a3;
+  background: #fff;
+
+  color: #080808;
+  font-family: Arial, "Helvetica Neue", sans-serif;
+}
+
+.plate-region::before {
+  content: "";
+  position: absolute;
+  inset: 9px 7px;
+
+  border: 1px solid rgba(105, 107, 110, 0.24);
+  pointer-events: none;
 }
 
 .plate-region strong {
-  margin-top: 3px;
-  font-size: 29px;
-  font-weight: 900;
+  position: relative;
+  z-index: 1;
+
+  margin-top: 2px;
+
+  font-size: 28px;
+  font-weight: 700;
   line-height: 0.9;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.045em;
 }
 
 .plate-rus {
+  position: relative;
+  z-index: 1;
+
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
-  font-size: 9px;
-  font-weight: 800;
+
+  font-size: 8px;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
 }
 
 .plate-flag {
   width: 15px;
   height: 9px;
   display: inline-block;
-  border: 0.5px solid rgba(0, 0, 0, 0.16);
-  background: linear-gradient(
-    to bottom,
-    #ffffff 0 33.333%,
-    #1f5fbf 33.333% 66.666%,
-    #d82d3d 66.666% 100%
-  );
+
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+
+  background:
+    linear-gradient(
+      to bottom,
+      #fff 0 33.333%,
+      #2458a6 33.333% 66.666%,
+      #d62f3f 66.666% 100%
+    );
 }
 
 .plate--special {
@@ -698,15 +774,17 @@ button:disabled {
 }
 
 .plate--special .plate-main-text {
-  font-size: clamp(28px, 3vw, 43px);
-  letter-spacing: -0.045em;
+  font-size: clamp(28px, 3vw, 41px);
+  letter-spacing: -0.015em;
+  transform: scaleX(0.86);
 }
 
 .plate-plus {
   flex: 0 0 auto;
+
   color: #777a82;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* =========================================================
@@ -1279,18 +1357,34 @@ button:disabled {
     width: min(100%, 355px);
     min-width: 0;
     height: 78px;
+    border-radius: 6px;
+  }
+
+  .plate-main {
+    padding-left: 10px;
+    padding-right: 7px;
   }
 
   .plate-main-text {
     font-size: 35px;
+    transform: scaleX(0.82);
   }
 
   .plate-region {
     flex-basis: 65px;
+    gap: 5px;
+  }
+
+  .plate-region::before {
+    inset: 8px 6px;
   }
 
   .plate-region strong {
     font-size: 24px;
+  }
+
+  .plate-rus {
+    font-size: 7px;
   }
 
   .favorite-button {
@@ -1390,20 +1484,26 @@ button:disabled {
 
   .plate {
     height: 68px;
+    border-radius: 5px;
   }
 
   .plate-main {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 7px;
+    padding-right: 5px;
   }
 
   .plate-main-text {
     font-size: 29px;
+    transform: scaleX(0.80);
   }
 
   .plate-region {
     flex-basis: 57px;
-    gap: 5px;
+    gap: 4px;
+  }
+
+  .plate-region::before {
+    inset: 7px 5px;
   }
 
   .plate-region strong {
