@@ -9,6 +9,8 @@ const ADMIN_PASSWORD = "299300";
 const SUPABASE_URL = "https://tjxuumgwkttfnfgpdkaj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_29-OjXwd3B9rGcPGo6IF4Q_1R8-DjQh";
 const API_URL = `${SUPABASE_URL}/rest/v1/numbers`;
+const TELEGRAM_POST = "https://t.me/grz124/451";
+const CATALOG_JSON = `${import.meta.env.BASE_URL}numbers.json`;
 
 const money = (v) => `${Number(v || 0).toLocaleString("ru-RU")} ₽`;
 const normalize = (v) => String(v || "").replace(/\s+/g, "").toUpperCase();
@@ -53,6 +55,7 @@ function App() {
   const [numbers, setNumbers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [catalogMeta, setCatalogMeta] = useState({ source: TELEGRAM_POST, updated_at: null });
   const [tab, setTab] = useState("catalog");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("Все");
@@ -63,24 +66,61 @@ function App() {
   const [passwordError, setPasswordError] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
   const [adminBusy, setAdminBusy] = useState(false);
-  const [form, setForm] = useState({ number: "", price: "", category: "", status: "available" });
+  const [adminQuery, setAdminQuery] = useState("");
   const secretTap = useRef({ count: 0, timer: null });
 
   const telegramUserId = Number(TG?.initDataUnsafe?.user?.id || 0);
   const isOwner = telegramUserId === OWNER_TELEGRAM_ID;
 
+  async function readSupabaseRows(full = false) {
+    const select = full ? "id,number,price,category,status,created_at" : "id,number,status";
+    const res = await fetch(`${API_URL}?select=${select}&order=id.asc`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return await res.json();
+  }
+
   async function loadNumbers() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API_URL}?select=id,number,price,category,status,created_at&order=id.asc`, {
-        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
-      });
-      if (!res.ok) throw new Error(await res.text());
-      setNumbers(dedupe(await res.json()));
+      let telegramItems = [];
+      try {
+        const jsonRes = await fetch(`${CATALOG_JSON}?v=${Date.now()}`, { cache: "no-store" });
+        if (jsonRes.ok) {
+          const payload = await jsonRes.json();
+          telegramItems = Array.isArray(payload) ? payload : (payload.items || []);
+          setCatalogMeta({ source: payload.source || TELEGRAM_POST, updated_at: payload.updated_at || null });
+        }
+      } catch (jsonError) {
+        console.warn("Telegram JSON unavailable:", jsonError);
+      }
+
+      if (telegramItems.length) {
+        let statuses = [];
+        try { statuses = await readSupabaseRows(false); } catch (statusError) { console.warn("Reservation overlay unavailable:", statusError); }
+        const statusMap = new Map();
+        for (const row of statuses) {
+          const key = normalize(row.number);
+          if (!key) continue;
+          const state = String(row.status || "available").toLowerCase();
+          if (state === "reserved" || state === "sold") statusMap.set(key, state);
+        }
+        setNumbers(dedupe(telegramItems.map((item, index) => ({
+          ...item,
+          id: item.id ?? `tg-${index}-${normalize(item.number)}`,
+          status: statusMap.get(normalize(item.number)) || "available",
+          source: "telegram"
+        }))));
+      } else {
+        const fallback = await readSupabaseRows(true);
+        setNumbers(dedupe(fallback));
+        setCatalogMeta({ source: "Supabase (резервный источник)", updated_at: null });
+      }
     } catch (e) {
       console.error(e);
-      setError("Не удалось загрузить каталог. Проверь доступ к таблице numbers в Supabase.");
+      setError("Не удалось загрузить каталог. Попробуйте обновить приложение позже.");
     } finally {
       setLoading(false);
     }
@@ -101,6 +141,10 @@ function App() {
     const q = normalize(query);
     return numbers.filter(n => (category === "Все" || n.category === category) && (!q || normalize(n.number).includes(q)));
   }, [numbers, query, category]);
+  const adminFiltered = useMemo(() => {
+    const q = normalize(adminQuery);
+    return q ? numbers.filter(n => normalize(n.number).includes(q)) : numbers;
+  }, [numbers, adminQuery]);
   const availableCount = numbers.filter(n => String(n.status).toLowerCase() === "available").length;
 
   function ownerSecretTap() {
@@ -126,6 +170,7 @@ function App() {
     setPassword("");
     setPasswordError("");
     setAdminMessage("");
+    setAdminQuery("");
   }
 
   function unlockAdmin(e) {
@@ -143,91 +188,49 @@ function App() {
 
   async function patchStatus(item) {
     if (!isOwner || !adminUnlocked || adminBusy) return;
+    const current = String(item.status || "available").toLowerCase();
+    const next = current === "reserved" ? "available" : "reserved";
     setAdminBusy(true);
     setAdminMessage("");
-    const next = item.status === "reserved" ? "available" : "reserved";
     try {
-      const res = await fetch(`${API_URL}?id=eq.${encodeURIComponent(item.id)}`, {
+      const filter = encodeURIComponent(item.number);
+      const patchRes = await fetch(`${API_URL}?number=eq.${filter}`, {
         method: "PATCH",
-        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-        body: JSON.stringify({ status: next })
-      });
-      if (!res.ok) throw new Error(await res.text());
-      setAdminMessage("Статус обновлён");
-      await loadNumbers();
-    } catch (e) {
-      console.error(e);
-      setAdminMessage("Supabase не разрешил изменение. Нужно разрешить UPDATE через защищённую RLS-политику.");
-    } finally {
-      setAdminBusy(false);
-    }
-  }
-
-  async function addNumber(e) {
-    e.preventDefault();
-    if (!isOwner || !adminUnlocked || adminBusy) return;
-
-    const cleanNumber = String(form.number || "").trim().toUpperCase();
-    const cleanPrice = Number(String(form.price || "").replace(/\s/g, ""));
-    const cleanCategory = String(form.category || "").trim();
-
-    if (!cleanNumber || !cleanPrice || cleanPrice <= 0 || !cleanCategory) {
-      setAdminMessage("Заполни номер, цену и категорию.");
-      return;
-    }
-    if (numbers.some(n => normalize(n.number) === normalize(cleanNumber))) {
-      setAdminMessage("Такой номер уже есть в каталоге.");
-      return;
-    }
-
-    setAdminBusy(true);
-    setAdminMessage("");
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
         headers: {
           apikey: SUPABASE_KEY,
           Authorization: `Bearer ${SUPABASE_KEY}`,
           "Content-Type": "application/json",
           Prefer: "return=representation"
         },
-        body: JSON.stringify({
-          number: cleanNumber,
-          price: cleanPrice,
-          category: cleanCategory,
-          status: form.status || "available"
-        })
+        body: JSON.stringify({ status: next })
       });
-      if (!res.ok) throw new Error(await res.text());
-      setForm({ number: "", price: "", category: cleanCategory, status: "available" });
-      setAdminMessage(`Номер ${cleanNumber} добавлен`);
+      if (!patchRes.ok) throw new Error(await patchRes.text());
+      const patched = await patchRes.json();
+
+      if (!patched.length) {
+        const insertRes = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
+          },
+          body: JSON.stringify({
+            number: item.number,
+            price: Number(item.price || 0),
+            category: item.category || "Прочее",
+            status: next
+          })
+        });
+        if (!insertRes.ok) throw new Error(await insertRes.text());
+      }
+
+      setAdminMessage(next === "reserved" ? `${item.number} поставлен в бронь` : `${item.number} снова в наличии`);
       await loadNumbers();
     } catch (e) {
       console.error(e);
-      setAdminMessage("Supabase не разрешил добавление. Нужно разрешить INSERT через защищённую RLS-политику.");
-    } finally {
-      setAdminBusy(false);
-    }
-  }
-
-  async function deleteNumber(item) {
-    if (!isOwner || !adminUnlocked || adminBusy) return;
-    const ok = window.confirm(`Удалить номер ${item.number} из каталога?`);
-    if (!ok) return;
-
-    setAdminBusy(true);
-    setAdminMessage("");
-    try {
-      const res = await fetch(`${API_URL}?id=eq.${encodeURIComponent(item.id)}`, {
-        method: "DELETE",
-        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, Prefer: "return=minimal" }
-      });
-      if (!res.ok) throw new Error(await res.text());
-      setAdminMessage(`Номер ${item.number} удалён`);
-      await loadNumbers();
-    } catch (e) {
-      console.error(e);
-      setAdminMessage("Supabase не разрешил удаление. Нужно разрешить DELETE через защищённую RLS-политику.");
+      setAdminMessage("Не удалось изменить бронь. Supabase пока не разрешает запись для админ-панели.");
     } finally {
       setAdminBusy(false);
     }
@@ -238,73 +241,52 @@ function App() {
     TG?.openTelegramLink?.(`https://t.me/Dremov767?text=${text}`);
   }
 
+  const updatedLabel = catalogMeta.updated_at
+    ? new Date(catalogMeta.updated_at).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+    : "ожидает первой синхронизации";
+
   if (adminOpen && isOwner && !adminUnlocked) {
     return (
-      <div className="app-shell">
-        <main className="content admin-content admin-login-wrap">
-          <div className="admin-login-card">
-            <button className="admin-login-close" onClick={closeAdmin}>×</button>
-            <div className="eyebrow">GRZ124 · PRIVATE</div>
-            <h1>Вход в админ-панель</h1>
-            <p>Введите пароль для управления каталогом.</p>
-            <form onSubmit={unlockAdmin}>
-              <input
-                className="admin-input admin-password-input"
-                type="password"
-                inputMode="numeric"
-                autoFocus
-                maxLength={12}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Пароль"
-              />
-              {passwordError && <div className="admin-error">{passwordError}</div>}
-              <button className="admin-primary-btn" type="submit">Войти</button>
-            </form>
-          </div>
-        </main>
-      </div>
+      <div className="app-shell"><main className="content admin-content admin-login-wrap">
+        <div className="admin-login-card">
+          <button className="admin-login-close" onClick={closeAdmin}>×</button>
+          <div className="eyebrow">GRZ124 · PRIVATE</div>
+          <h1>Вход в админ-панель</h1>
+          <p>Введите пароль для управления бронями.</p>
+          <form onSubmit={unlockAdmin}>
+            <input className="admin-input admin-password-input" type="password" inputMode="numeric" autoFocus maxLength={12} value={password} onChange={e => setPassword(e.target.value)} placeholder="Пароль" />
+            {passwordError && <div className="admin-error">{passwordError}</div>}
+            <button className="admin-primary-btn" type="submit">Войти</button>
+          </form>
+        </div>
+      </main></div>
     );
   }
 
   if (adminOpen && isOwner && adminUnlocked) {
     return (
-      <div className="app-shell">
-        <main className="content admin-content">
-          <div className="admin-head">
-            <div><div className="eyebrow">GRZ124 · PRIVATE</div><h1>Админ-панель</h1></div>
-            <button className="round-btn" onClick={closeAdmin}>×</button>
-          </div>
-
-          <div className="admin-note">Добавление, удаление и смена статуса отправляются напрямую в Supabase. Если операция запрещена RLS, здесь появится сообщение.</div>
-          {adminMessage && <div className="admin-message">{adminMessage}</div>}
-
-          <form className="admin-form" onSubmit={addNumber}>
-            <h3>Добавить номер</h3>
-            <div className="admin-form-grid">
-              <label><span>Номер</span><input className="admin-input" value={form.number} onChange={e => setForm(v => ({...v, number: e.target.value}))} placeholder="М333УМ24" /></label>
-              <label><span>Цена, ₽</span><input className="admin-input" inputMode="numeric" value={form.price} onChange={e => setForm(v => ({...v, price: e.target.value.replace(/[^0-9]/g, "")}))} placeholder="280000" /></label>
-              <label><span>Категория</span><input className="admin-input" list="admin-categories" value={form.category} onChange={e => setForm(v => ({...v, category: e.target.value}))} placeholder="Одинаковые цифры" /></label>
-              <label><span>Статус</span><select className="admin-input" value={form.status} onChange={e => setForm(v => ({...v, status: e.target.value}))}><option value="available">В наличии</option><option value="reserved">Бронь</option><option value="sold">Продан</option></select></label>
-            </div>
-            <datalist id="admin-categories">{categories.filter(c => c !== "Все").map(c => <option value={c} key={c} />)}</datalist>
-            <button className="admin-primary-btn" disabled={adminBusy} type="submit">{adminBusy ? "Сохраняем…" : "+ Добавить номер"}</button>
-          </form>
-
-          <div className="admin-list">
-            <div className="admin-list-title">Каталог · {numbers.length} позиций</div>
-            {numbers.map(item => (
-              <div className="admin-number-row" key={item.id}>
-                <div className="admin-number-main"><strong>{item.number}</strong><span>{money(item.price)}</span><small>{item.category} · {statusLabel(String(item.status || "available").toLowerCase())}</small></div>
-                <div className="admin-actions">
-                  <button disabled={adminBusy} onClick={() => patchStatus(item)}>{item.status === "reserved" ? "Освободить" : "В бронь"}</button>
-                  <button disabled={adminBusy} className="danger" onClick={() => deleteNumber(item)}>Удалить</button>
-                </div>
+      <div className="app-shell"><main className="content admin-content">
+        <div className="admin-head">
+          <div><div className="eyebrow">GRZ124 · БРОНИ</div><h1>Админ-панель</h1></div>
+          <button className="round-btn" onClick={closeAdmin}>×</button>
+        </div>
+        <div className="admin-note">Номера и цены берутся из Telegram-поста раз в сутки. Здесь меняется только бронь.</div>
+        {adminMessage && <div className="admin-message">{adminMessage}</div>}
+        <input className="admin-input" value={adminQuery} onChange={e => setAdminQuery(e.target.value)} placeholder="Найти номер для брони..." />
+        <div className="admin-list">
+          <div className="admin-list-title">Номеров: {adminFiltered.length}</div>
+          {adminFiltered.map(item => (
+            <div className="admin-number-row" key={normalize(item.number)}>
+              <div className="admin-number-main">
+                <strong>{item.number}</strong><span>{money(item.price)}</span><small>{item.category} · {statusLabel(String(item.status || "available").toLowerCase())}</small>
               </div>
-            ))}
-          </div>
-        </main>
-      </div>
+              <div className="admin-actions">
+                <button disabled={adminBusy} onClick={() => patchStatus(item)}>{item.status === "reserved" ? "Освободить" : "В бронь"}</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main></div>
     );
   }
 
@@ -312,59 +294,46 @@ function App() {
     <div className="app-shell">
       <main className="content">
         <header className="topbar">
-          <button className="brand" onClick={ownerSecretTap} aria-label="GRZ124">
-            <span className="brand-dot" />
-            <span><b>GRZ124</b><small>Красноярский край</small></span>
-          </button>
+          <button className="brand" onClick={ownerSecretTap} aria-label="GRZ124"><span className="brand-dot" /><span><b>GRZ124</b><small>Красноярский край</small></span></button>
           <button className="round-btn" onClick={loadNumbers}>↻</button>
         </header>
 
-        {tab === "catalog" && (
-          <>
-            <section className="hero-compact">
-              <div className="eyebrow">АКТУАЛЬНЫЙ КАТАЛОГ</div>
-              <h1>Красивые номера <span>24</span></h1>
-              <p>{loading ? "Обновляем каталог..." : `${numbers.length} позиций · ${availableCount} в наличии`}</p>
-            </section>
-
-            <section className="catalog-tools">
-              <label className="searchbar"><span>⌕</span><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Найти номер: 777, АА, 124..." />{query && <button onClick={() => setQuery("")}>×</button>}</label>
-              <div className="chips">{categories.map(c => <button key={c} className={category === c ? "active" : ""} onClick={() => setCategory(c)}>{c}</button>)}</div>
-            </section>
-
-            {loading ? <div className="state-card">Загружаем номера…</div> : error ? <div className="state-card error">{error}</div> : (
-              <>
-                <div className="results-line"><span>Найдено</span><b>{filtered.length}</b></div>
-                <section className="number-list">
-                  {filtered.map(item => {
-                    const state = String(item.status || "available").toLowerCase();
-                    return (
-                      <article className="number-card" key={normalize(item.number)}>
-                        <div className="card-status-row"><span className={`status-pill ${state}`}>{statusLabel(state)}</span><span className="category-label">{item.category || "Прочее"}</span></div>
-                        <Plate number={item.number} />
-                        <div className="card-bottom"><div><small>Цена</small><strong>{money(item.price)}</strong></div><button onClick={() => setSelected(item)}>Подробнее</button></div>
-                      </article>
-                    );
-                  })}
-                  {!filtered.length && <div className="state-card">По вашему запросу ничего не найдено.</div>}
-                </section>
-              </>
-            )}
-          </>
-        )}
-
-        {tab === "profile" && (
-          <section className="profile-page">
-            <div className="profile-logo">24</div>
-            <div className="eyebrow">GRZ124</div>
-            <h1>Красивые номера</h1>
-            <p>Каталог актуальных предложений по Красноярскому краю.</p>
-            <div className="profile-actions">
-              <button onClick={() => TG?.openTelegramLink?.("https://t.me/Dremov767")}>Написать менеджеру <span>›</span></button>
-              <button onClick={() => setTab("catalog")}>Вернуться в каталог <span>›</span></button>
-            </div>
+        {tab === "catalog" && <>
+          <section className="hero-compact">
+            <div className="eyebrow">КАТАЛОГ ИЗ TELEGRAM</div>
+            <h1>Красивые номера <span>24</span></h1>
+            <p>{loading ? "Обновляем каталог..." : `${numbers.length} позиций · ${availableCount} в наличии`}</p>
+            <small className="muted">Синхронизация: {updatedLabel}</small>
           </section>
-        )}
+          <section className="catalog-tools">
+            <label className="searchbar"><span>⌕</span><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Найти номер: 777, АА, 124..." />{query && <button onClick={() => setQuery("")}>×</button>}</label>
+            <div className="chips">{categories.map(c => <button key={c} className={category === c ? "active" : ""} onClick={() => setCategory(c)}>{c}</button>)}</div>
+          </section>
+          {loading ? <div className="state-card">Загружаем номера…</div> : error ? <div className="state-card error">{error}</div> : <>
+            <div className="results-line"><span>Найдено</span><b>{filtered.length}</b></div>
+            <section className="number-list">
+              {filtered.map(item => {
+                const state = String(item.status || "available").toLowerCase();
+                return <article className="number-card" key={normalize(item.number)}>
+                  <div className="card-status-row"><span className={`status-pill ${state}`}>{statusLabel(state)}</span><span className="category-label">{item.category || "Прочее"}</span></div>
+                  <Plate number={item.number} />
+                  <div className="card-bottom"><div><small>Цена</small><strong>{money(item.price)}</strong></div><button onClick={() => setSelected(item)}>Подробнее</button></div>
+                </article>;
+              })}
+              {!filtered.length && <div className="state-card">По вашему запросу ничего не найдено.</div>}
+            </section>
+          </>}
+        </>}
+
+        {tab === "profile" && <section className="profile-page">
+          <div className="profile-logo">24</div><div className="eyebrow">GRZ124</div><h1>Красивые номера</h1>
+          <p>Список автоматически синхронизируется с Telegram-постом один раз в сутки.</p>
+          <div className="profile-actions">
+            <button onClick={() => TG?.openTelegramLink?.(TELEGRAM_POST)}>Открыть исходный пост <span>›</span></button>
+            <button onClick={() => TG?.openTelegramLink?.("https://t.me/Dremov767")}>Написать менеджеру <span>›</span></button>
+            <button onClick={() => setTab("catalog")}>Вернуться в каталог <span>›</span></button>
+          </div>
+        </section>}
       </main>
 
       <nav className="bottom-nav">
@@ -372,18 +341,13 @@ function App() {
         <button className={tab === "profile" ? "active" : ""} onClick={() => setTab("profile")}><span>◎</span><small>Контакты</small></button>
       </nav>
 
-      {selected && (
-        <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelected(null)}>×</button>
-            <div className="eyebrow">{selected.category || "Прочее"}</div>
-            <Plate number={selected.number} large />
-            <div className="modal-price">{money(selected.price)}</div>
-            <div className="modal-info"><span>Статус</span><b>{statusLabel(String(selected.status || "available").toLowerCase())}</b></div>
-            <button className="primary-btn" disabled={String(selected.status).toLowerCase() !== "available"} onClick={() => contact(selected)}>{String(selected.status).toLowerCase() === "available" ? "Оставить заявку" : statusLabel(String(selected.status).toLowerCase())}</button>
-          </div>
-        </div>
-      )}
+      {selected && <div className="modal-overlay" onClick={() => setSelected(null)}><div className="modal" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={() => setSelected(null)}>×</button>
+        <div className="eyebrow">{selected.category || "Прочее"}</div><Plate number={selected.number} large />
+        <div className="modal-price">{money(selected.price)}</div>
+        <div className="modal-info"><span>Статус</span><b>{statusLabel(String(selected.status || "available").toLowerCase())}</b></div>
+        <button className="primary-btn" disabled={String(selected.status).toLowerCase() !== "available"} onClick={() => contact(selected)}>{String(selected.status).toLowerCase() === "available" ? "Оставить заявку" : statusLabel(String(selected.status).toLowerCase())}</button>
+      </div></div>}
     </div>
   );
 }
