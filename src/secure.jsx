@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
+import "./admin-panel.css";
 
 const TG = window.Telegram?.WebApp;
 const OWNER_TELEGRAM_ID = 105933015;
+const ADMIN_PASSWORD = "299300";
 const SUPABASE_URL = "https://tjxuumgwkttfnfgpdkaj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_29-OjXwd3B9rGcPGo6IF4Q_1R8-DjQh";
 const API_URL = `${SUPABASE_URL}/rest/v1/numbers`;
@@ -56,7 +58,12 @@ function App() {
   const [category, setCategory] = useState("Все");
   const [selected, setSelected] = useState(null);
   const [adminOpen, setAdminOpen] = useState(false);
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
+  const [adminBusy, setAdminBusy] = useState(false);
+  const [form, setForm] = useState({ number: "", price: "", category: "", status: "available" });
   const secretTap = useRef({ count: 0, timer: null });
 
   const telegramUserId = Number(TG?.initDataUnsafe?.user?.id || 0);
@@ -103,26 +110,127 @@ function App() {
     if (secretTap.current.count >= 5) {
       secretTap.current.count = 0;
       setAdminOpen(true);
+      setAdminUnlocked(false);
+      setPassword("");
+      setPasswordError("");
+      setAdminMessage("");
       TG?.HapticFeedback?.notificationOccurred?.("success");
       return;
     }
     secretTap.current.timer = setTimeout(() => { secretTap.current.count = 0; }, 1800);
   }
 
+  function closeAdmin() {
+    setAdminOpen(false);
+    setAdminUnlocked(false);
+    setPassword("");
+    setPasswordError("");
+    setAdminMessage("");
+  }
+
+  function unlockAdmin(e) {
+    e?.preventDefault?.();
+    if (password === ADMIN_PASSWORD) {
+      setAdminUnlocked(true);
+      setPasswordError("");
+      setPassword("");
+      TG?.HapticFeedback?.notificationOccurred?.("success");
+    } else {
+      setPasswordError("Неверный пароль");
+      TG?.HapticFeedback?.notificationOccurred?.("error");
+    }
+  }
+
   async function patchStatus(item) {
-    if (!isOwner) return;
+    if (!isOwner || !adminUnlocked || adminBusy) return;
+    setAdminBusy(true);
+    setAdminMessage("");
     const next = item.status === "reserved" ? "available" : "reserved";
-    const res = await fetch(`${API_URL}?id=eq.${encodeURIComponent(item.id)}`, {
-      method: "PATCH",
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-      body: JSON.stringify({ status: next })
-    });
-    if (!res.ok) {
-      setAdminMessage("Изменение заблокировано политиками Supabase. Публичный ключ нельзя использовать как полноценный админ-доступ.");
+    try {
+      const res = await fetch(`${API_URL}?id=eq.${encodeURIComponent(item.id)}`, {
+        method: "PATCH",
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify({ status: next })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setAdminMessage("Статус обновлён");
+      await loadNumbers();
+    } catch (e) {
+      console.error(e);
+      setAdminMessage("Supabase не разрешил изменение. Нужно разрешить UPDATE через защищённую RLS-политику.");
+    } finally {
+      setAdminBusy(false);
+    }
+  }
+
+  async function addNumber(e) {
+    e.preventDefault();
+    if (!isOwner || !adminUnlocked || adminBusy) return;
+
+    const cleanNumber = String(form.number || "").trim().toUpperCase();
+    const cleanPrice = Number(String(form.price || "").replace(/\s/g, ""));
+    const cleanCategory = String(form.category || "").trim();
+
+    if (!cleanNumber || !cleanPrice || cleanPrice <= 0 || !cleanCategory) {
+      setAdminMessage("Заполни номер, цену и категорию.");
       return;
     }
-    setAdminMessage("Статус обновлён");
-    await loadNumbers();
+    if (numbers.some(n => normalize(n.number) === normalize(cleanNumber))) {
+      setAdminMessage("Такой номер уже есть в каталоге.");
+      return;
+    }
+
+    setAdminBusy(true);
+    setAdminMessage("");
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=representation"
+        },
+        body: JSON.stringify({
+          number: cleanNumber,
+          price: cleanPrice,
+          category: cleanCategory,
+          status: form.status || "available"
+        })
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setForm({ number: "", price: "", category: cleanCategory, status: "available" });
+      setAdminMessage(`Номер ${cleanNumber} добавлен`);
+      await loadNumbers();
+    } catch (e) {
+      console.error(e);
+      setAdminMessage("Supabase не разрешил добавление. Нужно разрешить INSERT через защищённую RLS-политику.");
+    } finally {
+      setAdminBusy(false);
+    }
+  }
+
+  async function deleteNumber(item) {
+    if (!isOwner || !adminUnlocked || adminBusy) return;
+    const ok = window.confirm(`Удалить номер ${item.number} из каталога?`);
+    if (!ok) return;
+
+    setAdminBusy(true);
+    setAdminMessage("");
+    try {
+      const res = await fetch(`${API_URL}?id=eq.${encodeURIComponent(item.id)}`, {
+        method: "DELETE",
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, Prefer: "return=minimal" }
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setAdminMessage(`Номер ${item.number} удалён`);
+      await loadNumbers();
+    } catch (e) {
+      console.error(e);
+      setAdminMessage("Supabase не разрешил удаление. Нужно разрешить DELETE через защищённую RLS-политику.");
+    } finally {
+      setAdminBusy(false);
+    }
   }
 
   function contact(item) {
@@ -130,21 +238,68 @@ function App() {
     TG?.openTelegramLink?.(`https://t.me/Dremov767?text=${text}`);
   }
 
-  if (adminOpen && isOwner) {
+  if (adminOpen && isOwner && !adminUnlocked) {
+    return (
+      <div className="app-shell">
+        <main className="content admin-content admin-login-wrap">
+          <div className="admin-login-card">
+            <button className="admin-login-close" onClick={closeAdmin}>×</button>
+            <div className="eyebrow">GRZ124 · PRIVATE</div>
+            <h1>Вход в админ-панель</h1>
+            <p>Введите пароль для управления каталогом.</p>
+            <form onSubmit={unlockAdmin}>
+              <input
+                className="admin-input admin-password-input"
+                type="password"
+                inputMode="numeric"
+                autoFocus
+                maxLength={12}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Пароль"
+              />
+              {passwordError && <div className="admin-error">{passwordError}</div>}
+              <button className="admin-primary-btn" type="submit">Войти</button>
+            </form>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (adminOpen && isOwner && adminUnlocked) {
     return (
       <div className="app-shell">
         <main className="content admin-content">
           <div className="admin-head">
             <div><div className="eyebrow">GRZ124 · PRIVATE</div><h1>Админ-панель</h1></div>
-            <button className="round-btn" onClick={() => setAdminOpen(false)}>×</button>
+            <button className="round-btn" onClick={closeAdmin}>×</button>
           </div>
-          <div className="admin-note">Публичный Supabase-ключ подходит для чтения каталога. Изменения сработают только если RLS-политики разрешают соответствующую операцию.</div>
+
+          <div className="admin-note">Добавление, удаление и смена статуса отправляются напрямую в Supabase. Если операция запрещена RLS, здесь появится сообщение.</div>
           {adminMessage && <div className="admin-message">{adminMessage}</div>}
+
+          <form className="admin-form" onSubmit={addNumber}>
+            <h3>Добавить номер</h3>
+            <div className="admin-form-grid">
+              <label><span>Номер</span><input className="admin-input" value={form.number} onChange={e => setForm(v => ({...v, number: e.target.value}))} placeholder="М333УМ24" /></label>
+              <label><span>Цена, ₽</span><input className="admin-input" inputMode="numeric" value={form.price} onChange={e => setForm(v => ({...v, price: e.target.value.replace(/[^0-9]/g, "")}))} placeholder="280000" /></label>
+              <label><span>Категория</span><input className="admin-input" list="admin-categories" value={form.category} onChange={e => setForm(v => ({...v, category: e.target.value}))} placeholder="Одинаковые цифры" /></label>
+              <label><span>Статус</span><select className="admin-input" value={form.status} onChange={e => setForm(v => ({...v, status: e.target.value}))}><option value="available">В наличии</option><option value="reserved">Бронь</option><option value="sold">Продан</option></select></label>
+            </div>
+            <datalist id="admin-categories">{categories.filter(c => c !== "Все").map(c => <option value={c} key={c} />)}</datalist>
+            <button className="admin-primary-btn" disabled={adminBusy} type="submit">{adminBusy ? "Сохраняем…" : "+ Добавить номер"}</button>
+          </form>
+
           <div className="admin-list">
+            <div className="admin-list-title">Каталог · {numbers.length} позиций</div>
             {numbers.map(item => (
-              <div className="admin-row" key={item.id}>
-                <div><strong>{item.number}</strong><span>{money(item.price)}</span><small>{item.category} · {statusLabel(item.status)}</small></div>
-                <button onClick={() => patchStatus(item)}>{item.status === "reserved" ? "Освободить" : "В бронь"}</button>
+              <div className="admin-number-row" key={item.id}>
+                <div className="admin-number-main"><strong>{item.number}</strong><span>{money(item.price)}</span><small>{item.category} · {statusLabel(String(item.status || "available").toLowerCase())}</small></div>
+                <div className="admin-actions">
+                  <button disabled={adminBusy} onClick={() => patchStatus(item)}>{item.status === "reserved" ? "Освободить" : "В бронь"}</button>
+                  <button disabled={adminBusy} className="danger" onClick={() => deleteNumber(item)}>Удалить</button>
+                </div>
               </div>
             ))}
           </div>
