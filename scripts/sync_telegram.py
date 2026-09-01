@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-import html
 import json
+import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
-from html.parser import HTMLParser
 from pathlib import Path
 
-# Source of truth: the current edited Telegram post. Each sync rebuilds the JSON from scratch,
-# so numbers removed from the post are removed from the application catalog too.
 CHANNEL = "grz124"
-POST_ID = "451"
+POST_ID = 451
 SOURCE_POST = f"https://t.me/{CHANNEL}/{POST_ID}"
-PUBLIC_URL = f"https://t.me/s/{CHANNEL}/{POST_ID}"
 OUTPUT = Path("public/numbers.json")
+STATE = Path("data/telegram-sync-state.json")
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 
 KNOWN_CATEGORIES = [
     "Первая сотня",
@@ -42,70 +41,85 @@ def normalize_plate(value: str) -> str:
     return value
 
 
-class TelegramPostParser(HTMLParser):
-    def __init__(self):
-        super().__init__(convert_charrefs=True)
-        self.target_depth = None
-        self.depth = 0
-        self.in_text = False
-        self.text_depth = None
-        self.parts = []
-
-    def handle_starttag(self, tag, attrs):
-        attrs = dict(attrs)
-        self.depth += 1
-        if tag == "div" and attrs.get("data-post") == f"{CHANNEL}/{POST_ID}":
-            self.target_depth = self.depth
-        if self.target_depth is not None and tag == "div":
-            classes = attrs.get("class", "").split()
-            if "tgme_widget_message_text" in classes:
-                self.in_text = True
-                self.text_depth = self.depth
-        if self.in_text and tag in {"br", "p", "div", "li"}:
-            self.parts.append("\n")
-
-    def handle_startendtag(self, tag, attrs):
-        if self.in_text and tag == "br":
-            self.parts.append("\n")
-
-    def handle_endtag(self, tag):
-        if self.in_text and self.text_depth == self.depth and tag == "div":
-            self.in_text = False
-            self.text_depth = None
-        if self.target_depth == self.depth and tag == "div":
-            self.target_depth = None
-        self.depth -= 1
-
-    def handle_data(self, data):
-        if self.in_text:
-            self.parts.append(data)
-
-    @property
-    def text(self):
-        text = html.unescape("".join(self.parts))
-        text = text.replace("\xa0", " ")
-        lines = [re.sub(r"[ \t]+", " ", x).strip() for x in text.splitlines()]
-        return "\n".join(x for x in lines if x)
+def api(method: str, params=None):
+    if not TOKEN:
+        raise RuntimeError("Не задан GitHub Secret TELEGRAM_BOT_TOKEN")
+    url = f"https://api.telegram.org/bot{TOKEN}/{method}"
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(url, headers={"User-Agent": "GRZ124-sync/1.0"})
+    with urllib.request.urlopen(req, timeout=30) as response:
+        data = json.loads(response.read().decode("utf-8"))
+    if not data.get("ok"):
+        raise RuntimeError(f"Telegram Bot API error: {data}")
+    return data.get("result")
 
 
-def fetch_post_text() -> str:
-    request = urllib.request.Request(
-        PUBLIC_URL,
-        headers={
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36",
-            "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8",
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
-        },
-    )
-    with urllib.request.urlopen(request, timeout=30) as response:
-        body = response.read().decode("utf-8", errors="replace")
-    parser = TelegramPostParser()
-    parser.feed(body)
-    text = parser.text
-    if not text:
-        raise RuntimeError(f"Не удалось найти текст поста {CHANNEL}/{POST_ID} в публичной HTML-странице")
-    return text
+def load_state():
+    if not STATE.exists():
+        return {"offset": 0, "post_text": "", "post_date": None}
+    try:
+        return json.loads(STATE.read_text(encoding="utf-8"))
+    except Exception:
+        return {"offset": 0, "post_text": "", "post_date": None}
+
+
+def save_state(state):
+    STATE.parent.mkdir(parents=True, exist_ok=True)
+    STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def message_text(message):
+    return message.get("text") or message.get("caption") or ""
+
+
+def is_target_message(message):
+    if not message or int(message.get("message_id", 0)) != POST_ID:
+        return False
+    chat = message.get("chat") or {}
+    username = str(chat.get("username") or "").lower()
+    return username == CHANNEL.lower()
+
+
+def fetch_post_text_from_updates():
+    state = load_state()
+    offset = int(state.get("offset") or 0)
+    params = {
+        "timeout": 0,
+        "limit": 100,
+        "allowed_updates": json.dumps(["channel_post", "edited_channel_post"]),
+    }
+    if offset:
+        params["offset"] = offset
+
+    updates = api("getUpdates", params)
+    latest_text = state.get("post_text") or ""
+    latest_date = state.get("post_date")
+    max_update = offset - 1
+
+    for update in updates:
+        update_id = int(update.get("update_id", 0))
+        max_update = max(max_update, update_id)
+        message = update.get("edited_channel_post") or update.get("channel_post")
+        if is_target_message(message):
+            text = message_text(message).strip()
+            if text:
+                latest_text = text
+                latest_date = message.get("edit_date") or message.get("date")
+
+    new_offset = max_update + 1 if max_update >= offset else offset
+    save_state({
+        "offset": new_offset,
+        "post_text": latest_text,
+        "post_date": latest_date,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    if not latest_text:
+        raise RuntimeError(
+            "Бот пока не получал пост grz124/451. После добавления бота в канал отредактируйте пост 451 хотя бы один раз, затем запустите синхронизацию снова."
+        )
+    return latest_text
 
 
 def extract_category(line: str):
@@ -189,21 +203,22 @@ def parse_catalog(text: str):
 
 
 def main():
-    text = fetch_post_text()
+    text = fetch_post_text_from_updates()
     items = parse_catalog(text)
     if not items:
         print("Текст поста:\n" + text, file=sys.stderr)
-        raise RuntimeError("Пост найден, но из него не удалось распознать ни одного номера")
+        raise RuntimeError("Пост получен через Bot API, но из него не удалось распознать ни одного номера")
 
     payload = {
         "source": SOURCE_POST,
+        "source_type": "telegram_bot_api",
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(items),
         "items": items,
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Синхронизировано {len(items)} номеров из {SOURCE_POST}")
+    print(f"Синхронизировано {len(items)} номеров из {SOURCE_POST} через Telegram Bot API")
 
 
 if __name__ == "__main__":
