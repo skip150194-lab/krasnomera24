@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 
+# Source of truth: the current edited Telegram post. Each sync rebuilds the JSON from scratch,
+# so numbers removed from the post are removed from the application catalog too.
 CHANNEL = "grz124"
 POST_ID = "451"
 SOURCE_POST = f"https://t.me/{CHANNEL}/{POST_ID}"
@@ -92,6 +94,8 @@ def fetch_post_text() -> str:
         headers={
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36",
             "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
         },
     )
     with urllib.request.urlopen(request, timeout=30) as response:
@@ -142,7 +146,6 @@ def parse_line(line: str, category: str):
     before = re.sub(r"[—–\-:=]+\s*$", "", before).strip()
 
     candidates = []
-    # First try combinations with +, then standard car plates, then trailer/moto formats.
     for pattern in [
         r"[A-ZА-Я]\d{3}[A-ZА-Я]{2}(?:224|124|24)(?:\s*\+\s*[A-ZА-Я]\d{3}[A-ZА-Я]{2}(?:224|124|24))+",
         r"[A-ZА-Я]\d{3}[A-ZА-Я]{2}(?:224|124|24)",
