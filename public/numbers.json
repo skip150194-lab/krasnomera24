@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-09-08T13:25:16.345589+00:00",
-  "count": 81,
+  "updated_at": "2026-09-08T14:25:33.854836+00:00",
+  "count": 79,
   "items": [
     {
       "number": "У001ЕТ24",
@@ -119,12 +119,6 @@
       "status": "available"
     },
     {
-      "number": "Р014РР24",
-      "price": 250000,
-      "category": "Буквы",
-      "status": "available"
-    },
-    {
       "number": "У116УУ24",
       "price": 140000,
       "category": "Буквы",
@@ -151,12 +145,6 @@
     {
       "number": "А742АА124",
       "price": 140000,
-      "category": "Буквы",
-      "status": "available"
-    },
-    {
-      "number": "Р803РР24",
-      "price": 100000,
       "category": "Буквы",
       "status": "available"
     },
