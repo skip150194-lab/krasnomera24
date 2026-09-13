@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-09-13T13:21:08.574180+00:00",
-  "count": 78,
+  "updated_at": "2026-09-13T14:21:05.441424+00:00",
+  "count": 79,
   "items": [
     {
       "number": "У001ЕТ24",
@@ -91,6 +91,12 @@
     {
       "number": "У999ТТ24",
       "price": 550000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "М999СХ24",
+      "price": 450000,
       "category": "Одинаковые цифры",
       "status": "available"
     },
