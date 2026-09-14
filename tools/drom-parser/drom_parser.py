@@ -110,6 +110,10 @@ def find_plates(description):
     return sorted(found.values(), key=lambda item: item["score"], reverse=True)
 
 
+def clean_url(value):
+    return value.split("#", 1)[0].split("?", 1)[0]
+
+
 def listing_url(value):
     parsed = urlparse(value)
     return bool(
@@ -199,9 +203,9 @@ async def collect_links(page, page_number):
         "items => items.map(item => item.href)"
     )
     return sorted({
-        urljoin(BASE_URL, href).split("?")[0]
+        clean_url(urljoin(BASE_URL, href))
         for href in hrefs
-        if listing_url(urljoin(BASE_URL, href).split("?")[0])
+        if listing_url(clean_url(urljoin(BASE_URL, href)))
     })
 
 
