@@ -1,10 +1,6 @@
 name: Drom parser smoke run
 
 on:
-  issues:
-    types: [opened]
-  schedule:
-    - cron: '*/5 * * * *'
   workflow_dispatch:
     inputs:
       pages:
