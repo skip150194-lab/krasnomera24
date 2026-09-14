@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import csv
 import json
+import os
 import random
 import re
 from pathlib import Path
@@ -259,7 +260,7 @@ async def main(max_pages, new_only):
     async with async_playwright() as engine:
         context = await engine.chromium.launch_persistent_context(
             str(PROFILE),
-            headless=False,
+            headless=os.getenv("CI", "").lower() == "true",
             locale="ru-RU",
             viewport={"width": 1350, "height": 850},
         )
