@@ -1,9 +1,8 @@
 name: Drom parser smoke run
 
 on:
-  push:
-    paths:
-      - .github/workflows/drom-parser.yml
+  schedule:
+    - cron: '*/5 * * * *'
   workflow_dispatch:
     inputs:
       pages:
@@ -12,7 +11,7 @@ on:
         default: '5'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   parse:
@@ -22,6 +21,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Restore previous progress
+        run: |
+          cp data/drom-scan/checked_ads.json tools/drom-parser/checked_ads.json 2>/dev/null || true
+          cp data/drom-scan/beautiful_numbers.csv tools/drom-parser/beautiful_numbers.csv 2>/dev/null || true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,6 +46,23 @@ jobs:
         run: |
           PAGES="${INPUT_PAGES:-5}"
           python tools/drom-parser/drom_parser.py --pages "$PAGES" --full
+
+      - name: Save results to repository
+        if: always()
+        run: |
+          mkdir -p data/drom-scan
+          cp tools/drom-parser/beautiful_numbers.csv data/drom-scan/ 2>/dev/null || true
+          cp tools/drom-parser/checked_ads.json data/drom-scan/ 2>/dev/null || true
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f data/drom-scan
+          if git diff --cached --quiet; then
+            echo 'No result changes'
+            exit 0
+          fi
+          git commit -m 'Update Drom parser results'
+          git pull --rebase origin main
+          git push origin HEAD:main
 
       - name: Upload CSV and progress
         if: always()
