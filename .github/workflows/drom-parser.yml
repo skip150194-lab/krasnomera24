@@ -1,0 +1,55 @@
+name: Drom parser smoke run
+
+on:
+  push:
+    paths:
+      - .github/workflows/drom-parser.yml
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: Number of Drom result pages
+        required: false
+        default: '5'
+
+permissions:
+  contents: read
+
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/drom-parser/requirements.txt
+
+      - name: Install parser
+        run: |
+          python -m pip install -r tools/drom-parser/requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Run parser
+        env:
+          CI: 'true'
+          INPUT_PAGES: "${{ inputs.pages }}"
+        run: |
+          PAGES="${INPUT_PAGES:-5}"
+          python tools/drom-parser/drom_parser.py --pages "$PAGES" --full
+
+      - name: Upload CSV and progress
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drom-beautiful-numbers
+          path: |
+            tools/drom-parser/beautiful_numbers.csv
+            tools/drom-parser/checked_ads.json
+          if-no-files-found: warn
+          retention-days: 7
