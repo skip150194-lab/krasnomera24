@@ -1,0 +1,5 @@
+.venv/
+.browser-profile/
+.installed
+checked_ads.json
+beautiful_numbers.csv
