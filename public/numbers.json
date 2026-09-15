@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-09-15T14:24:05.240900+00:00",
-  "count": 80,
+  "updated_at": "2026-09-15T15:22:56.158113+00:00",
+  "count": 78,
   "items": [
     {
       "number": "У001ЕТ24",
@@ -360,18 +360,6 @@
     },
     {
       "number": "М359УР124",
-      "price": 30000,
-      "category": "Прочее",
-      "status": "available"
-    },
-    {
-      "number": "М389УР124",
-      "price": 30000,
-      "category": "Прочее",
-      "status": "available"
-    },
-    {
-      "number": "М398УР124",
       "price": 30000,
       "category": "Прочее",
       "status": "available"
