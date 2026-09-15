@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-09-15T08:26:47.925686+00:00",
-  "count": 79,
+  "updated_at": "2026-09-15T09:28:21.637846+00:00",
+  "count": 80,
   "items": [
     {
       "number": "У001ЕТ24",
@@ -79,6 +79,12 @@
     {
       "number": "Е666РЕ124",
       "price": 350000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "Р666КХ24",
+      "price": 360000,
       "category": "Одинаковые цифры",
       "status": "available"
     },
