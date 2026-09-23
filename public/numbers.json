@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-09-23T00:26:57.090737+00:00",
-  "count": 76,
+  "updated_at": "2026-09-23T05:55:18.894289+00:00",
+  "count": 75,
   "items": [
     {
       "number": "У001ЕТ24",
@@ -331,12 +331,6 @@
     {
       "number": "Т221УР124",
       "price": 35000,
-      "category": "Прочее",
-      "status": "available"
-    },
-    {
-      "number": "Х227АН224",
-      "price": 45000,
       "category": "Прочее",
       "status": "available"
     },
