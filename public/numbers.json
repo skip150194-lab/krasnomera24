@@ -1,12 +1,18 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-09-30T13:38:17.733403+00:00",
-  "count": 75,
+  "updated_at": "2026-09-30T19:14:00.060851+00:00",
+  "count": 81,
   "items": [
     {
       "number": "У001ЕТ24",
       "price": 550000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "А002НК124",
+      "price": 200000,
       "category": "Первая сотня",
       "status": "available"
     },
@@ -53,6 +59,12 @@
       "status": "available"
     },
     {
+      "number": "Е090МС124",
+      "price": 110000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
       "number": "М093ТВ124",
       "price": 40000,
       "category": "Первая сотня",
@@ -65,8 +77,14 @@
       "status": "available"
     },
     {
-      "number": "Н111ХЕ124",
-      "price": 300000,
+      "number": "Р555ОР124",
+      "price": 355000,
+      "category": "Одинаковые цифры",
+      "status": "available"
+    },
+    {
+      "number": "Р555ЕХ124",
+      "price": 335000,
       "category": "Одинаковые цифры",
       "status": "available"
     },
@@ -119,6 +137,12 @@
       "status": "available"
     },
     {
+      "number": "Р014РР24",
+      "price": 250000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
       "number": "У116УУ24",
       "price": 140000,
       "category": "Буквы",
@@ -144,7 +168,13 @@
     },
     {
       "number": "А742АА124",
-      "price": 140000,
+      "price": 120000,
+      "category": "Буквы",
+      "status": "available"
+    },
+    {
+      "number": "М776ММ124",
+      "price": 115000,
       "category": "Буквы",
       "status": "available"
     },
@@ -193,6 +223,12 @@
     {
       "number": "В181НЕ124",
       "price": 60000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "Е181ХА224",
+      "price": 39000,
       "category": "Зеркала",
       "status": "available"
     },
