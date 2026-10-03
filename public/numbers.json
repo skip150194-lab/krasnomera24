@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-10-03T00:26:33.828933+00:00",
-  "count": 81,
+  "updated_at": "2026-10-03T06:26:38.594777+00:00",
+  "count": 82,
   "items": [
     {
       "number": "У001ЕТ24",
@@ -342,6 +342,12 @@
     },
     {
       "number": "У898НТ124",
+      "price": 39000,
+      "category": "Зеркала",
+      "status": "available"
+    },
+    {
+      "number": "М898ХЕ224",
       "price": 39000,
       "category": "Зеркала",
       "status": "available"
