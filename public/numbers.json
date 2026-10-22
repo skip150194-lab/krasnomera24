@@ -1,7 +1,7 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-10-22T07:29:49.301712+00:00",
+  "updated_at": "2026-10-22T13:44:11.028329+00:00",
   "count": 81,
   "items": [
     {
@@ -55,6 +55,12 @@
     {
       "number": "К066НХ24",
       "price": 85000,
+      "category": "Первая сотня",
+      "status": "available"
+    },
+    {
+      "number": "В088ОВ124",
+      "price": 250000,
       "category": "Первая сотня",
       "status": "available"
     },
@@ -157,12 +163,6 @@
     {
       "number": "Е426ЕЕ124",
       "price": 105000,
-      "category": "Буквы",
-      "status": "available"
-    },
-    {
-      "number": "О482ОО24",
-      "price": 380000,
       "category": "Буквы",
       "status": "available"
     },
