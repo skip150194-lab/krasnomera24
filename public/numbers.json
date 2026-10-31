@@ -1,7 +1,7 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-10-31T13:36:09.569042+00:00",
+  "updated_at": "2026-10-31T18:29:16.609759+00:00",
   "count": 80,
   "items": [
     {
@@ -163,12 +163,6 @@
     {
       "number": "А742АА124",
       "price": 120000,
-      "category": "Буквы",
-      "status": "available"
-    },
-    {
-      "number": "М776ММ124",
-      "price": 115000,
       "category": "Буквы",
       "status": "available"
     },
@@ -372,6 +366,12 @@
     },
     {
       "number": "В440УС124",
+      "price": 30000,
+      "category": "Прочее",
+      "status": "available"
+    },
+    {
+      "number": "В550ХА224",
       "price": 30000,
       "category": "Прочее",
       "status": "available"
