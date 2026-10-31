@@ -1,7 +1,7 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-10-31T06:56:35.071598+00:00",
+  "updated_at": "2026-10-31T13:36:09.569042+00:00",
   "count": 80,
   "items": [
     {
@@ -125,14 +125,14 @@
       "status": "available"
     },
     {
-      "number": "К600РН124",
-      "price": 120000,
+      "number": "К900ХА24",
+      "price": 155000,
       "category": "Сотни",
       "status": "available"
     },
     {
-      "number": "К900ХА24",
-      "price": 155000,
+      "number": "Х900РО24",
+      "price": 145000,
       "category": "Сотни",
       "status": "available"
     },
