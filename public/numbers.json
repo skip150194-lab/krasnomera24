@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-11-07T00:04:36.789866+00:00",
-  "count": 81,
+  "updated_at": "2026-11-07T05:51:34.801140+00:00",
+  "count": 80,
   "items": [
     {
       "number": "А002НК124",
@@ -122,12 +122,6 @@
       "number": "С333ОК24+С333ОК124",
       "price": 1300000,
       "category": "Комплекты",
-      "status": "available"
-    },
-    {
-      "number": "К900ХА24",
-      "price": 155000,
-      "category": "Сотни",
       "status": "available"
     },
     {
