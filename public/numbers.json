@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-11-09T00:48:24.198878+00:00",
-  "count": 79,
+  "updated_at": "2026-11-09T07:53:36.181692+00:00",
+  "count": 78,
   "items": [
     {
       "number": "А002НК124",
@@ -13,12 +13,6 @@
     {
       "number": "О003МС124",
       "price": 210000,
-      "category": "Первая сотня",
-      "status": "available"
-    },
-    {
-      "number": "М003АК24",
-      "price": 200000,
       "category": "Первая сотня",
       "status": "available"
     },
