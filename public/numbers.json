@@ -1,8 +1,8 @@
 {
   "source": "https://t.me/grz124/451",
   "source_type": "telegram_bot_api",
-  "updated_at": "2026-11-10T09:41:56.265549+00:00",
-  "count": 78,
+  "updated_at": "2026-11-10T17:44:42.374138+00:00",
+  "count": 77,
   "items": [
     {
       "number": "А002НК124",
@@ -295,12 +295,6 @@
     {
       "number": "У707КУ124",
       "price": 150000,
-      "category": "Зеркала",
-      "status": "available"
-    },
-    {
-      "number": "С787УХ124",
-      "price": 39000,
       "category": "Зеркала",
       "status": "available"
     },
